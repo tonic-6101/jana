@@ -73,6 +73,11 @@ permission_query_conditions = {
 	"Jana User Key": "jana.permissions.user_key_permission_query_conditions",
 }
 
+# After Request
+# -------------
+
+after_request = ["jana.middleware.inject_widget_loader"]
+
 # Scheduled Tasks
 # ---------------
 
