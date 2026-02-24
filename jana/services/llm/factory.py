@@ -5,12 +5,13 @@ import frappe
 from frappe import _
 
 from jana.services.llm.base import LLMProvider
+from jana.services.llm.anthropic_provider import AnthropicProvider
 from jana.services.llm.ollama_provider import OllamaProvider
 from jana.services.llm.openai_provider import OpenAIProvider
 
 PROVIDER_MAP = {
 	"openai": OpenAIProvider,
-	"anthropic": OpenAIProvider,  # Anthropic supports OpenAI-compatible API
+	"anthropic": AnthropicProvider,
 	"google": OpenAIProvider,  # Gemini supports OpenAI-compatible API
 	"ollama": OllamaProvider,
 	"vllm": OpenAIProvider,  # vLLM serves OpenAI-compatible API

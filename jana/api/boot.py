@@ -2,6 +2,7 @@
 # Copyright (C) 2026 Tonic
 
 import frappe
+from frappe.utils.password import get_decrypted_password
 
 
 def extend_bootinfo(bootinfo):
@@ -25,7 +26,10 @@ def extend_bootinfo(bootinfo):
 		settings = frappe.get_single("Jana Settings")
 		if settings.default_provider:
 			provider = frappe.get_doc("Jana Provider", settings.default_provider)
-			if provider.enabled and provider.api_key:
+			api_key = get_decrypted_password(
+				"Jana Provider", provider.name, "api_key", raise_exception=False
+			)
+			if provider.enabled and api_key:
 				jana_config["enabled"] = True
 
 		jana_config["streaming"] = bool(settings.enable_streaming)
