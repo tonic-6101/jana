@@ -24,7 +24,8 @@ Jana is a **Frappe-level application** — it integrates with Frappe's core fram
 │  │                                                │   │
 │  │  ChatService ── Context ── PII Masker           │   │
 │  │       │            │          │                 │   │
-│  │  ToolExecutor  RateLimiter  Maintenance         │   │
+│  │  ToolExecutor  RateLimiter  Knowledge           │   │
+│  │       │                     Retriever            │   │
 │  │       │                                         │   │
 │  │       ▼                                         │   │
 │  │  LLM Provider Abstraction                       │   │
@@ -36,7 +37,8 @@ Jana is a **Frappe-level application** — it integrates with Frappe's core fram
 │  ┌───────────────────────────────────────────────┐   │
 │  │           jana.jana.doctype.*                  │   │
 │  │  Settings │ Provider │ Agent │ Session │ Msg   │   │
-│  │  Tool │ Agent Tool │ User Key │ Template       │   │
+│  │  Tool │ Agent Tool │ Knowledge Article │       │   │
+│  │  Agent Knowledge │ User Key │ Template         │   │
 │  └───────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────┘
 ```
@@ -87,6 +89,8 @@ jana/
 │   │   │   ├── openai_provider.py
 │   │   │   ├── anthropic_provider.py
 │   │   │   └── ollama_provider.py
+│   │   ├── knowledge/             # Knowledge base retrieval
+│   │   │   └── retriever.py       # Article selection + formatting
 │   │   ├── tools/                 # Tool calling framework
 │   │   │   └── executor.py        # ToolExecutor + built-in tools
 │   │   └── privacy/               # PII masking
@@ -101,6 +105,8 @@ jana/
 │           ├── jana_chat_message/
 │           ├── jana_tool/
 │           ├── jana_agent_tool/
+│           ├── jana_knowledge_article/
+│           ├── jana_agent_knowledge/
 │           ├── jana_user_key/
 │           └── jana_template/
 │
@@ -136,6 +142,8 @@ Business logic lives in `jana/services/`, not in API endpoints or DocType contro
 - **`ToolExecutor`** — Manages tool calling with multi-turn loop (up to 5 iterations)
 - **`get_page_context()`** — Fetches document data for context injection
 - **`LLMProvider`** (abstract) — Provider interface with `complete()` and `stream()`
+- **`get_knowledge_for_prompt()`** — Collects agent-attached + scope-matched knowledge articles
+- **`format_knowledge_for_prompt()`** — Formats articles with token budget enforcement
 - **`PIIMasker`** — Per-request PII masking with zero persistence
 - **`check_rate_limit()` / `increment_rate_counter()`** — Redis-based per-user rate limiting
 - **`get_jana_settings()`** — Cached settings lookup (Redis)
@@ -151,18 +159,22 @@ When a user sends a message:
 3.  Rate limit check (Redis counter, throws if exceeded)
 4.  Provider is resolved (agent override → default)
 5.  PIIMasker is created for this request
-6.  Context is fetched (get_page_context)
-7.  Context fields are masked (structured PII)
-8.  Message list is built (system prompt + context + history + user msg)
-9.  Free-text PII masking on user/assistant messages
-10. Tool specs resolved for agent (ToolExecutor)
-11. LLM provider.complete() or provider.stream() is called
-12. If tool_calls in response → execute tools, feed results back (loop up to 5x)
-13. Final response is unmasked
-14. Messages are saved to Jana Chat Message
-15. Rate counter incremented (successful response)
-16. Session title is auto-set (first exchange)
-17. Response is returned to client
+6.  Business description loaded from Jana Settings
+7.  Knowledge articles collected (agent-attached + scope-matched)
+8.  Agent system prompt appended
+9.  Context is fetched (get_page_context)
+10. Context fields are masked (structured PII)
+11. System prompt assembled: business desc → knowledge → agent prompt → page context
+12. Message list is built (system + history + user msg)
+13. Free-text PII masking on user/assistant messages
+14. Tool specs resolved for agent (ToolExecutor)
+15. LLM provider.complete() or provider.stream() is called
+16. If tool_calls in response → execute tools, feed results back (loop up to 5x)
+17. Final response is unmasked
+18. Messages are saved to Jana Chat Message
+19. Rate counter incremented (successful response)
+20. Session title is auto-set (first exchange)
+21. Response is returned to client
 ```
 
 ### Credential Resolution
@@ -193,7 +205,13 @@ Jana User Key
 
 Jana Agent
     ├── system_prompt, provider, model, temperature
-    └── tools (child table) → Jana Agent Tool → Jana Tool
+    ├── tools (child table) → Jana Agent Tool → Jana Tool
+    └── knowledge (child table) → Jana Agent Knowledge → Jana Knowledge Article
+
+Jana Knowledge Article
+    ├── article_title, content (Text Editor), category
+    ├── doctype_scope → DocType (optional, for auto-matching)
+    └── enabled
 
 Jana Chat Session
     ├── user → User

@@ -154,16 +154,53 @@ Agents can be marked as **templates** (`is_template = True`). Templates are agen
 | **Author** | Who created the template |
 | **Published** | Whether it's publicly visible |
 
+## Knowledge Articles
+
+Agents can be given business-specific context through **knowledge articles**. These are structured documents (policies, SOPs, FAQs, product info) that are injected into the agent's system prompt.
+
+### Attaching Articles to an Agent
+
+1. Create a knowledge article at `/app/jana-knowledge-article/new`
+2. Open the agent at `/app/jana-agent/<agent-name>`
+3. Scroll to the **Knowledge** section
+4. Add rows linking to your articles
+5. Save
+
+### Jana Knowledge Article
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **Title** | Data | Unique article title |
+| **Content** | Text Editor | Rich text content (HTML is stripped before sending to the LLM) |
+| **Category** | Select | `general`, `policy`, `process`, `product`, `faq` |
+| **DocType Scope** | Link (DocType) | When set, the article is automatically included for conversations on that DocType — even if not explicitly attached to the agent |
+| **Enabled** | Check | Whether this article is active (default: on) |
+
+### How Articles Are Selected
+
+When building the system prompt, Jana collects articles from two sources:
+
+1. **Agent-attached** — all enabled articles linked via the Knowledge child table
+2. **Scope-matched** — any enabled articles whose DocType Scope matches the current page's DocType
+
+Articles from both sources are deduplicated (an article attached to the agent AND matching the scope appears only once). Agent-attached articles are included first.
+
+### Token Budget
+
+The total knowledge content is limited by the **Knowledge Token Budget** in Jana Settings (default: 30,000 tokens). If the combined articles exceed this limit, they are truncated. This prevents knowledge from consuming too much of the LLM's context window.
+
 ## How Agents Interact with Context
 
-When a user sends a message, the agent receives:
+When a user sends a message, the agent receives (in this order):
 
-1. **System prompt** — The agent's instructions
-2. **Page context** — The current document's DocType, name, and field values (injected automatically)
-3. **Chat history** — Previous messages in the session
-4. **User message** — The current question
+1. **Business description** — Global context from Jana Settings (your company, industry, rules)
+2. **Knowledge articles** — Articles attached to the agent + scope-matched articles
+3. **Agent system prompt** — The agent's own instructions
+4. **Page context** — The current document's DocType, name, and field values (injected automatically)
+5. **Chat history** — Previous messages in the session
+6. **User message** — The current question
 
-The page context is appended to the system prompt, so the agent always knows what the user is looking at without needing to ask.
+The business description and knowledge articles are prepended to the system prompt, so the agent always has organisational context. Page context is appended, so the agent knows what the user is looking at.
 
 ## Agent Tools
 

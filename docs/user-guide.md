@@ -74,6 +74,23 @@ Click **New Chat** to start a fresh conversation at any time. This creates a new
 
 Your administrator may configure automatic archiving of old sessions. By default, sessions older than 90 days are archived automatically. This helps keep the session list manageable.
 
+## Business Context
+
+Your administrator can configure Jana with business-specific knowledge that makes AI responses more relevant.
+
+### Business Description
+
+In **Jana Settings**, the Business Description field lets your admin describe your organisation — industry, currency, approval rules, conventions. This context is included in every conversation, so Jana's answers reflect your actual business instead of giving generic advice.
+
+### Knowledge Articles
+
+Your admin can create **Knowledge Articles** (`/app/jana-knowledge-article`) containing policies, SOPs, product information, FAQs, and other reference material. These articles can be:
+
+- **Attached to specific agents** — an Accounting agent might have articles about your chart of accounts
+- **Scoped to a DocType** — an article about invoice policies is automatically included when you're viewing a Sales Invoice
+
+You don't need to do anything to benefit from knowledge articles — they're injected into the AI's context automatically. If you notice Jana giving answers that don't match your company's policies, ask your admin to add a knowledge article with the correct information.
+
 ## Tips for Better Results
 
 ### Be Specific

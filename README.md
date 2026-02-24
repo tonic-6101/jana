@@ -24,7 +24,8 @@ Jana is a **Frappe-level application**. It does not depend on ERPNext and works 
 - **Per-User Keys** — Each user can connect their own API key; the system admin can also set a shared key
 - **Multiple LLM Providers** — OpenAI, Anthropic Claude, Google Gemini, OpenRouter, Ollama, vLLM, or any OpenAI-compatible endpoint
 - **Streaming Responses** — Real-time token-by-token output
-- **Agent System** — Customizable AI agents with specific system prompts, model settings, and tool configurations
+- **Knowledge Base** — Business description + knowledge articles injected into every conversation for company-specific AI responses
+- **Agent System** — Customizable AI agents with specific system prompts, model settings, tool and knowledge configurations
 - **PII Auto-Masking** — GDPR-compliant privacy layer that strips personal data before sending to cloud LLM providers
 - **Persistent Chat Sessions** — Conversations persist across page navigation with full history
 - **Internationalization** — All user-facing strings are translatable
@@ -50,7 +51,7 @@ User ─── Frappe Desk ─── Jana Chat Widget (Vue 3)
        Google   OpenRouter    vLLM    Endpoint
 ```
 
-Jana reads the current page context (DocType, document name, field values), masks any personal data, assembles a prompt with the agent's system instructions, sends it to the configured LLM provider, unmasks the response, and displays it in the chat widget.
+Jana reads the current page context (DocType, document name, field values), injects business knowledge and agent-specific articles, masks any personal data, assembles a prompt with the agent's system instructions, sends it to the configured LLM provider, unmasks the response, and displays it in the chat widget.
 
 ## Quick Start
 

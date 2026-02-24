@@ -40,6 +40,21 @@ Capabilities that are disabled will not be available to any agent regardless of 
 
 Rate limiting uses a Redis-based per-user counter with a 1-hour sliding window. The daily scheduler job `auto_archive_old_sessions` handles session retention.
 
+### Knowledge
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Business Description** | Describe your business, industry, rules, and preferences. This context is included in every AI conversation. | (empty) |
+| **Knowledge Token Budget** | Maximum number of tokens allocated for knowledge articles in the system prompt. Articles exceeding this budget are truncated. | 30,000 |
+
+The business description is a global setting that applies to all agents. Write it in natural language — for example:
+
+> "We are ABC Trading, a wholesale distributor in Riyadh. We use FIFO inventory valuation and SAR currency. Our approval thresholds: Manager up to 50,000 SAR, Director above 50,000 SAR."
+
+This transforms generic AI responses into answers grounded in your business context.
+
+Knowledge articles are managed separately via the **Jana Knowledge Article** DocType. See [Agents](agents.md) for how to attach articles to agents.
+
 ### Privacy Settings
 
 | Field | Description | Default |

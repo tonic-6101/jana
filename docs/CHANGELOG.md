@@ -77,3 +77,14 @@
   - `get_cached_provider()` — cached provider document lookup
   - Automatic cache invalidation via `on_update` hooks
 - PIIMasker performance: O(1) reverse mapping for token lookups (was O(n))
+
+### Added (Knowledge Base)
+
+- Business description field on Jana Settings — free-text description of your organisation, industry, rules, and preferences injected into every AI conversation
+- Jana Knowledge Article DocType — structured articles with rich text content, category tags (general/policy/process/product/faq), and optional DocType scope for automatic context matching
+- Jana Agent Knowledge child table — attach specific knowledge articles to agents
+- Knowledge retrieval service with automatic deduplication and scope-based article selection
+- Token budget management (default: 30,000 tokens, configurable in Jana Settings) with automatic truncation when articles exceed the budget
+- HTML stripping for rich text content before LLM injection
+- Updated prompt assembly order: business description → knowledge articles → agent system prompt → page context
+- Knowledge content covered by existing PII masking pipeline — no additional configuration needed
