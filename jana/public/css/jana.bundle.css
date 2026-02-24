@@ -98,6 +98,97 @@
 	color: var(--text-color, #1a202c);
 }
 
+/* Session List view */
+.jana-sessions {
+	flex: 1;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.jana-sessions-loading {
+	display: flex;
+	justify-content: center;
+	padding: 40px 20px;
+}
+
+.jana-sessions-empty {
+	text-align: center;
+	padding: 60px 20px;
+	color: var(--text-muted, #718096);
+}
+
+.jana-sessions-empty p {
+	margin: 0 0 8px 0;
+}
+
+.jana-sessions-empty-hint {
+	font-size: 13px;
+}
+
+.jana-session-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.jana-session-item {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 12px 16px;
+	border: none;
+	border-bottom: 1px solid var(--border-color, #e2e8f0);
+	background: var(--fg-color, #fff);
+	cursor: pointer;
+	text-align: left;
+	font-family: inherit;
+	transition: background 0.15s;
+}
+
+.jana-session-item:hover {
+	background: var(--subtle-fg, #f7fafc);
+}
+
+.jana-session-item-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.jana-session-item-title {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--text-color, #1a202c);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.jana-session-item-meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 2px;
+}
+
+.jana-session-item-time {
+	font-size: 12px;
+	color: var(--text-muted, #718096);
+}
+
+.jana-session-item-agent {
+	font-size: 11px;
+	color: var(--text-muted, #718096);
+	background: var(--subtle-fg, #f7fafc);
+	padding: 1px 6px;
+	border-radius: 8px;
+}
+
+.jana-header-label {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--text-muted, #718096);
+}
+
 /* Messages area */
 .jana-messages {
 	flex: 1;
