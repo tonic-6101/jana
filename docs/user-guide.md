@@ -31,6 +31,7 @@ Jana will answer using the actual data from the document you're viewing — not 
 | **Answer Questions** | Explain Frappe concepts, DocTypes, workflows, and field meanings |
 | **Interpret Data** | Help you understand totals, statuses, linked records, and timelines |
 | **Draft Content** | Help compose email text, descriptions, notes, and summaries based on document context |
+| **Use Tools** | Read other documents, create records, run reports — with your permission and within your Frappe access rights |
 
 ### What Jana Cannot Do
 
@@ -57,9 +58,21 @@ You can view your past chat sessions. Each session stores:
 - Which agent was used
 - The page context at the time of the conversation
 
+### Archiving Sessions
+
+You can archive a session when you no longer need it but want to keep the history. Archived sessions are hidden from the default session list but can be viewed by filtering for archived sessions.
+
+### Deleting Sessions
+
+Deleting a session permanently removes it and all its messages. This action cannot be undone.
+
 ### New Chat
 
 Click **New Chat** to start a fresh conversation at any time. This creates a new session with no prior context.
+
+### Session Retention
+
+Your administrator may configure automatic archiving of old sessions. By default, sessions older than 90 days are archived automatically. This helps keep the session list manageable.
 
 ## Tips for Better Results
 
@@ -107,6 +120,10 @@ Each user has their own:
 - **Chat sessions** — your conversations are private to your account
 - **API key** (optional) — you can use your own key via Jana User Key
 - **Permissions** — Jana respects Frappe's permission system. You can only ask about documents you have access to
+
+## Rate Limiting
+
+To ensure fair usage, your administrator may set a limit on how many messages you can send per hour (default: 60). If you reach the limit, wait a few minutes before sending more messages. The counter resets automatically.
 
 ## Supported Languages
 

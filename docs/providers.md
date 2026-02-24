@@ -196,3 +196,17 @@ The `OpenAIProvider` class handles all OpenAI-compatible APIs. The `AnthropicPro
 | vLLM | 120 seconds |
 
 If a request times out, Jana returns an error message. Large models or first-time Ollama requests (which trigger model loading) may take longer.
+
+## Health Check
+
+Administrators can test provider connectivity via the `test_connection` API endpoint. This sends a minimal completion request ("Say OK", max 5 tokens) using the cheapest available model for the provider type, and returns the latency in milliseconds.
+
+This is useful for verifying API keys are valid, endpoints are reachable, and models are available before configuring agents to use a provider.
+
+## Deletion Protection
+
+Providers that are referenced by one or more agents cannot be deleted. Remove or reassign agents first, then delete the provider. This prevents agents from referencing a non-existent provider.
+
+## Caching
+
+Provider documents are cached in Redis for performance. The cache is automatically invalidated when a provider is updated or deleted, so changes take effect immediately.

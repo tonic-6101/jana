@@ -13,6 +13,7 @@ Navigate to `/app/jana-settings` in Frappe Desk. This is a Single DocType — on
 | **Default Provider** | The LLM provider used when an agent doesn't specify one | (none — must be set) |
 | **Default Model** | The model used when not overridden by an agent | (provider default) |
 | **Enable Streaming** | Stream responses token-by-token instead of waiting for the full reply | Enabled |
+| **Enable Tool Calling** | Allow agents to call tools (read docs, create docs, run reports, etc.) | Enabled |
 
 ### Capability Toggles
 
@@ -30,11 +31,20 @@ Each capability can be individually enabled or disabled. These are site-wide set
 
 Capabilities that are disabled will not be available to any agent regardless of the agent's configuration.
 
+### Limits
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| **Rate Limit (per hour)** | Maximum AI messages a user can send per hour. Set to 0 to disable. | 60 |
+| **Session Retention (days)** | Automatically archive chat sessions older than this many days. Set to 0 to keep forever. | 90 |
+
+Rate limiting uses a Redis-based per-user counter with a 1-hour sliding window. The daily scheduler job `auto_archive_old_sessions` handles session retention.
+
 ### Privacy Settings
 
 | Field | Description | Default |
 |-------|-------------|---------|
-| **Mask PII** | Enable automatic PII masking before sending data to LLM providers | Disabled |
+| **Mask PII** | Enable automatic PII masking before sending data to LLM providers | Enabled |
 
 See [Privacy & Data Handling](privacy.md) for detailed information.
 
@@ -113,3 +123,24 @@ frappe.boot.jana = {
 ```
 
 This allows the frontend widget to know whether to show itself, which capabilities are active, and whether streaming is available — all without additional API calls.
+
+## Roles
+
+Jana uses two custom roles for access control:
+
+| Role | Purpose |
+|------|---------|
+| **Jana Admin** | Full CRUD access to all Jana DocTypes. Can test provider connections, view agent system prompts, archive/delete any session. |
+| **Jana User** | Can create and manage own chat sessions and messages. Read-only access to agents and templates. Cannot see other users' sessions. |
+
+Both roles are created automatically during installation and on `bench migrate`. System Manager has full access to all Jana DocTypes by default.
+
+### Owner-Scoped Access
+
+The following DocTypes enforce owner-scoped access for Jana User:
+
+- **Jana Chat Session** — users can only see/edit sessions where `user` matches their account
+- **Jana Chat Message** — users can only see messages belonging to their own sessions
+- **Jana User Key** — users can only see/edit their own API keys
+
+Jana Admin and System Manager can access all records regardless of ownership.

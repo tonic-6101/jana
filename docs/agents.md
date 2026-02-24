@@ -164,3 +164,37 @@ When a user sends a message, the agent receives:
 4. **User message** — The current question
 
 The page context is appended to the system prompt, so the agent always knows what the user is looking at without needing to ask.
+
+## Agent Tools
+
+Agents can call tools to interact with Frappe data. Tools are attached via the Jana Agent Tool child table.
+
+### Built-in Tools
+
+| Tool | Description | Permission Toggle |
+|------|-------------|-------------------|
+| `read_document` | Read a document's field values | Enable Read Documents |
+| `list_documents` | List/search documents of a DocType | Enable Read Documents |
+| `create_document` | Create a new document | Enable Create Documents |
+| `update_document` | Modify an existing document | Enable Modify Documents |
+| `run_report` | Execute a Frappe Report query | Enable Report Queries |
+| `navigate_to_page` | Suggest a URL for the user to visit | Enable Navigate |
+
+Tools respect both the Jana Settings capability toggles (site-wide) and Frappe's `has_permission()` checks (per-user, per-document).
+
+### Multi-Turn Tool Loop
+
+When the LLM decides to call a tool, Jana executes it and feeds the result back. This continues for up to 5 iterations per message, allowing the agent to chain multiple tool calls (e.g., list documents → read a specific one → summarize).
+
+## Agent API
+
+Two API endpoints are available for listing and retrieving agents programmatically:
+
+- `jana.api.agents.list_agents` — Returns all non-template agents (name, description, provider, model)
+- `jana.api.agents.get_agent` — Returns full agent details. The `system_prompt` field is only included for admin users.
+
+See the [API Reference](api-reference.md) for full details.
+
+## Deletion Protection
+
+Agents with active chat sessions cannot be deleted. Archive or delete the referencing sessions first. This prevents orphaned sessions that reference a non-existent agent.

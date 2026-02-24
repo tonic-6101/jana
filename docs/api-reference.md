@@ -119,7 +119,7 @@ Each line is a JSON object:
 
 ### Get Sessions
 
-Returns the current user's active chat sessions.
+Returns the current user's chat sessions.
 
 **Endpoint:** `jana.api.chat.get_sessions`
 **Method:** GET/POST
@@ -129,6 +129,7 @@ Returns the current user's active chat sessions.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `limit` | integer | No | Max sessions to return (default: 20) |
+| `status` | string | No | Filter: `active` (default), `archived`, or `all` |
 
 **Response:**
 
@@ -138,6 +139,7 @@ Returns the current user's active chat sessions.
     "name": "abc123def456",
     "session_title": "Invoice outstanding amount question",
     "agent": "General Assistant",
+    "status": "active",
     "context_doctype": "Sales Invoice",
     "context_docname": "SI-00042",
     "modified": "2026-02-24 14:30:00"
@@ -147,8 +149,65 @@ Returns the current user's active chat sessions.
 
 **Notes:**
 - Only returns sessions owned by the current user
-- Only returns active sessions (not archived)
+- Defaults to active sessions; pass `status: "all"` to include archived
 - Ordered by most recently modified first
+
+---
+
+### Archive Session
+
+Archives a chat session. Archived sessions are excluded from `get_sessions` by default.
+
+**Endpoint:** `jana.api.chat.archive_session`
+**Method:** POST
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `session_id` | string | Yes | Chat session ID |
+
+**Response:**
+
+```json
+{
+  "session_id": "abc123def456",
+  "status": "archived"
+}
+```
+
+**Notes:**
+- Only the session owner or a Jana Admin can archive a session
+- Already-archived sessions return an error
+
+---
+
+### Delete Session
+
+Permanently deletes a chat session and all its messages.
+
+**Endpoint:** `jana.api.chat.delete_session`
+**Method:** POST
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `session_id` | string | Yes | Chat session ID |
+
+**Response:**
+
+```json
+{
+  "session_id": "abc123def456",
+  "deleted": true
+}
+```
+
+**Notes:**
+- Only the session owner or a Jana Admin can delete a session
+- All child messages are cascade-deleted via the `on_trash` handler
+- This action is irreversible
 
 ---
 
@@ -201,6 +260,115 @@ Returns a single session with its messages.
 **Notes:**
 - Returns up to 50 messages per session (ordered by creation, ascending)
 - Throws an error if the session belongs to a different user
+
+## Agent Endpoints
+
+### List Agents
+
+Returns all non-template agents visible to the current user.
+
+**Endpoint:** `jana.api.agents.list_agents`
+**Method:** GET/POST
+
+**Parameters:** None
+
+**Response:**
+
+```json
+[
+  {
+    "name": "General Assistant",
+    "agent_name": "General Assistant",
+    "description": "A helpful AI assistant for Frappe Desk",
+    "provider": "My OpenAI",
+    "model": "gpt-4o-mini"
+  }
+]
+```
+
+---
+
+### Get Agent
+
+Returns detailed information about a specific agent.
+
+**Endpoint:** `jana.api.agents.get_agent`
+**Method:** GET/POST
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `agent_name` | string | Yes | Agent name |
+
+**Response:**
+
+```json
+{
+  "name": "General Assistant",
+  "agent_name": "General Assistant",
+  "description": "A helpful AI assistant",
+  "provider": "My OpenAI",
+  "model": "gpt-4o-mini",
+  "temperature": 0.7,
+  "max_tokens": null,
+  "is_template": false,
+  "tools": [
+    {"tool": "read_document", "enabled": true},
+    {"tool": "list_documents", "enabled": true}
+  ]
+}
+```
+
+**Notes:**
+- The `system_prompt` field is only included for Jana Admin / System Manager users
+- Returns an error if the agent does not exist
+
+## Provider Endpoints
+
+### Get Models for Provider
+
+Returns available models for a given provider (known defaults + user-defined).
+
+**Endpoint:** `jana.api.providers.get_models_for_provider`
+**Method:** GET/POST
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `provider_name` | string | Yes | Jana Provider name |
+
+---
+
+### Test Connection
+
+Tests connectivity to an LLM provider. Admin-only.
+
+**Endpoint:** `jana.api.providers.test_connection`
+**Method:** POST
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `provider_name` | string | Yes | Jana Provider name |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Connection successful",
+  "latency_ms": 847,
+  "model": "gpt-4o-mini"
+}
+```
+
+**Notes:**
+- Only Jana Admin / System Manager can use this endpoint
+- Sends a minimal completion request ("Say OK", max 5 tokens) using the cheapest model for that provider type
+- On failure, returns `success: false` with the error message
 
 ## Boot Hook
 
@@ -264,7 +432,8 @@ Common errors:
 | "No AI provider configured" | No default provider set |
 | "Provider X is disabled" | Provider exists but is not enabled |
 | "Invalid API key" | LLM provider rejected the credentials |
-| "Rate limit exceeded" | LLM provider rate limit hit |
+| "Rate limit exceeded" | User exceeded the per-hour message limit (configurable in Jana Settings) |
+| "LLM rate limit exceeded" | The LLM provider's own rate limit was hit |
 | "Model not found" | Invalid model name for the provider |
 | "Could not connect to X" | Network error reaching the LLM API |
 | "Request timed out" | LLM API didn't respond in time |

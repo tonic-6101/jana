@@ -16,16 +16,18 @@ Jana is a **Frappe-level application** — it integrates with Frappe's core fram
 │                       │ Frappe API calls             │
 │  ┌────────────────────▼─────────────────────────┐   │
 │  │              jana.api.*                        │   │
-│  │  chat.py  │  boot.py  │  providers.py         │   │
+│  │  chat.py │ boot.py │ agents.py │ providers.py │   │
 │  └────────────────────┬─────────────────────────┘   │
 │                       │                              │
 │  ┌────────────────────▼─────────────────────────┐   │
 │  │           jana.services.*                      │   │
 │  │                                                │   │
-│  │  ChatService  ─── Context ─── PII Masker      │   │
-│  │       │                           │            │   │
-│  │       ▼                           ▼            │   │
-│  │  LLM Provider Abstraction                      │   │
+│  │  ChatService ── Context ── PII Masker           │   │
+│  │       │            │          │                 │   │
+│  │  ToolExecutor  RateLimiter  Maintenance         │   │
+│  │       │                                         │   │
+│  │       ▼                                         │   │
+│  │  LLM Provider Abstraction                       │   │
 │  │  ┌─────────┬──────────┬─────────┐             │   │
 │  │  │ OpenAI  │Anthropic │ Ollama  │             │   │
 │  │  └─────────┴──────────┴─────────┘             │   │
@@ -66,20 +68,27 @@ jana/
 │   ├── hooks.py                   # Frappe hooks configuration
 │   ├── install.py                 # Post-install setup
 │   ├── __init__.py                # App version
+│   ├── permissions.py             # Permission hooks (owner-scoped access)
+│   ├── utils.py                   # Cache utilities (settings, providers)
 │   ├── api/                       # Whitelist API endpoints
-│   │   ├── chat.py                # Chat CRUD + messaging
+│   │   ├── chat.py                # Chat CRUD + messaging + session lifecycle
 │   │   ├── boot.py                # extend_bootinfo hook
 │   │   ├── oauth.py               # OAuth token handling
-│   │   └── providers.py           # Provider management
+│   │   ├── agents.py              # Agent listing/detail
+│   │   └── providers.py           # Provider management + health check
 │   ├── services/                  # Business logic (no API exposure)
 │   │   ├── chat.py                # ChatService orchestration
 │   │   ├── context.py             # Page context detection
+│   │   ├── rate_limiter.py        # Redis per-user rate limiting
+│   │   ├── maintenance.py         # Scheduled cleanup jobs
 │   │   ├── llm/                   # LLM provider layer
 │   │   │   ├── base.py            # Abstract LLMProvider
 │   │   │   ├── factory.py         # Provider factory
 │   │   │   ├── openai_provider.py
 │   │   │   ├── anthropic_provider.py
 │   │   │   └── ollama_provider.py
+│   │   ├── tools/                 # Tool calling framework
+│   │   │   └── executor.py        # ToolExecutor + built-in tools
 │   │   └── privacy/               # PII masking
 │   │       ├── detector.py        # Field classification + regex
 │   │       └── masker.py          # Mask/unmask engine
@@ -112,36 +121,48 @@ Jana integrates with Frappe through standard hooks defined in `hooks.py`:
 | `app_include_js` | Loads `jana.bundle.js` on every Desk page |
 | `app_include_css` | Loads `jana.bundle.css` on every Desk page |
 | `extend_bootinfo` | Injects Jana config into `frappe.boot.jana` |
-| `after_install` | Creates the default General Assistant agent |
+| `after_install` | Creates roles, default agent, and built-in tools |
 | `website_route_rules` | Routes `/jana/*` to the Vue SPA |
+| `fixtures` | Syncs Jana User and Jana Admin roles on migrate |
+| `has_permission` | Owner-scoped access for Sessions, Messages, User Keys |
+| `permission_query_conditions` | SQL WHERE clauses for list view filtering |
+| `scheduler_events` | Daily: auto-archive old sessions, cleanup orphaned messages |
 
 ### Service Layer
 
 Business logic lives in `jana/services/`, not in API endpoints or DocType controllers. This keeps the code testable and reusable:
 
 - **`ChatService`** — Orchestrates sessions, messages, and LLM calls
+- **`ToolExecutor`** — Manages tool calling with multi-turn loop (up to 5 iterations)
 - **`get_page_context()`** — Fetches document data for context injection
 - **`LLMProvider`** (abstract) — Provider interface with `complete()` and `stream()`
 - **`PIIMasker`** — Per-request PII masking with zero persistence
+- **`check_rate_limit()` / `increment_rate_counter()`** — Redis-based per-user rate limiting
+- **`get_jana_settings()`** — Cached settings lookup (Redis)
+- **`get_cached_provider()`** — Cached provider document lookup
 
 ### Message Flow
 
 When a user sends a message:
 
 ```
-1. API endpoint validates input (chat.py)
-2. ChatService loads session and agent
-3. Provider is resolved (agent override → default)
-4. PIIMasker is created for this request
-5. Context is fetched (get_page_context)
-6. Context fields are masked (structured PII)
-7. Message list is built (system prompt + context + history + user msg)
-8. Free-text PII masking on user/assistant messages
-9. LLM provider.complete() or provider.stream() is called
-10. Response is unmasked
-11. Messages are saved to Jana Chat Message
-12. Session title is auto-set (first exchange)
-13. Response is returned to client
+1.  API endpoint validates input (chat.py)
+2.  ChatService loads session, verifies ownership
+3.  Rate limit check (Redis counter, throws if exceeded)
+4.  Provider is resolved (agent override → default)
+5.  PIIMasker is created for this request
+6.  Context is fetched (get_page_context)
+7.  Context fields are masked (structured PII)
+8.  Message list is built (system prompt + context + history + user msg)
+9.  Free-text PII masking on user/assistant messages
+10. Tool specs resolved for agent (ToolExecutor)
+11. LLM provider.complete() or provider.stream() is called
+12. If tool_calls in response → execute tools, feed results back (loop up to 5x)
+13. Final response is unmasked
+14. Messages are saved to Jana Chat Message
+15. Rate counter incremented (successful response)
+16. Session title is auto-set (first exchange)
+17. Response is returned to client
 ```
 
 ### Credential Resolution
