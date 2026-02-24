@@ -39,3 +39,17 @@ class JanaAgent(Document):
 	def validate_temperature(self):
 		if self.temperature is not None and (self.temperature < 0.0 or self.temperature > 2.0):
 			frappe.throw(_("Temperature must be between 0.0 and 2.0"))
+
+	def on_trash(self):
+		"""Prevent deletion if active sessions reference this agent."""
+		active_sessions = frappe.db.count(
+			"Jana Chat Session",
+			filters={"agent": self.name, "status": "active"},
+		)
+		if active_sessions:
+			frappe.throw(
+				_("Cannot delete agent {0}: {1} active session(s) still reference it. "
+				  "Archive or delete those sessions first.").format(
+					self.agent_name, active_sessions
+				)
+			)

@@ -25,6 +25,7 @@ class PIIMasker:
 
 	def __init__(self, provider_doc):
 		self._mapping: dict[str, str] = {}
+		self._reverse_mapping: dict[str, str] = {}
 		self._counters: dict[str, int] = defaultdict(int)
 		self._stream_buffer: str = ""
 		self.enabled: bool = self._resolve_enabled(provider_doc)
@@ -60,12 +61,16 @@ class PIIMasker:
 		return f"[{category}_{self._counters[category]}]"
 
 	def _get_or_create_token(self, value: str, category: str) -> str:
-		"""Return an existing token for value, or create a new one."""
-		for token, stored_value in self._mapping.items():
-			if stored_value == value:
-				return token
+		"""Return an existing token for value, or create a new one.
+
+		Uses O(1) reverse mapping lookup instead of iterating all entries.
+		"""
+		existing = self._reverse_mapping.get(value)
+		if existing:
+			return existing
 		token = self._make_token(category)
 		self._mapping[token] = value
+		self._reverse_mapping[value] = token
 		return token
 
 	def mask_context_fields(self, context: dict) -> dict:
@@ -125,12 +130,12 @@ class PIIMasker:
 		known-entities registry for consistent pseudonymisation across
 		all text segments within a single processing request.
 		"""
-		if not self._mapping:
+		if not self._reverse_mapping:
 			return text
 
-		# Reverse lookup: real value → token, longest values first.
+		# Sort by value length (longest first) to prevent partial matches.
 		value_to_token = sorted(
-			((v, k) for k, v in self._mapping.items()),
+			self._reverse_mapping.items(),
 			key=lambda pair: len(pair[0]),
 			reverse=True,
 		)

@@ -22,21 +22,87 @@ class AnthropicProvider(LLMProvider):
 
 	def _get_headers(self) -> dict:
 		return {
-			"x-api-key": self._get_api_key(),
+			"x-api-key": self._get_api_key(),  # uses user → system key chain
 			"anthropic-version": API_VERSION,
 			"content-type": "application/json",
 		}
 
 	def _build_payload(self, messages, model, temperature, max_tokens, tools, stream=False):
-		# Anthropic requires system prompt as a top-level param, not in messages
-		system_text = ""
+		"""Build Anthropic Messages API payload.
+
+		Converts OpenAI-format messages (including tool_calls and role="tool")
+		to Anthropic's native format:
+		- System messages → top-level ``system`` param
+		- Assistant messages with ``tool_calls`` → content array with tool_use blocks
+		- Tool result messages (role="tool") → role="user" with tool_result content blocks
+		"""
+		system_parts = []
 		chat_messages = []
+
 		for msg in messages:
-			if msg.get("role") == "system":
-				system_text += msg.get("content", "") + "\n"
-			else:
+			role = msg.get("role", "")
+
+			if role == "system":
+				content = msg.get("content", "").strip()
+				if content:
+					system_parts.append(content)
+
+			elif role == "assistant":
+				tool_calls = msg.get("tool_calls")
+				if tool_calls:
+					# Convert OpenAI tool_calls to Anthropic content blocks
+					content_blocks = []
+					text = msg.get("content", "")
+					if text:
+						content_blocks.append({"type": "text", "text": text})
+					for tc in tool_calls:
+						func = tc.get("function", {})
+						raw_input = func.get("arguments", "{}")
+						try:
+							parsed_input = json.loads(raw_input) if isinstance(raw_input, str) else raw_input
+						except json.JSONDecodeError:
+							parsed_input = {}
+						content_blocks.append({
+							"type": "tool_use",
+							"id": tc.get("id", ""),
+							"name": func.get("name", ""),
+							"input": parsed_input,
+						})
+					chat_messages.append({"role": "assistant", "content": content_blocks})
+				else:
+					chat_messages.append({
+						"role": "assistant",
+						"content": msg.get("content", ""),
+					})
+
+			elif role == "tool":
+				# Convert OpenAI tool result to Anthropic tool_result block.
+				# Anthropic expects tool results as role="user" messages.
+				# Merge consecutive tool results into one user message.
+				tool_result_block = {
+					"type": "tool_result",
+					"tool_use_id": msg.get("tool_call_id", ""),
+					"content": msg.get("content", ""),
+				}
+				# Check if the previous message is already a user message with
+				# tool_result blocks (from a prior tool in the same batch)
+				if (
+					chat_messages
+					and chat_messages[-1].get("role") == "user"
+					and isinstance(chat_messages[-1].get("content"), list)
+					and chat_messages[-1]["content"]
+					and chat_messages[-1]["content"][0].get("type") == "tool_result"
+				):
+					chat_messages[-1]["content"].append(tool_result_block)
+				else:
+					chat_messages.append({
+						"role": "user",
+						"content": [tool_result_block],
+					})
+
+			elif role == "user":
 				chat_messages.append({
-					"role": msg["role"],
+					"role": "user",
 					"content": msg.get("content", ""),
 				})
 
@@ -48,8 +114,8 @@ class AnthropicProvider(LLMProvider):
 			"stream": stream,
 		}
 
-		if system_text.strip():
-			payload["system"] = system_text.strip()
+		if system_parts:
+			payload["system"] = "\n\n".join(system_parts)
 
 		if tools:
 			payload["tools"] = self._convert_tools(tools)
@@ -83,20 +149,24 @@ class AnthropicProvider(LLMProvider):
 		except requests.exceptions.Timeout:
 			frappe.throw(_("Anthropic API request timed out. Please try again."))
 
-		data = response.json()
+		try:
+			data = response.json()
+		except ValueError:
+			frappe.throw(_("Invalid response from Anthropic API (not JSON)."))
 
 		content = ""
 		tool_calls = []
 		for block in data.get("content", []):
-			if block["type"] == "text":
-				content += block["text"]
-			elif block["type"] == "tool_use":
+			block_type = block.get("type", "")
+			if block_type == "text":
+				content += block.get("text", "")
+			elif block_type == "tool_use":
 				tool_calls.append({
 					"id": block["id"],
 					"type": "function",
 					"function": {
 						"name": block["name"],
-						"arguments": json.dumps(block["input"]),
+						"arguments": json.dumps(block.get("input", {})),
 					},
 				})
 
@@ -126,6 +196,7 @@ class AnthropicProvider(LLMProvider):
 		except requests.exceptions.ConnectionError:
 			frappe.throw(_("Could not connect to Anthropic API. Check your API base URL."))
 
+		chunk_count = 0
 		for line in response.iter_lines():
 			if not line:
 				continue
@@ -143,6 +214,10 @@ class AnthropicProvider(LLMProvider):
 					delta = data.get("delta", {})
 					if delta.get("type") == "text_delta":
 						yield {"content": delta.get("text", ""), "done": False}
+						chunk_count += 1
+						if chunk_count >= 50000:
+							yield {"content": "", "done": True}
+							return
 
 				elif event_type == "message_stop":
 					yield {"content": "", "done": True}

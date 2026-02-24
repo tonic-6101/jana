@@ -25,6 +25,11 @@ class JanaSettings(Document):
 		enable_streaming: DF.Check
 		enable_tool_calling: DF.Check
 		max_context_tokens: DF.Int
+		rate_limit_per_hour: DF.Int
+		session_retention_days: DF.Int
 	# end: auto-generated types
 
-	pass
+	def on_update(self):
+		from jana.utils import clear_jana_settings_cache
+
+		clear_jana_settings_cache()

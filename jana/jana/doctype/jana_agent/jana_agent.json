@@ -119,8 +119,15 @@
    "write": 1
   },
   {
+   "create": 1,
+   "delete": 1,
    "read": 1,
-   "role": "All"
+   "role": "Jana Admin",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Jana User"
   }
  ],
  "sort_field": "modified",

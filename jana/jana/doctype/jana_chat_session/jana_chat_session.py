@@ -25,3 +25,17 @@ class JanaChatSession(Document):
 	def before_insert(self):
 		if not self.user:
 			self.user = frappe.session.user
+
+	def on_trash(self):
+		"""Cascade delete all messages belonging to this session."""
+		messages = frappe.get_all(
+			"Jana Chat Message",
+			filters={"session": self.name},
+			fields=["name"],
+			limit_page_length=0,
+		)
+		for msg in messages:
+			frappe.delete_doc(
+				"Jana Chat Message", msg.name,
+				ignore_permissions=True, force=True,
+			)

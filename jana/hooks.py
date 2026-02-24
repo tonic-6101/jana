@@ -47,5 +47,34 @@ after_install = "jana.install.after_install"
 
 extend_bootinfo = "jana.api.boot.extend_bootinfo"
 
-# Automatically update python controller files with type annotations for this app.
-export_python_type_annotations = True
+# Fixtures
+# --------
+
+fixtures = [
+	{"dt": "Role", "filters": [["name", "in", ["Jana User", "Jana Admin"]]]},
+]
+
+# Permissions
+# -----------
+
+has_permission = {
+	"Jana Chat Session": "jana.permissions.session_has_permission",
+	"Jana Chat Message": "jana.permissions.message_has_permission",
+	"Jana User Key": "jana.permissions.user_key_has_permission",
+}
+
+permission_query_conditions = {
+	"Jana Chat Session": "jana.permissions.session_permission_query_conditions",
+	"Jana Chat Message": "jana.permissions.message_permission_query_conditions",
+	"Jana User Key": "jana.permissions.user_key_permission_query_conditions",
+}
+
+# Scheduled Tasks
+# ---------------
+
+scheduler_events = {
+	"daily": [
+		"jana.services.maintenance.auto_archive_old_sessions",
+		"jana.services.maintenance.cleanup_orphaned_messages",
+	],
+}

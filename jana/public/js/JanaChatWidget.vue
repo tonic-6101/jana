@@ -35,7 +35,21 @@
 				<!-- Welcome / setup message -->
 				<div v-if="!enabled" class="jana-welcome">
 					<p>{{ __('Welcome to Jana!') }}</p>
-					<p>{{ __('To get started, add your AI provider key.') }}</p>
+					<template v-if="unconnectedOAuth.length">
+						<p>{{ __('Connect your account to get started:') }}</p>
+						<button
+							v-for="op in unconnectedOAuth"
+							:key="op.name"
+							class="jana-btn-primary jana-oauth-btn"
+							@click="connectOAuth(op)"
+						>
+							{{ __('Connect with {0}').replace('{0}', op.provider_name) }}
+						</button>
+						<div class="jana-divider">
+							<span>{{ __('or') }}</span>
+						</div>
+					</template>
+					<p v-else>{{ __('To get started, add your AI provider key.') }}</p>
 					<a :href="settingsUrl" class="jana-btn-primary">
 						{{ __('Open Jana Settings') }}
 					</a>
@@ -45,13 +59,13 @@
 				<div
 					v-for="msg in messages"
 					:key="msg.name || msg.id"
-					:class="['jana-message', 'jana-message-' + msg.role]"
+					:class="['jana-message', 'jana-message-' + msg.role, { 'jana-message-streaming': msg._streaming }]"
 				>
 					<div class="jana-message-content">{{ msg.content }}</div>
 				</div>
 
-				<!-- Loading indicator -->
-				<div v-if="loading" class="jana-message jana-message-assistant">
+				<!-- Loading indicator (typing dots while waiting for first chunk) -->
+				<div v-if="loading && !isStreaming" class="jana-message jana-message-assistant">
 					<div class="jana-typing">
 						<span></span><span></span><span></span>
 					</div>
@@ -88,6 +102,7 @@ export default {
 		defaultAgent: { type: String, default: "General Assistant" },
 		streaming: { type: Boolean, default: true },
 		capabilities: { type: Object, default: () => ({}) },
+		oauthProviders: { type: Array, default: () => [] },
 	},
 	data() {
 		return {
@@ -103,12 +118,20 @@ export default {
 		settingsUrl() {
 			return "/app/jana-settings";
 		},
+		unconnectedOAuth() {
+			return this.oauthProviders.filter(p => !p.connected);
+		},
 		pageContext() {
 			const route = frappe.get_route();
 			if (route && route[0] === "Form" && route.length >= 3) {
 				return { doctype: route[1], docname: route[2] };
 			}
 			return null;
+		},
+		isStreaming() {
+			if (!this.messages.length) return false;
+			const last = this.messages[this.messages.length - 1];
+			return last && last._streaming === true;
 		},
 	},
 	methods: {
@@ -175,30 +198,136 @@ export default {
 				}
 
 				const ctx = this.pageContext;
-				const response = await frappe.call({
-					method: "jana.api.chat.send_message",
-					args: {
-						session_id: this.sessionId,
-						content: content,
-						context_doctype: ctx ? ctx.doctype : null,
-						context_docname: ctx ? ctx.docname : null,
-					},
-				});
 
-				this.messages.push({
-					id: Date.now() + 1,
-					role: "assistant",
-					content: response.message.content,
-				});
+				if (this.streaming) {
+					await this.sendMessageStreaming(content, ctx);
+				} else {
+					await this.sendMessageNonStreaming(content, ctx);
+				}
 			} catch (err) {
-				this.messages.push({
-					id: Date.now() + 1,
-					role: "assistant",
-					content: this.__("Sorry, something went wrong. Please try again."),
-				});
+				const last = this.messages[this.messages.length - 1];
+				if (last && last.role === "assistant" && last._streaming) {
+					last._streaming = false;
+					if (!last.content) {
+						last.content = this.__("Sorry, something went wrong. Please try again.");
+					}
+				} else {
+					this.messages.push({
+						id: Date.now() + 1,
+						role: "assistant",
+						content: this.__("Sorry, something went wrong. Please try again."),
+					});
+				}
 			} finally {
 				this.loading = false;
 				this.scrollToBottom();
+			}
+		},
+		async sendMessageStreaming(content, ctx) {
+			const response = await fetch("/api/method/jana.api.chat.send_message_stream", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Accept": "application/x-ndjson",
+					"X-Frappe-CSRF-Token": frappe.csrf_token,
+				},
+				body: JSON.stringify({
+					session_id: this.sessionId,
+					content: content,
+					context_doctype: ctx ? ctx.doctype : null,
+					context_docname: ctx ? ctx.docname : null,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Stream request failed: " + response.status);
+			}
+
+			const assistantMsg = {
+				id: Date.now() + 1,
+				role: "assistant",
+				content: "",
+				_streaming: true,
+			};
+			this.messages.push(assistantMsg);
+			this.scrollToBottom();
+
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+			let buffer = "";
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split("\n");
+				buffer = lines.pop();
+
+				for (const line of lines) {
+					if (!line.trim()) continue;
+					try {
+						const data = JSON.parse(line);
+						if (data.error) {
+							assistantMsg.content += "\n\n" + data.error;
+							assistantMsg._streaming = false;
+							this.scrollToBottom();
+							return;
+						}
+						if (data.content) {
+							assistantMsg.content += data.content;
+							this.scrollToBottom();
+						}
+						if (data.done) {
+							assistantMsg._streaming = false;
+							this.scrollToBottom();
+							return;
+						}
+					} catch (e) {
+						continue;
+					}
+				}
+			}
+
+			assistantMsg._streaming = false;
+			this.scrollToBottom();
+		},
+		async sendMessageNonStreaming(content, ctx) {
+			const response = await frappe.call({
+				method: "jana.api.chat.send_message",
+				args: {
+					session_id: this.sessionId,
+					content: content,
+					context_doctype: ctx ? ctx.doctype : null,
+					context_docname: ctx ? ctx.docname : null,
+				},
+			});
+
+			this.messages.push({
+				id: Date.now() + 1,
+				role: "assistant",
+				content: response.message.content,
+			});
+		},
+		async connectOAuth(provider) {
+			const methodName =
+				provider.provider_type === "google"
+					? "jana.api.oauth.initiate_google_oauth"
+					: "jana.api.oauth.initiate_openrouter_oauth";
+			try {
+				const response = await frappe.call({
+					method: methodName,
+					args: { provider_name: provider.name },
+				});
+				if (response.message && response.message.auth_url) {
+					window.location.href = response.message.auth_url;
+				}
+			} catch (err) {
+				frappe.msgprint({
+					title: this.__("Error"),
+					message: this.__("Could not start OAuth flow. Please try again."),
+					indicator: "red",
+				});
 			}
 		},
 		scrollToBottom() {

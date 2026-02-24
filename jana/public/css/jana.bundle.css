@@ -191,6 +191,19 @@
 	40% { transform: scale(1); }
 }
 
+/* Streaming cursor */
+.jana-message-streaming .jana-message-content::after {
+	content: "\25AE";
+	animation: jana-cursor-blink 0.8s step-end infinite;
+	color: var(--primary, #2490ef);
+	margin-left: 1px;
+}
+
+@keyframes jana-cursor-blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0; }
+}
+
 /* Input area */
 .jana-input-area {
 	display: flex;

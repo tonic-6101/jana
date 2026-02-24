@@ -88,9 +88,17 @@
   },
   {
    "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Jana Admin",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
    "if_owner": 1,
    "read": 1,
-   "role": "All",
+   "role": "Jana User",
    "write": 1
   }
  ],

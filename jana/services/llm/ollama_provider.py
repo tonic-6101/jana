@@ -37,6 +37,15 @@ class OllamaProvider(LLMProvider):
 		try:
 			response = requests.post(url, json=payload, timeout=300)
 			response.raise_for_status()
+		except requests.exceptions.HTTPError:
+			status = response.status_code
+			try:
+				detail = response.json().get("error", str(response.text))
+			except Exception:
+				detail = response.text[:200]
+			frappe.throw(
+				_("Ollama error ({0}): {1}").format(status, detail)
+			)
 		except requests.exceptions.ConnectionError:
 			frappe.throw(
 				_("Could not connect to Ollama at {0}. Is Ollama running?").format(
@@ -46,7 +55,11 @@ class OllamaProvider(LLMProvider):
 		except requests.exceptions.Timeout:
 			frappe.throw(_("Ollama request timed out. The model may be loading."))
 
-		data = response.json()
+		try:
+			data = response.json()
+		except ValueError:
+			frappe.throw(_("Invalid response from Ollama (not JSON)."))
+
 		message = data.get("message", {})
 
 		result = {
@@ -78,6 +91,15 @@ class OllamaProvider(LLMProvider):
 		try:
 			response = requests.post(url, json=payload, timeout=300, stream=True)
 			response.raise_for_status()
+		except requests.exceptions.HTTPError:
+			status = response.status_code
+			try:
+				detail = response.json().get("error", str(response.text))
+			except Exception:
+				detail = response.text[:200]
+			frappe.throw(
+				_("Ollama error ({0}): {1}").format(status, detail)
+			)
 		except requests.exceptions.ConnectionError:
 			frappe.throw(
 				_("Could not connect to Ollama at {0}. Is Ollama running?").format(
@@ -85,6 +107,7 @@ class OllamaProvider(LLMProvider):
 				)
 			)
 
+		chunk_count = 0
 		for line in response.iter_lines():
 			if not line:
 				continue
@@ -96,21 +119,30 @@ class OllamaProvider(LLMProvider):
 					"content": message.get("content", ""),
 					"done": data.get("done", False),
 				}
+				chunk_count += 1
 				if data.get("done"):
+					return
+				if chunk_count >= 50000:
+					yield {"content": "", "done": True}
 					return
 			except (json.JSONDecodeError, KeyError):
 				continue
 
 	def _format_tools(self, tools):
-		"""Convert tools to Ollama format."""
+		"""Convert OpenAI-format tools to Ollama format.
+
+		Ollama uses the same OpenAI function-calling structure,
+		but the tools come in wrapped in ``{"type": "function", "function": {...}}``.
+		"""
 		formatted = []
 		for tool in tools:
+			func = tool.get("function", tool)
 			formatted.append({
 				"type": "function",
 				"function": {
-					"name": tool.get("name", ""),
-					"description": tool.get("description", ""),
-					"parameters": tool.get("parameters", {}),
+					"name": func.get("name", ""),
+					"description": func.get("description", ""),
+					"parameters": func.get("parameters", {}),
 				},
 			})
 		return formatted

@@ -13,6 +13,10 @@
   "column_break_general",
   "enable_streaming",
   "enable_tool_calling",
+  "limits_section",
+  "rate_limit_per_hour",
+  "column_break_limits",
+  "session_retention_days",
   "capabilities_section",
   "enable_chat",
   "enable_read_documents",
@@ -21,7 +25,11 @@
   "enable_create_documents",
   "enable_navigate",
   "enable_report_queries",
-  "enable_modify_documents"
+  "enable_modify_documents",
+  "privacy_section",
+  "mask_pii",
+  "column_break_privacy",
+  "mask_pii_description"
  ],
  "fields": [
   {
@@ -70,6 +78,29 @@
    "fieldname": "enable_tool_calling",
    "fieldtype": "Check",
    "label": "Enable Tool Calling"
+  },
+  {
+   "fieldname": "limits_section",
+   "fieldtype": "Section Break",
+   "label": "Limits"
+  },
+  {
+   "default": "60",
+   "description": "Maximum AI messages a user can send per hour. Set to 0 to disable rate limiting.",
+   "fieldname": "rate_limit_per_hour",
+   "fieldtype": "Int",
+   "label": "Rate Limit (per hour)"
+  },
+  {
+   "fieldname": "column_break_limits",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "90",
+   "description": "Automatically archive chat sessions older than this many days. Set to 0 to keep sessions forever.",
+   "fieldname": "session_retention_days",
+   "fieldtype": "Int",
+   "label": "Session Retention (days)"
   },
   {
    "fieldname": "capabilities_section",
@@ -121,6 +152,27 @@
    "fieldname": "enable_modify_documents",
    "fieldtype": "Check",
    "label": "Modify Existing Documents"
+  },
+  {
+   "fieldname": "privacy_section",
+   "fieldtype": "Section Break",
+   "label": "Privacy & Compliance"
+  },
+  {
+   "default": "1",
+   "description": "When enabled, personally identifiable information (names, emails, phone numbers, IBANs) is replaced with placeholder tokens before being sent to cloud LLM providers. Responses are automatically restored. Local providers (Ollama, vLLM) are exempt by default.",
+   "fieldname": "mask_pii",
+   "fieldtype": "Check",
+   "label": "Auto-Mask PII Before Sending to Cloud Providers"
+  },
+  {
+   "fieldname": "column_break_privacy",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mask_pii_description",
+   "fieldtype": "HTML",
+   "options": "<p class='text-muted small'>PII masking helps with GDPR Article 28 compliance by minimising personal data transferred to third-party processors. Tokens are never stored to disk.</p>"
   }
  ],
  "icon": "fa fa-cog",
@@ -139,6 +191,12 @@
    "read": 1,
    "role": "System Manager",
    "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Jana Admin",
    "write": 1
   }
  ],

@@ -26,19 +26,27 @@ def get_page_context(doctype: str, docname: str) -> dict | None:
 		fields = {}
 		meta = frappe.get_meta(doctype)
 
+		# Max length per field value to prevent prompt bloat
+		max_value_len = 500
+
 		for field in meta.fields:
 			if field.fieldtype in (
 				"Section Break", "Column Break", "Tab Break",
 				"HTML", "HTML Editor", "Heading",
+				"Password",
 			):
 				continue
 
 			value = doc.get(field.fieldname)
 			if value is not None and value != "":
+				str_value = str(value)
+				if len(str_value) > max_value_len:
+					str_value = str_value[:max_value_len] + "..."
 				fields[field.fieldname] = {
 					"label": _(field.label) if field.label else field.fieldname,
-					"value": str(value),
+					"value": str_value,
 					"fieldtype": field.fieldtype,
+					"options": field.options or None,
 				}
 
 		return {

@@ -84,6 +84,13 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Jana Admin",
+   "write": 1
   }
  ],
  "sort_field": "modified",

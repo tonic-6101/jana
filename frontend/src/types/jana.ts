@@ -4,11 +4,21 @@
 export interface JanaProvider {
   name: string;
   provider_name: string;
-  provider_type: "openai" | "anthropic" | "google" | "ollama" | "vllm" | "custom";
+  provider_type: "openai" | "anthropic" | "google" | "openrouter" | "ollama" | "vllm" | "custom";
   api_base_url?: string;
   available_models?: string;
+  auth_method: "API Key" | "OAuth";
+  connected_app?: string;
+  openrouter_callback_url?: string;
   is_default: boolean;
   enabled: boolean;
+}
+
+export interface JanaOAuthProvider {
+  name: string;
+  provider_name: string;
+  provider_type: string;
+  connected: boolean;
 }
 
 export interface JanaAgent {
@@ -71,6 +81,7 @@ export interface JanaBootConfig {
   enabled: boolean;
   default_agent: string;
   streaming: boolean;
+  oauth_providers: JanaOAuthProvider[];
   capabilities: {
     chat: boolean;
     read_documents: boolean;

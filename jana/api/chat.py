@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Tonic
 
+import json
+
 import frappe
 from frappe import _
+from werkzeug.wrappers import Response
 
 from jana.services.chat import ChatService
 
@@ -44,19 +47,135 @@ def send_message(
 	)
 
 
+@frappe.whitelist(methods=["POST"])
+def send_message_stream(
+	session_id: str = None,
+	content: str = None,
+	context_doctype: str = None,
+	context_docname: str = None,
+):
+	"""Send a message and stream the AI response as NDJSON.
+
+	Returns a werkzeug Response with ``Content-Type: application/x-ndjson``.
+	Each line is a JSON object: ``{"content": "...", "done": bool}``.
+	Falls back to non-streaming if the setting is disabled.
+	"""
+	if not session_id:
+		frappe.throw(_("Session ID is required"))
+	if not content or not content.strip():
+		frappe.throw(_("Message content is required"))
+
+	content = content.strip()
+	service = ChatService()
+
+	from jana.utils import get_jana_settings
+	from frappe.utils import cint
+
+	enable_streaming = cint(get_jana_settings().get("enable_streaming") or 0)
+	if not enable_streaming:
+		result = service.send_message(
+			session_id=session_id,
+			content=content,
+			context_doctype=context_doctype,
+			context_docname=context_docname,
+		)
+		body = json.dumps({
+			"content": result["content"],
+			"done": True,
+			"model": result.get("model"),
+			"tokens_used": result.get("tokens_used", 0),
+		}) + "\n"
+		return Response(body, content_type="application/x-ndjson", status=200)
+
+	def generate():
+		try:
+			yield from service.send_message_stream(
+				session_id=session_id,
+				content=content,
+				context_doctype=context_doctype,
+				context_docname=context_docname,
+			)
+		except Exception:
+			frappe.log_error(title="Jana SSE Stream Error")
+			yield json.dumps({"content": "", "done": True, "error": _("Streaming failed")}) + "\n"
+
+	return Response(
+		generate(),
+		content_type="application/x-ndjson",
+		status=200,
+		headers={
+			"Cache-Control": "no-cache",
+			"X-Accel-Buffering": "no",
+		},
+	)
+
+
 @frappe.whitelist()
-def get_sessions(limit: int = 20) -> list:
-	"""Get the current user's chat sessions."""
+def get_sessions(limit: int = 20, status: str = "active") -> list:
+	"""Get the current user's chat sessions.
+
+	Args:
+		limit: Maximum number of sessions to return.
+		status: Filter by status (``active``, ``archived``, or ``all``).
+	"""
+	filters = {"user": frappe.session.user}
+	if status != "all":
+		filters["status"] = status
+
 	return frappe.get_all(
 		"Jana Chat Session",
-		filters={
-			"user": frappe.session.user,
-			"status": "active",
-		},
-		fields=["name", "session_title", "agent", "context_doctype", "context_docname", "modified"],
+		filters=filters,
+		fields=["name", "session_title", "agent", "status", "context_doctype", "context_docname", "modified"],
 		order_by="modified desc",
 		limit_page_length=limit,
 	)
+
+
+@frappe.whitelist()
+def archive_session(session_id: str) -> dict:
+	"""Archive a chat session.
+
+	Only the session owner or a Jana Admin can archive a session.
+	"""
+	if not session_id:
+		frappe.throw(_("Session ID is required"))
+
+	session = frappe.get_doc("Jana Chat Session", session_id)
+
+	from jana.permissions import _is_jana_admin
+
+	if session.user != frappe.session.user and not _is_jana_admin():
+		frappe.throw(_("You do not have permission to archive this session"))
+
+	if session.status == "archived":
+		frappe.throw(_("Session is already archived"))
+
+	session.status = "archived"
+	session.save(ignore_permissions=True)
+
+	return {"session_id": session.name, "status": "archived"}
+
+
+@frappe.whitelist()
+def delete_session(session_id: str) -> dict:
+	"""Delete a chat session and all its messages.
+
+	Only the session owner or a Jana Admin can delete a session.
+	Messages are cascade-deleted via the ``on_trash`` handler.
+	"""
+	if not session_id:
+		frappe.throw(_("Session ID is required"))
+
+	session = frappe.get_doc("Jana Chat Session", session_id)
+
+	from jana.permissions import _is_jana_admin
+
+	if session.user != frappe.session.user and not _is_jana_admin():
+		frappe.throw(_("You do not have permission to delete this session"))
+
+	frappe.delete_doc("Jana Chat Session", session_id, ignore_permissions=True)
+
+	return {"session_id": session_id, "deleted": True}
 
 
 @frappe.whitelist()

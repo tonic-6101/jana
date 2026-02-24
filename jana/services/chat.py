@@ -1,11 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Tonic
 
+import json
+
 import frappe
 from frappe import _
 
 from jana.services.context import format_context_for_prompt, get_page_context
 from jana.services.llm.factory import get_provider
+from jana.services.privacy import PIIMasker
+from jana.services.tools.executor import MAX_TOOL_ITERATIONS, ToolExecutor
 
 
 class ChatService:
@@ -42,11 +46,20 @@ class ChatService:
 		context_doctype: str = None,
 		context_docname: str = None,
 	) -> dict:
-		"""Send a user message and get an AI response."""
+		"""Send a user message and get an AI response.
+
+		Supports multi-turn tool calling: if the LLM returns tool_calls,
+		the tools are executed and results fed back until the LLM produces
+		a final text response (or MAX_TOOL_ITERATIONS is reached).
+		"""
 		session = frappe.get_doc("Jana Chat Session", session_id)
 
 		if session.user != frappe.session.user:
 			frappe.throw(_("You do not have access to this session"))
+
+		# Rate limiting — check before doing any work
+		from jana.services.rate_limiter import check_rate_limit
+		check_rate_limit()
 
 		# Update context if the user navigated to a new page
 		if context_doctype and context_docname:
@@ -54,37 +67,104 @@ class ChatService:
 			session.context_docname = context_docname
 			session.save(ignore_permissions=True)
 
-		# Save user message
+		# Save user message (original, unmasked)
 		self._save_message(session_id, "user", content)
 
-		# Build the prompt
+		# Get provider first — masker needs provider_doc to resolve settings
 		agent = frappe.get_doc("Jana Agent", session.agent or "General Assistant")
-		messages = self._build_messages(session, agent)
-
-		# Get provider and call LLM
 		provider_name = agent.provider or None
-		provider = get_provider(provider_name)
+		provider = get_provider(provider_name, user=frappe.session.user)
 
-		model = agent.model or frappe.db.get_single_value("Jana Settings", "default_model")
+		# PII masking: per-request instance, GC'd at end of request
+		masker = PIIMasker(provider.provider_doc)
+
+		# Build the prompt (structured PII masking happens inside)
+		messages = self._build_messages(session, agent, masker=masker)
+
+		# Free-text PII masking on user messages and chat history
+		if masker.enabled:
+			messages = masker.mask_messages(messages)
+
+		from jana.utils import get_jana_settings
+
+		settings = get_jana_settings()
+		model = agent.model or settings.get("default_model")
+		if not model:
+			frappe.throw(_("No model configured. Set a model on the agent or in Jana Settings."))
 		temperature = agent.temperature or 0.7
 		max_tokens = agent.max_tokens or None
 
-		result = provider.complete(
-			messages=messages,
-			model=model,
-			temperature=temperature,
-			max_tokens=max_tokens,
-		)
+		# Resolve available tools for this agent
+		executor = ToolExecutor(agent)
+		tools_spec = executor.get_tools_for_llm() if executor.has_tools else None
 
-		# Save assistant response
+		# Multi-turn tool loop
+		for _iteration in range(MAX_TOOL_ITERATIONS):
+			result = provider.complete(
+				messages=messages,
+				model=model,
+				temperature=temperature,
+				max_tokens=max_tokens,
+				tools=tools_spec,
+			)
+
+			tool_calls = result.get("tool_calls")
+			if not tool_calls:
+				break
+
+			# LLM wants to call tools — save the assistant message with tool_calls
+			assistant_content = result.get("content", "") or ""
+			self._save_message(
+				session_id,
+				"assistant",
+				assistant_content or _("(tool call)"),
+				model=result.get("model"),
+				tokens_used=result.get("tokens_used", 0),
+				tool_calls=tool_calls,
+			)
+
+			# Append assistant message (with tool_calls) to conversation
+			assistant_msg = {"role": "assistant", "content": assistant_content}
+			assistant_msg["tool_calls"] = tool_calls
+			messages.append(assistant_msg)
+
+			# Execute each tool call and append results
+			for tc in tool_calls:
+				tool_result = executor.execute(tc)
+				# Save unmasked tool result to DB (for audit/history)
+				self._save_message(
+					session_id,
+					"tool",
+					tool_result["content"],
+					tool_call_id=tool_result["tool_call_id"],
+				)
+				# Mask tool result before re-sending to LLM
+				result_content = tool_result["content"]
+				if masker.enabled:
+					result_content = masker.mask_text(result_content)
+				messages.append({
+					"role": "tool",
+					"tool_call_id": tool_result["tool_call_id"],
+					"content": result_content,
+				})
+
+		# Final text response (no tool_calls)
+		response_content = result.get("content", "")
+		if masker.enabled:
+			response_content = masker.unmask(response_content)
+
+		# Save assistant response (unmasked — user sees real values)
 		self._save_message(
 			session_id,
 			"assistant",
-			result.get("content", ""),
+			response_content,
 			model=result.get("model"),
 			tokens_used=result.get("tokens_used", 0),
-			tool_calls=result.get("tool_calls"),
 		)
+
+		# Rate counter — successful AI response
+		from jana.services.rate_limiter import increment_rate_counter
+		increment_rate_counter()
 
 		# Auto-title on first exchange
 		if not session.session_title:
@@ -95,24 +175,163 @@ class ChatService:
 			session.save(ignore_permissions=True)
 
 		return {
-			"content": result.get("content", ""),
+			"content": response_content,
 			"model": result.get("model"),
 			"tokens_used": result.get("tokens_used", 0),
 		}
+
+	def send_message_stream(
+		self,
+		session_id: str,
+		content: str,
+		context_doctype: str = None,
+		context_docname: str = None,
+	):
+		"""Send a user message and yield streaming AI response chunks.
+
+		Yields NDJSON lines: ``{"content": "...", "done": false}``
+
+		When the agent has tools enabled, streaming falls back to the
+		non-streaming ``send_message()`` path (tool execution is
+		server-side and not streamable), then yields the final result
+		as a single NDJSON chunk.
+		"""
+		session = frappe.get_doc("Jana Chat Session", session_id)
+
+		if session.user != frappe.session.user:
+			yield json.dumps({"content": "", "done": True, "error": _("You do not have access to this session")}) + "\n"
+			return
+
+		# Rate limiting — check before doing any work
+		from jana.services.rate_limiter import check_rate_limit
+		try:
+			check_rate_limit()
+		except frappe.ValidationError:
+			yield json.dumps({"content": "", "done": True, "error": _("Rate limit exceeded. Please wait before sending more messages.")}) + "\n"
+			return
+
+		# Check if agent has tools — if so, delegate to non-streaming path
+		agent = frappe.get_doc("Jana Agent", session.agent or "General Assistant")
+		executor = ToolExecutor(agent)
+
+		if executor.has_tools:
+			try:
+				result = self.send_message(
+					session_id=session_id,
+					content=content,
+					context_doctype=context_doctype,
+					context_docname=context_docname,
+				)
+				yield json.dumps({"content": result.get("content", ""), "done": True, "model": result.get("model", "")}) + "\n"
+			except Exception:
+				frappe.log_error(title="Jana Tool Streaming Error")
+				yield json.dumps({"content": "", "done": True, "error": _("An error occurred")}) + "\n"
+			return
+
+		# No tools — stream normally
+		if context_doctype and context_docname:
+			session.context_doctype = context_doctype
+			session.context_docname = context_docname
+			session.save(ignore_permissions=True)
+
+		self._save_message(session_id, "user", content)
+
+		provider_name = agent.provider or None
+		provider = get_provider(provider_name, user=frappe.session.user)
+		masker = PIIMasker(provider.provider_doc)
+
+		messages = self._build_messages(session, agent, masker=masker)
+		if masker.enabled:
+			messages = masker.mask_messages(messages)
+
+		from jana.utils import get_jana_settings
+
+		stream_settings = get_jana_settings()
+		model = agent.model or stream_settings.get("default_model")
+		if not model:
+			yield json.dumps({"content": "", "done": True, "error": _("No model configured. Set a model on the agent or in Jana Settings.")}) + "\n"
+			return
+		temperature = agent.temperature or 0.7
+		max_tokens = agent.max_tokens or None
+
+		full_content = ""
+
+		try:
+			for chunk in provider.stream(
+				messages=messages,
+				model=model,
+				temperature=temperature,
+				max_tokens=max_tokens,
+			):
+				chunk_text = chunk.get("content", "")
+				is_done = chunk.get("done", False)
+
+				if chunk_text:
+					full_content += chunk_text
+					if masker.enabled:
+						unmasked = masker.unmask_chunk(chunk_text)
+					else:
+						unmasked = chunk_text
+					if unmasked:
+						yield json.dumps({"content": unmasked, "done": False}) + "\n"
+
+				if is_done:
+					if masker.enabled:
+						remaining = masker.flush_buffer()
+						if remaining:
+							yield json.dumps({"content": remaining, "done": False}) + "\n"
+
+					full_unmasked = masker.unmask(full_content) if masker.enabled else full_content
+					self._save_message(session_id, "assistant", full_unmasked, model=model)
+
+					# Rate counter — successful streaming response
+					from jana.services.rate_limiter import increment_rate_counter
+					increment_rate_counter()
+
+					if not session.session_title:
+						title = content[:80] + ("..." if len(content) > 80 else "")
+						session.session_title = title
+						session.save(ignore_permissions=True)
+
+					yield json.dumps({"content": "", "done": True, "model": model}) + "\n"
+					return
+
+		except Exception:
+			frappe.log_error(title="Jana Streaming Error")
+			if masker.enabled:
+				remaining = masker.flush_buffer()
+				if remaining:
+					yield json.dumps({"content": remaining, "done": False}) + "\n"
+			yield json.dumps({"content": "", "done": True, "error": _("An error occurred during streaming")}) + "\n"
+			return
+
+		# Provider ended without done=True — save what we have
+		if masker.enabled:
+			remaining = masker.flush_buffer()
+			if remaining:
+				yield json.dumps({"content": remaining, "done": False}) + "\n"
+		if full_content:
+			full_unmasked = masker.unmask(full_content) if masker.enabled else full_content
+			self._save_message(session_id, "assistant", full_unmasked, model=model)
+		yield json.dumps({"content": "", "done": True, "model": model}) + "\n"
 
 	def get_session_messages(self, session_id: str, limit: int = 50) -> list:
 		"""Get messages for a session."""
 		messages = frappe.get_all(
 			"Jana Chat Message",
 			filters={"session": session_id},
-			fields=["name", "role", "content", "model", "tokens_used", "creation"],
+			fields=["name", "role", "content", "model", "tokens_used", "tool_calls", "tool_call_id", "creation"],
 			order_by="creation asc",
 			limit_page_length=limit,
 		)
 		return messages
 
-	def _build_messages(self, session, agent) -> list:
-		"""Build the message list for the LLM call."""
+	def _build_messages(self, session, agent, masker=None) -> list:
+		"""Build the message list for the LLM call.
+
+		Includes tool messages and assistant tool_calls in history so the
+		LLM can see previous tool interactions in the conversation.
+		"""
 		messages = []
 
 		# System prompt
@@ -121,6 +340,9 @@ class ChatService:
 		# Inject page context
 		if session.context_doctype and session.context_docname:
 			context = get_page_context(session.context_doctype, session.context_docname)
+			# Structured PII masking while fieldtype metadata is available
+			if masker and masker.enabled and context:
+				context = masker.mask_context_fields(context)
 			context_text = format_context_for_prompt(context)
 			if context_text:
 				system_prompt += "\n\n---\n\n" + context_text
@@ -128,18 +350,31 @@ class ChatService:
 		if system_prompt:
 			messages.append({"role": "system", "content": system_prompt})
 
-		# Chat history
+		# Chat history — include tool messages for proper tool-call context
 		history = frappe.get_all(
 			"Jana Chat Message",
 			filters={"session": session.name},
-			fields=["role", "content"],
+			fields=["role", "content", "tool_calls", "tool_call_id"],
 			order_by="creation asc",
 			limit_page_length=50,
 		)
 
 		for msg in history:
-			if msg.role in ("user", "assistant"):
-				messages.append({"role": msg.role, "content": msg.content})
+			if msg.role == "assistant":
+				entry = {"role": "assistant", "content": msg.content or ""}
+				if msg.tool_calls:
+					try:
+						entry["tool_calls"] = json.loads(msg.tool_calls)
+					except (json.JSONDecodeError, TypeError):
+						pass
+				messages.append(entry)
+			elif msg.role == "tool":
+				entry = {"role": "tool", "content": msg.content or ""}
+				if msg.tool_call_id:
+					entry["tool_call_id"] = msg.tool_call_id
+				messages.append(entry)
+			elif msg.role == "user":
+				messages.append({"role": "user", "content": msg.content or ""})
 
 		return messages
 
@@ -154,8 +389,11 @@ class ChatService:
 
 		tool_calls = kwargs.get("tool_calls")
 		if tool_calls:
-			import json
 			msg.tool_calls = json.dumps(tool_calls)
+
+		tool_call_id = kwargs.get("tool_call_id")
+		if tool_call_id:
+			msg.tool_call_id = tool_call_id
 
 		msg.insert(ignore_permissions=True)
 		frappe.db.commit()

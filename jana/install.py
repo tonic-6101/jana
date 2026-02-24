@@ -4,6 +4,8 @@
 import frappe
 from frappe import _
 
+from jana.services.tools.builtin import attach_tools_to_agent, install_builtin_tools
+
 GENERAL_ASSISTANT_PROMPT = """You are Jana, an AI assistant embedded in the Frappe framework. You help \
 users understand their business data, navigate the system, and work more \
 efficiently within Frappe Desk.
@@ -56,8 +58,21 @@ details, and compliance-related information, against the actual records in \
 their system."""
 
 
+def _create_roles():
+	"""Create Jana-specific roles if they don't exist."""
+	for role_name in ("Jana User", "Jana Admin"):
+		if not frappe.db.exists("Role", role_name):
+			role = frappe.new_doc("Role")
+			role.role_name = role_name
+			role.desk_access = 1
+			role.insert(ignore_permissions=True)
+	frappe.db.commit()
+
+
 def after_install():
-	"""Create default General Assistant agent after installation."""
+	"""Create roles, default General Assistant agent, and built-in tools."""
+	_create_roles()
+
 	if not frappe.db.exists("Jana Agent", "General Assistant"):
 		agent = frappe.new_doc("Jana Agent")
 		agent.agent_name = "General Assistant"
@@ -66,3 +81,6 @@ def after_install():
 		agent.temperature = 0.7
 		agent.insert(ignore_permissions=True)
 		frappe.db.commit()
+
+	install_builtin_tools()
+	attach_tools_to_agent("General Assistant")

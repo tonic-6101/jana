@@ -34,3 +34,19 @@ class JanaTool(Document):
 				json.loads(self.parameters_schema)
 			except (json.JSONDecodeError, TypeError):
 				frappe.throw(_("Parameters Schema must be valid JSON"))
+
+	def on_trash(self):
+		"""Prevent deletion if any agent references this tool."""
+		referencing = frappe.get_all(
+			"Jana Agent Tool",
+			filters={"tool": self.name},
+			fields=["parent"],
+			limit_page_length=5,
+		)
+		if referencing:
+			agents = ", ".join(sorted({r.parent for r in referencing}))
+			frappe.throw(
+				_("Cannot delete tool {0}: referenced by agent(s): {1}").format(
+					self.tool_name, agents
+				)
+			)

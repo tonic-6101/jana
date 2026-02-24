@@ -22,6 +22,7 @@ class JanaWidget {
 			defaultAgent: config.default_agent,
 			streaming: config.streaming,
 			capabilities: config.capabilities,
+			oauthProviders: config.oauth_providers || [],
 		});
 
 		this.app.mount(mountPoint);

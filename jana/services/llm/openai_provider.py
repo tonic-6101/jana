@@ -16,17 +16,36 @@ DEFAULT_BASE_URL = "https://api.openai.com/v1"
 class OpenAIProvider(LLMProvider):
 	"""OpenAI-compatible chat completions provider.
 
-	Works with OpenAI, Azure OpenAI, and any OpenAI-compatible API.
+	Works with OpenAI, Azure OpenAI, OpenRouter, and any OpenAI-compatible API.
 	"""
 
 	def _get_base_url(self) -> str:
+		if self.provider_type == "openrouter":
+			return (self.api_base_url or "https://openrouter.ai/api/v1").rstrip("/")
 		return (self.api_base_url or DEFAULT_BASE_URL).rstrip("/")
 
+	def _resolve_credential(self) -> str:
+		"""Resolve the credential for this request.
+
+		For Google OAuth providers, uses the OAuth token from Connected App.
+		For everything else, uses the standard API key resolution chain.
+		"""
+		if self.auth_method == "OAuth" and self.provider_type == "google":
+			token = self._get_oauth_token()
+			if token:
+				return token
+		return self._get_api_key()
+
 	def _get_headers(self) -> dict:
-		return {
-			"Authorization": f"Bearer {self._get_api_key()}",
+		headers = {
+			"Authorization": f"Bearer {self._resolve_credential()}",
 			"Content-Type": "application/json",
 		}
+		if self.provider_type == "openrouter":
+			site_url = frappe.utils.get_url()
+			headers["HTTP-Referer"] = site_url
+			headers["X-Title"] = "Jana AI"
+		return headers
 
 	def _build_payload(self, messages, model, temperature, max_tokens, tools, stream=False):
 		payload = {
@@ -55,9 +74,19 @@ class OpenAIProvider(LLMProvider):
 		except requests.exceptions.Timeout:
 			frappe.throw(_("OpenAI API request timed out. Please try again."))
 
-		data = response.json()
-		choice = data["choices"][0]
-		message = choice["message"]
+		try:
+			data = response.json()
+		except ValueError:
+			frappe.throw(_("Invalid response from AI provider (not JSON)."))
+
+		choices = data.get("choices")
+		if not choices:
+			error_msg = data.get("error", {}).get("message", "")
+			frappe.throw(_("Unexpected response from AI provider: {0}").format(
+				error_msg or _("no choices returned")
+			))
+
+		message = choices[0].get("message", {})
 
 		result = {
 			"content": message.get("content", ""),
@@ -84,6 +113,7 @@ class OpenAIProvider(LLMProvider):
 		except requests.exceptions.ConnectionError:
 			frappe.throw(_("Could not connect to OpenAI API. Check your API base URL."))
 
+		chunk_count = 0
 		for line in response.iter_lines():
 			if not line:
 				continue
@@ -104,6 +134,10 @@ class OpenAIProvider(LLMProvider):
 					"content": delta.get("content", ""),
 					"done": False,
 				}
+				chunk_count += 1
+				if chunk_count >= 50000:
+					yield {"content": "", "done": True}
+					return
 			except (json.JSONDecodeError, KeyError, IndexError):
 				continue
 
