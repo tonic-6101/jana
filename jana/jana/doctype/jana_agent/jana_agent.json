@@ -18,7 +18,9 @@
   "temperature",
   "max_tokens",
   "tools_section",
-  "tools"
+  "tools",
+  "knowledge_section",
+  "knowledge"
  ],
  "fields": [
   {
@@ -98,6 +100,17 @@
    "fieldtype": "Table",
    "label": "Tools",
    "options": "Jana Agent Tool"
+  },
+  {
+   "fieldname": "knowledge_section",
+   "fieldtype": "Section Break",
+   "label": "Knowledge"
+  },
+  {
+   "fieldname": "knowledge",
+   "fieldtype": "Table",
+   "label": "Knowledge Articles",
+   "options": "Jana Agent Knowledge"
   }
  ],
  "links": [],

@@ -1,0 +1,97 @@
+{
+ "actions": [],
+ "autoname": "field:article_title",
+ "creation": "2026-02-24 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "article_title",
+  "category",
+  "column_break_config",
+  "doctype_scope",
+  "enabled",
+  "content_section",
+  "content"
+ ],
+ "fields": [
+  {
+   "fieldname": "article_title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "general",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "general\npolicy\nprocess\nproduct\nfaq"
+  },
+  {
+   "fieldname": "column_break_config",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "When set, this article is automatically included for conversations on the specified DocType.",
+   "fieldname": "doctype_scope",
+   "fieldtype": "Link",
+   "label": "DocType Scope",
+   "options": "DocType"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "content_section",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "fieldname": "content",
+   "fieldtype": "Text Editor",
+   "label": "Content",
+   "reqd": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-02-24 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Jana",
+ "name": "Jana Knowledge Article",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "Jana Admin",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Jana User"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

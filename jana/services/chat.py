@@ -7,6 +7,7 @@ import frappe
 from frappe import _
 
 from jana.services.context import format_context_for_prompt, get_page_context
+from jana.services.knowledge import format_knowledge_for_prompt, get_knowledge_for_prompt
 from jana.services.llm.factory import get_provider
 from jana.services.privacy import PIIMasker
 from jana.services.tools.executor import MAX_TOOL_ITERATIONS, ToolExecutor
@@ -329,15 +330,37 @@ class ChatService:
 	def _build_messages(self, session, agent, masker=None) -> list:
 		"""Build the message list for the LLM call.
 
+		Prompt assembly order:
+		1. Business description (global, from Jana Settings)
+		2. Knowledge articles (agent-attached + scope-matched)
+		3. Agent system prompt
+		4. Page context (with PII masking)
+
 		Includes tool messages and assistant tool_calls in history so the
 		LLM can see previous tool interactions in the conversation.
 		"""
 		messages = []
+		parts = []
 
-		# System prompt
-		system_prompt = agent.system_prompt or ""
+		# 1. Business description (global)
+		business_desc = frappe.db.get_single_value("Jana Settings", "business_description")
+		if business_desc:
+			parts.append(business_desc)
 
-		# Inject page context
+		# 2. Knowledge articles (agent-attached + scope-matched)
+		context_doctype = session.context_doctype if session.context_doctype else None
+		knowledge_articles = get_knowledge_for_prompt(agent.name, context_doctype)
+		if knowledge_articles:
+			token_budget = frappe.db.get_single_value("Jana Settings", "knowledge_token_budget") or 30000
+			knowledge_text = format_knowledge_for_prompt(knowledge_articles, token_budget)
+			if knowledge_text:
+				parts.append(knowledge_text)
+
+		# 3. Agent system prompt
+		if agent.system_prompt:
+			parts.append(agent.system_prompt)
+
+		# 4. Page context (with PII masking)
 		if session.context_doctype and session.context_docname:
 			context = get_page_context(session.context_doctype, session.context_docname)
 			# Structured PII masking while fieldtype metadata is available
@@ -345,7 +368,9 @@ class ChatService:
 				context = masker.mask_context_fields(context)
 			context_text = format_context_for_prompt(context)
 			if context_text:
-				system_prompt += "\n\n---\n\n" + context_text
+				parts.append(context_text)
+
+		system_prompt = "\n\n---\n\n".join(parts) if parts else ""
 
 		if system_prompt:
 			messages.append({"role": "system", "content": system_prompt})

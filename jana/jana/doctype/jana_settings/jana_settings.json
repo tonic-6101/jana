@@ -17,6 +17,11 @@
   "rate_limit_per_hour",
   "column_break_limits",
   "session_retention_days",
+  "knowledge_section",
+  "business_description",
+  "column_break_knowledge",
+  "knowledge_token_budget",
+  "knowledge_description",
   "capabilities_section",
   "enable_chat",
   "enable_read_documents",
@@ -101,6 +106,33 @@
    "fieldname": "session_retention_days",
    "fieldtype": "Int",
    "label": "Session Retention (days)"
+  },
+  {
+   "fieldname": "knowledge_section",
+   "fieldtype": "Section Break",
+   "label": "Knowledge"
+  },
+  {
+   "description": "Describe your business, industry, rules, and preferences. This context is included in every AI conversation.",
+   "fieldname": "business_description",
+   "fieldtype": "Long Text",
+   "label": "Business Description"
+  },
+  {
+   "fieldname": "column_break_knowledge",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "30000",
+   "description": "Maximum number of tokens allocated for knowledge articles in the system prompt. Articles exceeding this budget are truncated.",
+   "fieldname": "knowledge_token_budget",
+   "fieldtype": "Int",
+   "label": "Knowledge Token Budget"
+  },
+  {
+   "fieldname": "knowledge_description",
+   "fieldtype": "HTML",
+   "options": "<p class='text-muted small'>Knowledge articles and the business description are injected into the AI system prompt to give Jana context about your organisation. Create articles at <b>Jana Knowledge Article</b> and attach them to agents.</p>"
   },
   {
    "fieldname": "capabilities_section",

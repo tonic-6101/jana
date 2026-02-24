@@ -10,3 +10,4 @@ jana.patches.v0_1.install_builtin_tools
 jana.patches.v0_1.update_doctype_permissions
 jana.patches.v0_1.add_rate_limit_setting
 jana.patches.v0_1.add_session_retention_setting
+jana.patches.v0_1.add_knowledge_settings
