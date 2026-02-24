@@ -25,6 +25,7 @@ class JanaSettings(Document):
 		enable_streaming: DF.Check
 		enable_tool_calling: DF.Check
 		max_context_tokens: DF.Int
+		require_write_confirmation: DF.Check
 		rate_limit_per_hour: DF.Int
 		session_retention_days: DF.Int
 	# end: auto-generated types

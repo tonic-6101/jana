@@ -5,6 +5,7 @@
 
 import json
 import re
+import uuid
 
 import frappe
 from frappe import _
@@ -188,26 +189,109 @@ class ToolExecutor:
 		return {"doctype": doctype, "count": len(results), "data": results}
 
 	def _handle_create_document(self, doctype: str, values: dict, **_kw) -> dict:
-		"""Create a new document."""
+		"""Create a new document, or return a preview if confirmation is required."""
 		frappe.has_permission(doctype, ptype="create", throw=True)
+
+		if cint(self.settings.get("require_write_confirmation")):
+			confirmation_id = str(uuid.uuid4())
+			cache_key = f"jana_pending_write:{frappe.session.user}:{confirmation_id}"
+			frappe.cache.set_value(cache_key, {
+				"type": "create",
+				"doctype": doctype,
+				"values": values,
+				"user": frappe.session.user,
+			}, expires_in_sec=300)
+			return {
+				"status": "pending_confirmation",
+				"confirmation_id": confirmation_id,
+				"action": "create",
+				"doctype": doctype,
+				"values": values,
+				"message": _(
+					"Preview: Create a new {0}. Present these values to the user "
+					"and call confirm_write with the confirmation_id after they approve."
+				).format(doctype),
+			}
 
 		doc = frappe.new_doc(doctype)
 		doc.update(values)
 		doc.insert()
 		frappe.db.commit()
-		return {"doctype": doctype, "name": doc.name, "status": "created"}
+		url = f"/app/{frappe.scrub(doctype)}/{doc.name}"
+		return {"doctype": doctype, "name": doc.name, "status": "created", "url": url}
 
 	def _handle_update_document(
 		self, doctype: str, name: str, values: dict, **_kw
 	) -> dict:
-		"""Update fields on an existing document."""
+		"""Update fields on an existing document, or return a preview if confirmation is required."""
 		frappe.has_permission(doctype, doc=name, ptype="write", throw=True)
+
+		if cint(self.settings.get("require_write_confirmation")):
+			doc = frappe.get_doc(doctype, name)
+			current_values = {field: doc.get(field) for field in values}
+
+			confirmation_id = str(uuid.uuid4())
+			cache_key = f"jana_pending_write:{frappe.session.user}:{confirmation_id}"
+			frappe.cache.set_value(cache_key, {
+				"type": "update",
+				"doctype": doctype,
+				"name": name,
+				"values": values,
+				"user": frappe.session.user,
+			}, expires_in_sec=300)
+			return {
+				"status": "pending_confirmation",
+				"confirmation_id": confirmation_id,
+				"action": "update",
+				"doctype": doctype,
+				"name": name,
+				"current_values": current_values,
+				"new_values": values,
+				"message": _(
+					"Preview: Update {0} {1}. Show the user what will change "
+					"and call confirm_write with the confirmation_id after they approve."
+				).format(doctype, name),
+			}
 
 		doc = frappe.get_doc(doctype, name)
 		doc.update(values)
 		doc.save()
 		frappe.db.commit()
-		return {"doctype": doctype, "name": doc.name, "status": "updated"}
+		url = f"/app/{frappe.scrub(doctype)}/{doc.name}"
+		return {"doctype": doctype, "name": doc.name, "status": "updated", "url": url}
+
+	def _handle_confirm_write(self, confirmation_id: str, **_kw) -> dict:
+		"""Execute a previously previewed write action after user confirmation."""
+		cache_key = f"jana_pending_write:{frappe.session.user}:{confirmation_id}"
+		action = frappe.cache.get_value(cache_key)
+
+		if not action:
+			return {"error": _("Confirmation expired or not found. Please try the action again.")}
+
+		if action.get("user") != frappe.session.user:
+			return {"error": _("Permission denied")}
+
+		frappe.cache.delete_value(cache_key)
+
+		if action["type"] == "create":
+			frappe.has_permission(action["doctype"], ptype="create", throw=True)
+			doc = frappe.new_doc(action["doctype"])
+			doc.update(action["values"])
+			doc.insert()
+			frappe.db.commit()
+			url = f"/app/{frappe.scrub(action['doctype'])}/{doc.name}"
+			return {"doctype": action["doctype"], "name": doc.name, "status": "created", "url": url}
+
+		if action["type"] == "update":
+			frappe.has_permission(action["doctype"], doc=action["name"], ptype="write", throw=True)
+			doc = frappe.get_doc(action["doctype"], action["name"])
+			doc.update(action["values"])
+			doc.save()
+			frappe.db.commit()
+			url = f"/app/{frappe.scrub(action['doctype'])}/{doc.name}"
+			return {"doctype": action["doctype"], "name": doc.name, "status": "updated", "url": url}
+
+		return {"error": _("Unknown action type")}
 
 	def _handle_run_report(
 		self,

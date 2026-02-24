@@ -83,7 +83,9 @@ BUILTIN_TOOLS = [
 		"method": "create_document",
 		"description": (
 			"Create a new Frappe document. Provide the DocType and field values. "
-			"The document is inserted and submitted if applicable."
+			"When write confirmation is enabled, returns a preview with a "
+			"confirmation_id. Present the preview to the user and call "
+			"confirm_write after they approve."
 		),
 		"parameters_schema": json.dumps({
 			"type": "object",
@@ -107,7 +109,9 @@ BUILTIN_TOOLS = [
 		"method": "update_document",
 		"description": (
 			"Update fields on an existing Frappe document. "
-			"Only the specified fields are changed."
+			"When write confirmation is enabled, returns a preview showing "
+			"current vs new values with a confirmation_id. Present the changes "
+			"to the user and call confirm_write after they approve."
 		),
 		"parameters_schema": json.dumps({
 			"type": "object",
@@ -128,6 +132,27 @@ BUILTIN_TOOLS = [
 			"required": ["doctype", "name", "values"],
 		}),
 		"settings_toggle": "enable_modify_documents",
+	},
+	{
+		"tool_name": "confirm_write",
+		"tool_type": "frappe_api",
+		"method": "confirm_write",
+		"description": (
+			"Execute a previously previewed write action after the user has "
+			"confirmed. Requires the confirmation_id from the create_document "
+			"or update_document preview response."
+		),
+		"parameters_schema": json.dumps({
+			"type": "object",
+			"properties": {
+				"confirmation_id": {
+					"type": "string",
+					"description": "The confirmation_id from the preview response",
+				},
+			},
+			"required": ["confirmation_id"],
+		}),
+		"settings_toggle": "enable_tool_calling",
 	},
 	{
 		"tool_name": "run_report",
