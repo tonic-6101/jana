@@ -28,8 +28,11 @@ Each capability can be individually enabled or disabled. These are site-wide set
 | **Enable Navigate** | Allow Jana to suggest page navigation | Disabled |
 | **Enable Report Queries** | Allow Jana to query reports | Disabled |
 | **Enable Modify Documents** | Allow Jana to propose modifications to existing documents | Disabled |
+| **Require Write Confirmation** | When enabled, create and update actions show a preview and require user approval before executing. Only visible when Create or Modify Documents is enabled. | Enabled |
 
 Capabilities that are disabled will not be available to any agent regardless of the agent's configuration.
+
+When **Require Write Confirmation** is enabled, the AI presents a preview of the proposed changes and asks the user to confirm before executing. This uses a server-side cache (5-minute TTL) and a dedicated `confirm_write` tool. The entire confirmation flow happens naturally in conversation — no separate UI is needed.
 
 ### Limits
 

@@ -5,7 +5,7 @@
 
 <p align="center">
   <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"></a>
-  <img src="https://img.shields.io/badge/version-0.0.1-green" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.1.0-green" alt="Version">
   <img src="https://img.shields.io/badge/Frappe-v15+-purple" alt="Frappe v15+">
   <img src="https://img.shields.io/badge/Python-3.10+-yellow" alt="Python 3.10+">
 </p>

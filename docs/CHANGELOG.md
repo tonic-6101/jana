@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.1.0] - 2026-02-25
+
+### Added (Month 2 — Interface & Agents)
+
+- Vue 3 SPA frontend with full-featured pages: Chat, Settings, Agents, Agent Form, Content Generation
+- Polished Desk chat widget: markdown rendering, auto-resize textarea, abort streaming, agent selector, keyboard shortcut (Ctrl+Shift+J), copy button on assistant messages
+- Fixed Vue reactivity for streaming messages (mutations through reactive array index)
+- Chat sidebar with session history, rename, archive, delete
+- Agent creation form: system prompt, model config, tool and knowledge attachment
+- Content generation page: email drafting, description generation, report summarisation
+- Settings UI with 6 tabs: General, Providers, Capabilities, Limits, Knowledge, My Keys
+- Provider connection testing with latency display
+- Accounting Assistant agent template with knowledge articles (Chart of Accounts, Invoice Processing, Bank Reconciliation)
+- Marketplace template records for pre-built agents
+
+### Added (Month 3 — Polish & Launch)
+
+- CRM Assistant agent template with lead management and sales pipeline knowledge articles
+- HR Assistant agent template with leave management and payroll knowledge articles
+- Ask AI (Data Analyst agent) — natural language querying via dynamic report discovery
+  - Discovers available Frappe reports at runtime, filtered by user permissions
+  - Injects report list into the agent's system prompt via `{{AVAILABLE_REPORTS}}` placeholder
+  - Users ask questions in plain English; the LLM selects and runs the appropriate report
+- Report discovery service (`jana.services.query`) with `get_available_reports()` and `format_reports_for_prompt()`
+- Data Analysis Tips knowledge article with common report names, filter patterns, and date format conventions
+- Agent template installation tests (`test_agent_templates.py`)
+- Report discovery and prompt injection tests (`test_query.py`)
+- Version sync script (`bump_version.py`) to keep VERSION, __init__.py, package.json, and README.md in sync
+
+### Added (Phase 1 Polish)
+
+- Navigate-to-page frontend integration: internal `/app/...` links in assistant messages are now clickable
+  - Desk widget uses `frappe.set_route()` for smooth SPA navigation
+  - SPA component navigates to Frappe Desk or opens external links in new tabs
+- Write confirmation dialog for create/update tools
+  - New `require_write_confirmation` setting in Jana Settings (default: ON)
+  - When enabled, `create_document` and `update_document` return a preview with a `confirmation_id` instead of executing immediately
+  - New `confirm_write` tool executes pending actions after user approval via conversation
+  - Pending actions stored in Redis cache with 5-minute TTL, scoped per user
+  - Write confirmation tests (`test_write_confirmation.py`)
+- Context Level 3 — workflow actions
+  - Document context now includes docstatus label (Draft / Submitted / Cancelled) for submittable DocTypes
+  - Available actions (Submit, Cancel, Amend) detected based on user permissions
+  - Active Frappe Workflow detection: workflow state and available transitions filtered by user role
+  - AI prompt now shows document status, workflow state, and available actions
+  - Context tests (`test_context.py`)
+
 ## [0.0.1] - 2026-02-24
 
 ### Added

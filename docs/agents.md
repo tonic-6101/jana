@@ -26,6 +26,71 @@ The General Assistant:
 - Drafts content based on document context
 - Clearly communicates what it can and cannot do
 
+## Built-in Agent Templates
+
+Jana ships with five pre-built agents installed automatically when you set up the app. Each agent is tuned for a specific domain with appropriate system prompts, tools, and knowledge articles.
+
+### Accounting Assistant
+
+Specialised for financial data: invoices, payments, journal entries, GL queries, bank reconciliation, and ageing analysis.
+
+**Example prompts:**
+- "What's the outstanding amount on this invoice?"
+- "Show me the ageing report for accounts receivable"
+- "Walk me through the bank reconciliation process"
+
+**Tools:** read_document, list_documents, run_report, navigate_to_page
+**Knowledge:** Chart of Accounts, Invoice Processing, Bank Reconciliation
+**Temperature:** 0.5
+
+### CRM Assistant
+
+Specialised for customer relationship management: lead tracking, opportunity pipelines, quotation workflows, and sales analytics.
+
+**Example prompts:**
+- "What's the status of this lead?"
+- "Show me the sales pipeline for this quarter"
+- "Draft a follow-up email for this opportunity"
+
+**Tools:** read_document, list_documents, run_report, navigate_to_page
+**Knowledge:** Lead Management, Sales Pipeline
+**Temperature:** 0.5
+
+### HR Assistant
+
+Specialised for human resources: employee records, leave management, attendance, payroll, and recruitment workflows.
+
+**Example prompts:**
+- "How many leave days do I have remaining?"
+- "Explain the deductions on this salary slip"
+- "Show me the attendance report for this month"
+
+**Tools:** read_document, list_documents, run_report, navigate_to_page
+**Knowledge:** Leave Management, Payroll Basics
+**Temperature:** 0.5
+
+### Data Analyst (Ask AI)
+
+A natural language querying agent that answers business questions by selecting and running the appropriate Frappe report.
+
+**How it works:**
+1. You ask a question in plain English
+2. The agent discovers available reports (filtered by your permissions)
+3. It selects the right report and constructs filters
+4. It runs the report and explains the results
+
+**Example prompts:**
+- "Show me overdue invoices"
+- "How many leads came from the website this month?"
+- "Compare this quarter's sales to last quarter"
+- "What's our stock balance for Item X?"
+
+**Tools:** read_document, list_documents, run_report, navigate_to_page
+**Knowledge:** Data Analysis Tips
+**Temperature:** 0.3 (low for deterministic data queries)
+
+The Data Analyst uses a dynamic report discovery mechanism — available reports are injected into the agent's system prompt at runtime, so it always knows which reports you have access to.
+
 ## Creating an Agent
 
 1. Navigate to `/app/jana-agent/new`

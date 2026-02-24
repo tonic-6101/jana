@@ -91,6 +91,42 @@ Your admin can create **Knowledge Articles** (`/app/jana-knowledge-article`) con
 
 You don't need to do anything to benefit from knowledge articles — they're injected into the AI's context automatically. If you notice Jana giving answers that don't match your company's policies, ask your admin to add a knowledge article with the correct information.
 
+## Ask AI — Natural Language Querying
+
+Jana includes a **Data Analyst** agent that answers business questions by running Frappe reports for you. Instead of navigating to a report page, selecting filters, and interpreting rows — just ask in plain English.
+
+### How to Use It
+
+1. Open the Jana chat widget
+2. Switch to the **Data Analyst** agent (from the agent selector)
+3. Ask your question
+
+### Example Questions
+
+- "Show me overdue invoices"
+- "How many leads did we get from the website this month?"
+- "What's the stock balance for Item A?"
+- "Compare this quarter's revenue to last quarter"
+- "Who are our top 5 customers by revenue?"
+
+### How It Works
+
+The Data Analyst agent:
+1. Discovers all reports you have access to (based on your Frappe permissions)
+2. Selects the most relevant report for your question
+3. Constructs the right filters (date ranges, statuses, party names)
+4. Runs the report and summarises the results
+5. Offers to drill down if you need more detail
+
+If no report matches your question exactly, the agent falls back to querying documents directly.
+
+### Tips
+
+- Include time periods in your question: "this month", "last quarter", "since January"
+- Mention specific entities: "for Customer X", "in the Accounts department"
+- Ask follow-up questions: "Show me the details on the largest one"
+- The agent works with any report you have access to in Frappe, including custom reports
+
 ## Tips for Better Results
 
 ### Be Specific
