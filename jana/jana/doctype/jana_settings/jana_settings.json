@@ -1,0 +1,149 @@
+{
+ "actions": [],
+ "creation": "2026-02-24 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "provider_section",
+  "default_provider",
+  "column_break_provider",
+  "default_model",
+  "section_break_general",
+  "max_context_tokens",
+  "column_break_general",
+  "enable_streaming",
+  "enable_tool_calling",
+  "capabilities_section",
+  "enable_chat",
+  "enable_read_documents",
+  "enable_draft_content",
+  "column_break_capabilities",
+  "enable_create_documents",
+  "enable_navigate",
+  "enable_report_queries",
+  "enable_modify_documents"
+ ],
+ "fields": [
+  {
+   "fieldname": "provider_section",
+   "fieldtype": "Section Break",
+   "label": "Provider"
+  },
+  {
+   "fieldname": "default_provider",
+   "fieldtype": "Link",
+   "label": "Default Provider",
+   "options": "Jana Provider"
+  },
+  {
+   "fieldname": "column_break_provider",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_model",
+   "fieldtype": "Data",
+   "label": "Default Model"
+  },
+  {
+   "fieldname": "section_break_general",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "default": "4096",
+   "fieldname": "max_context_tokens",
+   "fieldtype": "Int",
+   "label": "Max Context Tokens"
+  },
+  {
+   "fieldname": "column_break_general",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_streaming",
+   "fieldtype": "Check",
+   "label": "Enable Streaming Responses"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_tool_calling",
+   "fieldtype": "Check",
+   "label": "Enable Tool Calling"
+  },
+  {
+   "fieldname": "capabilities_section",
+   "fieldtype": "Section Break",
+   "label": "Capabilities"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_chat",
+   "fieldtype": "Check",
+   "label": "Chat / Q&A"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_read_documents",
+   "fieldtype": "Check",
+   "label": "Read Documents"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_draft_content",
+   "fieldtype": "Check",
+   "label": "Draft Content"
+  },
+  {
+   "fieldname": "column_break_capabilities",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_create_documents",
+   "fieldtype": "Check",
+   "label": "Create Documents"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_navigate",
+   "fieldtype": "Check",
+   "label": "Navigate to Pages"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_report_queries",
+   "fieldtype": "Check",
+   "label": "Run Report Queries"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_modify_documents",
+   "fieldtype": "Check",
+   "label": "Modify Existing Documents"
+  }
+ ],
+ "icon": "fa fa-cog",
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-02-24 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Jana",
+ "name": "Jana Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

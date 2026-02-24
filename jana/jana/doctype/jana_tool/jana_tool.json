@@ -1,0 +1,93 @@
+{
+ "actions": [],
+ "autoname": "field:tool_name",
+ "creation": "2026-02-24 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tool_name",
+  "tool_type",
+  "column_break_config",
+  "enabled",
+  "method",
+  "details_section",
+  "description",
+  "parameters_schema"
+ ],
+ "fields": [
+  {
+   "fieldname": "tool_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Tool Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "tool_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Tool Type",
+   "options": "frappe_api\nwebhook\ncustom",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_config",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "description": "Frappe API method path (e.g. frappe.client.get)",
+   "fieldname": "method",
+   "fieldtype": "Data",
+   "label": "Method"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "description": "Description for the LLM (used in function calling)",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "description": "JSON Schema for tool parameters",
+   "fieldname": "parameters_schema",
+   "fieldtype": "JSON",
+   "label": "Parameters Schema"
+  }
+ ],
+ "links": [],
+ "modified": "2026-02-24 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Jana",
+ "name": "Jana Tool",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
