@@ -92,3 +92,98 @@ export interface JanaBootConfig {
     modify_documents: boolean;
   };
 }
+
+// --- Runtime chat types (not DocType shapes) ---
+
+/** Runtime message used in the chat UI */
+export interface ChatMessageUI {
+  name?: string;
+  localId: string;
+  role: "user" | "assistant" | "system" | "tool";
+  content: string;
+  model?: string;
+  tokens_used?: number;
+  creation?: string;
+  streaming?: boolean;
+}
+
+/** Session summary from get_sessions API */
+export interface ChatSessionSummary {
+  name: string;
+  session_title: string | null;
+  agent: string | null;
+  status: "active" | "archived";
+  context_doctype?: string;
+  context_docname?: string;
+  modified: string;
+}
+
+/** Full session detail from get_session API */
+export interface ChatSessionDetail {
+  session: {
+    name: string;
+    session_title: string | null;
+    agent: string | null;
+    status: string;
+    context_doctype?: string;
+    context_docname?: string;
+  };
+  messages: JanaChatMessage[];
+}
+
+/** Agent summary from list_agents API */
+export interface AgentSummary {
+  name: string;
+  agent_name: string;
+  description: string | null;
+  provider: string | null;
+  model: string | null;
+}
+
+// --- Settings types ---
+
+/** Jana Settings Single DocType fields */
+export interface JanaSettings {
+  default_provider: string | null;
+  default_model: string | null;
+  max_context_tokens: number;
+  enable_streaming: boolean;
+  enable_tool_calling: boolean;
+  rate_limit_per_hour: number;
+  session_retention_days: number;
+  business_description: string;
+  knowledge_token_budget: number;
+  enable_chat: boolean;
+  enable_read_documents: boolean;
+  enable_draft_content: boolean;
+  enable_create_documents: boolean;
+  enable_navigate: boolean;
+  enable_report_queries: boolean;
+  enable_modify_documents: boolean;
+  mask_pii: boolean;
+}
+
+/** User's own API key (BYOK) */
+export interface JanaUserKey {
+  name: string;
+  user: string;
+  provider: string;
+  auth_type: "api_key" | "oauth_key" | "oauth_token";
+  enabled: boolean;
+  connected_at: string | null;
+}
+
+/** Result from provider test_connection API */
+export interface ConnectionTestResult {
+  success: boolean;
+  message: string;
+  latency_ms: number;
+  model: string | null;
+}
+
+/** OAuth connection status for a provider */
+export interface OAuthProviderStatus {
+  connected: boolean;
+  provider_type: string;
+  provider_name: string;
+}

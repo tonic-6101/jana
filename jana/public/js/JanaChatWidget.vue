@@ -1,3 +1,8 @@
+<!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  Copyright (C) 2026 Tonic
+-->
+
 <template>
 	<div class="jana-widget">
 		<!-- Floating bubble -->
@@ -73,7 +78,7 @@
 				<!-- Messages -->
 				<div class="jana-messages" ref="messagesContainer">
 					<!-- Welcome / setup message -->
-					<div v-if="!enabled" class="jana-welcome">
+					<div v-if="!props.enabled" class="jana-welcome">
 						<p>{{ __('Welcome to Jana!') }}</p>
 						<template v-if="unconnectedOAuth.length">
 							<p>{{ __('Connect your account to get started:') }}</p>
@@ -105,7 +110,7 @@
 					</div>
 
 					<!-- Loading indicator (typing dots while waiting for first chunk) -->
-					<div v-if="loading && !isStreaming" class="jana-message jana-message-assistant">
+					<div v-if="loading && !isStreamingMsg" class="jana-message jana-message-assistant">
 						<div class="jana-typing">
 							<span></span><span></span><span></span>
 						</div>
@@ -113,7 +118,7 @@
 				</div>
 
 				<!-- Input -->
-				<div v-if="enabled" class="jana-input-area">
+				<div v-if="props.enabled" class="jana-input-area">
 					<textarea
 						ref="inputField"
 						v-model="userInput"
@@ -135,331 +140,413 @@
 	</div>
 </template>
 
-<script>
-export default {
-	name: "JanaChatWidget",
-	props: {
-		enabled: { type: Boolean, default: false },
-		defaultAgent: { type: String, default: "General Assistant" },
-		streaming: { type: Boolean, default: true },
-		capabilities: { type: Object, default: () => ({}) },
-		oauthProviders: { type: Array, default: () => [] },
+<script setup lang="ts">
+import { ref, computed, nextTick } from "vue";
+
+// --- Types ---
+
+interface ChatMessage {
+	name?: string;
+	id?: number;
+	role: "user" | "assistant" | "system" | "tool";
+	content: string;
+	_streaming?: boolean;
+}
+
+interface SessionInfo {
+	name: string;
+	session_title: string;
+	modified: string;
+	agent?: string;
+}
+
+interface OAuthProvider {
+	name: string;
+	provider_name: string;
+	provider_type: string;
+	connected: boolean;
+}
+
+interface StreamChunk {
+	content?: string;
+	error?: string;
+	done?: boolean;
+}
+
+interface PageContext {
+	doctype: string;
+	docname: string;
+}
+
+declare const frappe: {
+	__: (text: string) => string;
+	csrf_token: string;
+	get_route: () => string[];
+	call: (args: { method: string; args?: Record<string, unknown> }) => Promise<{ message: Record<string, unknown> }>;
+	datetime: { prettyDate: (dt: string) => string };
+	msgprint: (args: { title: string; message: string; indicator: string }) => void;
+};
+
+// --- Props ---
+
+const props = withDefaults(
+	defineProps<{
+		enabled: boolean;
+		defaultAgent: string;
+		streaming: boolean;
+		capabilities: Record<string, boolean>;
+		oauthProviders: OAuthProvider[];
+	}>(),
+	{
+		enabled: false,
+		defaultAgent: "General Assistant",
+		streaming: true,
+		capabilities: () => ({}),
+		oauthProviders: () => [],
 	},
-	data() {
-		return {
-			isOpen: false,
-			messages: [],
-			userInput: "",
-			loading: false,
-			sessionId: null,
-			currentAgent: this.defaultAgent,
-			currentView: "chat",
-			sessions: [],
-			sessionsLoading: false,
+);
+
+// --- State ---
+
+const isOpen = ref(false);
+const messages = ref<ChatMessage[]>([]);
+const userInput = ref("");
+const loading = ref(false);
+const sessionId = ref<string | null>(null);
+const currentAgent = ref(props.defaultAgent);
+const currentView = ref<"chat" | "sessions">("chat");
+const sessions = ref<SessionInfo[]>([]);
+const sessionsLoading = ref(false);
+
+// --- Template refs ---
+
+const messagesContainer = ref<HTMLElement | null>(null);
+const inputField = ref<HTMLTextAreaElement | null>(null);
+
+// --- Translation helper ---
+
+function __(text: string): string {
+	return typeof frappe !== "undefined" && frappe.__ ? frappe.__(text) : text;
+}
+
+// --- Computed ---
+
+const settingsUrl = computed(() => "/app/jana-settings");
+
+const unconnectedOAuth = computed(() =>
+	props.oauthProviders.filter((p) => !p.connected),
+);
+
+const pageContext = computed((): PageContext | null => {
+	const route = frappe.get_route();
+	if (route && route[0] === "Form" && route.length >= 3) {
+		return { doctype: route[1], docname: route[2] };
+	}
+	return null;
+});
+
+const isStreamingMsg = computed(() => {
+	if (!messages.value.length) return false;
+	const last = messages.value[messages.value.length - 1];
+	return last?._streaming === true;
+});
+
+// --- Methods ---
+
+function scrollToBottom(): void {
+	nextTick(() => {
+		if (messagesContainer.value) {
+			messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+		}
+	});
+}
+
+function openPanel(): void {
+	isOpen.value = true;
+	if (sessionId.value) {
+		currentView.value = "chat";
+	} else {
+		currentView.value = "sessions";
+		fetchSessions();
+	}
+	nextTick(() => {
+		if (currentView.value === "chat" && inputField.value) {
+			inputField.value.focus();
+		}
+	});
+}
+
+function closePanel(): void {
+	isOpen.value = false;
+}
+
+function openSettings(): void {
+	window.open("/app/jana-settings", "_blank");
+}
+
+function startNewChat(): void {
+	messages.value = [];
+	sessionId.value = null;
+	userInput.value = "";
+	currentView.value = "chat";
+	nextTick(() => inputField.value?.focus());
+}
+
+async function showSessionList(): Promise<void> {
+	currentView.value = "sessions";
+	await fetchSessions();
+}
+
+async function fetchSessions(): Promise<void> {
+	sessionsLoading.value = true;
+	try {
+		const response = await frappe.call({
+			method: "jana.api.chat.get_sessions",
+			args: { limit: 20, status: "active" },
+		});
+		sessions.value = (response.message as SessionInfo[]) || [];
+	} catch {
+		sessions.value = [];
+		frappe.msgprint({
+			title: __("Error"),
+			message: __("Could not load chat history."),
+			indicator: "red",
+		});
+	} finally {
+		sessionsLoading.value = false;
+	}
+}
+
+async function loadSession(id: string): Promise<void> {
+	sessionsLoading.value = true;
+	try {
+		const response = await frappe.call({
+			method: "jana.api.chat.get_session",
+			args: { session_id: id },
+		});
+		const data = response.message as {
+			session: { name: string; agent?: string };
+			messages: ChatMessage[];
 		};
-	},
-	computed: {
-		settingsUrl() {
-			return "/app/jana-settings";
-		},
-		unconnectedOAuth() {
-			return this.oauthProviders.filter(p => !p.connected);
-		},
-		pageContext() {
-			const route = frappe.get_route();
-			if (route && route[0] === "Form" && route.length >= 3) {
-				return { doctype: route[1], docname: route[2] };
-			}
-			return null;
-		},
-		isStreaming() {
-			if (!this.messages.length) return false;
-			const last = this.messages[this.messages.length - 1];
-			return last && last._streaming === true;
-		},
-	},
-	methods: {
-		__: function (text) {
-			return typeof frappe !== "undefined" && frappe.__ ? frappe.__(text) : text;
-		},
-		openPanel() {
-			this.isOpen = true;
-			if (this.sessionId) {
-				this.currentView = "chat";
-			} else {
-				this.currentView = "sessions";
-				this.fetchSessions();
-			}
-			this.$nextTick(() => {
-				if (this.currentView === "chat" && this.$refs.inputField) {
-					this.$refs.inputField.focus();
-				}
-			});
-		},
-		closePanel() {
-			this.isOpen = false;
-		},
-		openSettings() {
-			window.open("/app/jana-settings", "_blank");
-		},
-		startNewChat() {
-			this.messages = [];
-			this.sessionId = null;
-			this.userInput = "";
-			this.currentView = "chat";
-			this.$nextTick(() => {
-				if (this.$refs.inputField) {
-					this.$refs.inputField.focus();
-				}
-			});
-		},
-		async showSessionList() {
-			this.currentView = "sessions";
-			await this.fetchSessions();
-		},
-		async fetchSessions() {
-			this.sessionsLoading = true;
-			try {
-				const response = await frappe.call({
-					method: "jana.api.chat.get_sessions",
-					args: { limit: 20, status: "active" },
-				});
-				this.sessions = response.message || [];
-			} catch (err) {
-				this.sessions = [];
-				frappe.msgprint({
-					title: this.__("Error"),
-					message: this.__("Could not load chat history."),
-					indicator: "red",
-				});
-			} finally {
-				this.sessionsLoading = false;
-			}
-		},
-		async loadSession(sessionId) {
-			this.sessionsLoading = true;
-			try {
-				const response = await frappe.call({
-					method: "jana.api.chat.get_session",
-					args: { session_id: sessionId },
-				});
-				const data = response.message;
-				this.sessionId = data.session.name;
-				this.currentAgent = data.session.agent || this.defaultAgent;
-				this.messages = (data.messages || [])
-					.filter(function (msg) {
-						return msg.role === "user" || msg.role === "assistant";
-					})
-					.map(function (msg) {
-						return {
-							name: msg.name,
-							role: msg.role,
-							content: msg.content,
-						};
-					});
-				this.currentView = "chat";
-				this.scrollToBottom();
-			} catch (err) {
-				frappe.msgprint({
-					title: this.__("Error"),
-					message: this.__("Could not load this conversation."),
-					indicator: "red",
-				});
-			} finally {
-				this.sessionsLoading = false;
-			}
-		},
-		formatTime(datetime) {
-			if (!datetime) return "";
-			if (typeof frappe !== "undefined" && frappe.datetime && frappe.datetime.prettyDate) {
-				return frappe.datetime.prettyDate(datetime);
-			}
-			return datetime;
-		},
-		async ensureSession() {
-			if (this.sessionId) return;
+		sessionId.value = data.session.name;
+		currentAgent.value = data.session.agent || props.defaultAgent;
+		messages.value = (data.messages || [])
+			.filter((msg) => msg.role === "user" || msg.role === "assistant")
+			.map((msg) => ({
+				name: msg.name,
+				role: msg.role,
+				content: msg.content,
+			}));
+		currentView.value = "chat";
+		scrollToBottom();
+	} catch {
+		frappe.msgprint({
+			title: __("Error"),
+			message: __("Could not load this conversation."),
+			indicator: "red",
+		});
+	} finally {
+		sessionsLoading.value = false;
+	}
+}
 
-			const ctx = this.pageContext;
-			try {
-				const response = await frappe.call({
-					method: "jana.api.chat.create_session",
-					args: {
-						agent: this.currentAgent,
-						context_doctype: ctx ? ctx.doctype : null,
-						context_docname: ctx ? ctx.docname : null,
-					},
-				});
-				this.sessionId = response.message.session_id;
-			} catch (err) {
-				frappe.msgprint({
-					title: this.__("Error"),
-					message: this.__("Could not create chat session. Please try again."),
-					indicator: "red",
-				});
-			}
+function formatTime(datetime: string): string {
+	if (!datetime) return "";
+	if (typeof frappe !== "undefined" && frappe.datetime?.prettyDate) {
+		return frappe.datetime.prettyDate(datetime);
+	}
+	return datetime;
+}
+
+async function ensureSession(): Promise<void> {
+	if (sessionId.value) return;
+
+	const ctx = pageContext.value;
+	try {
+		const response = await frappe.call({
+			method: "jana.api.chat.create_session",
+			args: {
+				agent: currentAgent.value,
+				context_doctype: ctx?.doctype ?? null,
+				context_docname: ctx?.docname ?? null,
+			},
+		});
+		const data = response.message as { session_id: string };
+		sessionId.value = data.session_id;
+	} catch {
+		frappe.msgprint({
+			title: __("Error"),
+			message: __("Could not create chat session. Please try again."),
+			indicator: "red",
+		});
+	}
+}
+
+async function sendMessageStreaming(
+	content: string,
+	ctx: PageContext | null,
+): Promise<void> {
+	const response = await fetch(
+		"/api/method/jana.api.chat.send_message_stream",
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/x-ndjson",
+				"X-Frappe-CSRF-Token": frappe.csrf_token,
+			},
+			body: JSON.stringify({
+				session_id: sessionId.value,
+				content,
+				context_doctype: ctx?.doctype ?? null,
+				context_docname: ctx?.docname ?? null,
+			}),
 		},
-		async sendMessage() {
-			const content = this.userInput.trim();
-			if (!content || this.loading) return;
+	);
 
-			this.userInput = "";
-			this.messages.push({
-				id: Date.now(),
-				role: "user",
-				content: content,
-			});
-			this.scrollToBottom();
+	if (!response.ok) {
+		throw new Error(`Stream request failed: ${response.status}`);
+	}
 
-			this.loading = true;
+	const assistantMsg: ChatMessage = {
+		id: Date.now() + 1,
+		role: "assistant",
+		content: "",
+		_streaming: true,
+	};
+	messages.value.push(assistantMsg);
+	scrollToBottom();
 
+	const reader = response.body!.getReader();
+	const decoder = new TextDecoder();
+	let buffer = "";
+
+	while (true) {
+		const { done, value } = await reader.read();
+		if (done) break;
+
+		buffer += decoder.decode(value, { stream: true });
+		const lines = buffer.split("\n");
+		buffer = lines.pop()!;
+
+		for (const line of lines) {
+			if (!line.trim()) continue;
 			try {
-				await this.ensureSession();
-				if (!this.sessionId) {
-					this.loading = false;
+				const data: StreamChunk = JSON.parse(line);
+				if (data.error) {
+					assistantMsg.content += "\n\n" + data.error;
+					assistantMsg._streaming = false;
+					scrollToBottom();
 					return;
 				}
-
-				const ctx = this.pageContext;
-
-				if (this.streaming) {
-					await this.sendMessageStreaming(content, ctx);
-				} else {
-					await this.sendMessageNonStreaming(content, ctx);
+				if (data.content) {
+					assistantMsg.content += data.content;
+					scrollToBottom();
 				}
-			} catch (err) {
-				const last = this.messages[this.messages.length - 1];
-				if (last && last.role === "assistant" && last._streaming) {
-					last._streaming = false;
-					if (!last.content) {
-						last.content = this.__("Sorry, something went wrong. Please try again.");
-					}
-				} else {
-					this.messages.push({
-						id: Date.now() + 1,
-						role: "assistant",
-						content: this.__("Sorry, something went wrong. Please try again."),
-					});
+				if (data.done) {
+					assistantMsg._streaming = false;
+					scrollToBottom();
+					return;
 				}
-			} finally {
-				this.loading = false;
-				this.scrollToBottom();
+			} catch {
+				continue;
 			}
+		}
+	}
+
+	assistantMsg._streaming = false;
+	scrollToBottom();
+}
+
+async function sendMessageNonStreaming(
+	content: string,
+	ctx: PageContext | null,
+): Promise<void> {
+	const response = await frappe.call({
+		method: "jana.api.chat.send_message",
+		args: {
+			session_id: sessionId.value,
+			content,
+			context_doctype: ctx?.doctype ?? null,
+			context_docname: ctx?.docname ?? null,
 		},
-		async sendMessageStreaming(content, ctx) {
-			const response = await fetch("/api/method/jana.api.chat.send_message_stream", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"Accept": "application/x-ndjson",
-					"X-Frappe-CSRF-Token": frappe.csrf_token,
-				},
-				body: JSON.stringify({
-					session_id: this.sessionId,
-					content: content,
-					context_doctype: ctx ? ctx.doctype : null,
-					context_docname: ctx ? ctx.docname : null,
-				}),
-			});
+	});
+	const data = response.message as { content: string };
+	messages.value.push({
+		id: Date.now() + 1,
+		role: "assistant",
+		content: data.content,
+	});
+}
 
-			if (!response.ok) {
-				throw new Error("Stream request failed: " + response.status);
+async function sendMessage(): Promise<void> {
+	const content = userInput.value.trim();
+	if (!content || loading.value) return;
+
+	userInput.value = "";
+	messages.value.push({
+		id: Date.now(),
+		role: "user",
+		content,
+	});
+	scrollToBottom();
+
+	loading.value = true;
+
+	try {
+		await ensureSession();
+		if (!sessionId.value) {
+			loading.value = false;
+			return;
+		}
+
+		const ctx = pageContext.value;
+
+		if (props.streaming) {
+			await sendMessageStreaming(content, ctx);
+		} else {
+			await sendMessageNonStreaming(content, ctx);
+		}
+	} catch {
+		const last = messages.value[messages.value.length - 1];
+		if (last?.role === "assistant" && last._streaming) {
+			last._streaming = false;
+			if (!last.content) {
+				last.content = __("Sorry, something went wrong. Please try again.");
 			}
-
-			const assistantMsg = {
+		} else {
+			messages.value.push({
 				id: Date.now() + 1,
 				role: "assistant",
-				content: "",
-				_streaming: true,
-			};
-			this.messages.push(assistantMsg);
-			this.scrollToBottom();
-
-			const reader = response.body.getReader();
-			const decoder = new TextDecoder();
-			let buffer = "";
-
-			while (true) {
-				const { done, value } = await reader.read();
-				if (done) break;
-
-				buffer += decoder.decode(value, { stream: true });
-				const lines = buffer.split("\n");
-				buffer = lines.pop();
-
-				for (const line of lines) {
-					if (!line.trim()) continue;
-					try {
-						const data = JSON.parse(line);
-						if (data.error) {
-							assistantMsg.content += "\n\n" + data.error;
-							assistantMsg._streaming = false;
-							this.scrollToBottom();
-							return;
-						}
-						if (data.content) {
-							assistantMsg.content += data.content;
-							this.scrollToBottom();
-						}
-						if (data.done) {
-							assistantMsg._streaming = false;
-							this.scrollToBottom();
-							return;
-						}
-					} catch (e) {
-						continue;
-					}
-				}
-			}
-
-			assistantMsg._streaming = false;
-			this.scrollToBottom();
-		},
-		async sendMessageNonStreaming(content, ctx) {
-			const response = await frappe.call({
-				method: "jana.api.chat.send_message",
-				args: {
-					session_id: this.sessionId,
-					content: content,
-					context_doctype: ctx ? ctx.doctype : null,
-					context_docname: ctx ? ctx.docname : null,
-				},
+				content: __("Sorry, something went wrong. Please try again."),
 			});
+		}
+	} finally {
+		loading.value = false;
+		scrollToBottom();
+	}
+}
 
-			this.messages.push({
-				id: Date.now() + 1,
-				role: "assistant",
-				content: response.message.content,
-			});
-		},
-		async connectOAuth(provider) {
-			const methodName =
-				provider.provider_type === "google"
-					? "jana.api.oauth.initiate_google_oauth"
-					: "jana.api.oauth.initiate_openrouter_oauth";
-			try {
-				const response = await frappe.call({
-					method: methodName,
-					args: { provider_name: provider.name },
-				});
-				if (response.message && response.message.auth_url) {
-					window.location.href = response.message.auth_url;
-				}
-			} catch (err) {
-				frappe.msgprint({
-					title: this.__("Error"),
-					message: this.__("Could not start OAuth flow. Please try again."),
-					indicator: "red",
-				});
-			}
-		},
-		scrollToBottom() {
-			this.$nextTick(() => {
-				const container = this.$refs.messagesContainer;
-				if (container) {
-					container.scrollTop = container.scrollHeight;
-				}
-			});
-		},
-	},
-};
+async function connectOAuth(provider: OAuthProvider): Promise<void> {
+	const methodName =
+		provider.provider_type === "google"
+			? "jana.api.oauth.initiate_google_oauth"
+			: "jana.api.oauth.initiate_openrouter_oauth";
+	try {
+		const response = await frappe.call({
+			method: methodName,
+			args: { provider_name: provider.name },
+		});
+		const data = response.message as { auth_url?: string };
+		if (data?.auth_url) {
+			window.location.href = data.auth_url;
+		}
+	} catch {
+		frappe.msgprint({
+			title: __("Error"),
+			message: __("Could not start OAuth flow. Please try again."),
+			indicator: "red",
+		});
+	}
+}
 </script>

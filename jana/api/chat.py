@@ -179,6 +179,30 @@ def delete_session(session_id: str) -> dict:
 
 
 @frappe.whitelist()
+def rename_session(session_id: str, title: str) -> dict:
+	"""Rename a chat session.
+
+	Only the session owner or a Jana Admin can rename a session.
+	"""
+	if not session_id:
+		frappe.throw(_("Session ID is required"))
+	if not title or not title.strip():
+		frappe.throw(_("Title is required"))
+
+	session = frappe.get_doc("Jana Chat Session", session_id)
+
+	from jana.permissions import _is_jana_admin
+
+	if session.user != frappe.session.user and not _is_jana_admin():
+		frappe.throw(_("You do not have permission to rename this session"))
+
+	session.session_title = title.strip()
+	session.save(ignore_permissions=True)
+
+	return {"session_id": session.name, "session_title": session.session_title}
+
+
+@frappe.whitelist()
 def get_session(session_id: str) -> dict:
 	"""Get a session with its messages."""
 	session = frappe.get_doc("Jana Chat Session", session_id)

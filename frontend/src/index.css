@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Typing indicator */
+.typing-dots span {
+  @apply inline-block w-2 h-2 bg-gray-400 rounded-full;
+  animation: typing-bounce 1.4s infinite ease-in-out both;
+}
+.typing-dots span:nth-child(1) { animation-delay: 0s; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* Streaming cursor */
+.streaming-cursor > div::after {
+  content: '\25AE';
+  @apply text-gray-400 ml-0.5;
+  animation: cursor-blink 0.8s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Chat markdown rendering */
+.chat-markdown p { @apply mb-2 last:mb-0; }
+.chat-markdown h1 { @apply text-lg font-bold mb-2; }
+.chat-markdown h2 { @apply text-base font-bold mb-2; }
+.chat-markdown h3 { @apply text-sm font-bold mb-1; }
+.chat-markdown code { @apply bg-black/10 px-1.5 py-0.5 rounded text-[0.85em] font-mono; }
+.chat-markdown pre { @apply bg-gray-800 text-gray-100 p-3 rounded-lg overflow-x-auto my-2; }
+.chat-markdown pre code { @apply bg-transparent p-0 text-inherit; }
+.chat-markdown ul { @apply list-disc pl-5 mb-2; }
+.chat-markdown ol { @apply list-decimal pl-5 mb-2; }
+.chat-markdown li { @apply mb-1; }
+.chat-markdown a { @apply text-blue-600 hover:underline; }
+.chat-markdown blockquote { @apply border-l-4 border-gray-300 pl-3 italic text-gray-600 my-2; }
+.chat-markdown table { @apply border-collapse w-full my-2; }
+.chat-markdown th, .chat-markdown td { @apply border border-gray-300 px-3 py-1.5 text-left text-sm; }
+.chat-markdown th { @apply bg-gray-50 font-medium; }

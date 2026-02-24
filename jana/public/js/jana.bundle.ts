@@ -1,13 +1,33 @@
-import { createApp } from "vue";
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 Tonic
+
+import { createApp, type App } from "vue";
 import JanaChatWidget from "./JanaChatWidget.vue";
 
-class JanaWidget {
-	constructor() {
-		this.app = null;
-		this.mounted = false;
-	}
+interface JanaBootConfig {
+	enabled: boolean;
+	default_agent: string;
+	streaming: boolean;
+	capabilities: Record<string, boolean>;
+	oauth_providers: Array<{
+		name: string;
+		provider_name: string;
+		provider_type: string;
+		connected: boolean;
+	}>;
+}
 
-	init() {
+declare const frappe: {
+	boot: {
+		jana?: JanaBootConfig;
+	};
+};
+
+class JanaWidget {
+	private app: App | null = null;
+	private mounted = false;
+
+	init(): void {
 		if (this.mounted) return;
 
 		const config = frappe.boot.jana;
@@ -35,12 +55,10 @@ const widget = new JanaWidget();
 
 if (document.readyState === "loading") {
 	document.addEventListener("DOMContentLoaded", () => {
-		// Wait for frappe.boot to be available
 		if (frappe.boot) {
 			widget.init();
 		}
 	});
 } else {
-	// DOM already loaded
 	setTimeout(() => widget.init(), 100);
 }

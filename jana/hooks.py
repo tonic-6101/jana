@@ -27,7 +27,7 @@ export_python_type_annotations = True
 # Includes in <head>
 # ------------------
 
-app_include_js = "jana.bundle.js"
+app_include_js = "jana.bundle.ts"
 app_include_css = "jana.bundle.css"
 
 # Home Pages
