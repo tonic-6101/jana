@@ -356,9 +356,17 @@ class ChatService:
 			if knowledge_text:
 				parts.append(knowledge_text)
 
-		# 3. Agent system prompt
+		# 3. Agent system prompt (with dynamic report injection for Ask AI)
 		if agent.system_prompt:
-			parts.append(agent.system_prompt)
+			prompt_text = agent.system_prompt
+			if "{{AVAILABLE_REPORTS}}" in prompt_text:
+				from jana.services.query import format_reports_for_prompt, get_available_reports
+
+				reports = get_available_reports(limit=50)
+				prompt_text = prompt_text.replace(
+					"{{AVAILABLE_REPORTS}}", format_reports_for_prompt(reports)
+				)
+			parts.append(prompt_text)
 
 		# 4. Page context (with PII masking)
 		if session.context_doctype and session.context_docname:
