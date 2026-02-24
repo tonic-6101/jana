@@ -21,6 +21,7 @@
         v-else
         class="chat-markdown"
         v-html="renderedContent"
+        @click="handleLinkClick"
       />
     </div>
   </div>
@@ -45,4 +46,29 @@ const md = new MarkdownIt({
 const renderedContent = computed(() => {
   return md.render(props.message.content || "")
 })
+
+/**
+ * Intercept clicks on internal Frappe links inside assistant messages.
+ * Opens /app/... routes in the same window (navigates to Frappe Desk).
+ * External links open in a new tab.
+ */
+function handleLinkClick(event: MouseEvent): void {
+  const target = event.target as HTMLElement
+  const link = target.closest("a")
+  if (!link) return
+
+  const href = link.getAttribute("href")
+  if (!href) return
+
+  if (href.startsWith("/app/") || href.startsWith("/api/")) {
+    event.preventDefault()
+    event.stopPropagation()
+    window.location.href = href
+  } else if (href.startsWith("http")) {
+    // External links open in a new tab
+    event.preventDefault()
+    event.stopPropagation()
+    window.open(href, "_blank", "noopener,noreferrer")
+  }
+}
 </script>

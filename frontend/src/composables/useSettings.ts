@@ -10,8 +10,6 @@ import type {
   OAuthProviderStatus,
 } from "@/types/jana"
 
-const ADMIN_ROLES = ["System Manager", "Jana Admin", "Administrator"]
-
 const SETTINGS_FIELDS: (keyof JanaSettings)[] = [
   "default_provider",
   "default_model",
@@ -61,8 +59,8 @@ export function useSettings() {
 
   async function detectRole(): Promise<void> {
     try {
-      const roles = (await apiCall("frappe.client.get_roles")) as string[]
-      isAdmin.value = ADMIN_ROLES.some((r) => roles.includes(r))
+      const result = (await apiCall("jana.api.agents.check_admin")) as { is_admin: boolean }
+      isAdmin.value = result.is_admin
     } catch {
       isAdmin.value = false
     }
@@ -121,22 +119,25 @@ export function useSettings() {
 
   async function loadProviders(): Promise<void> {
     try {
-      const result = await apiCall("frappe.client.get_list", {
-        doctype: "Jana Provider",
-        fields: [
-          "name",
-          "provider_name",
-          "provider_type",
-          "enabled",
-          "is_default",
-          "auth_method",
-        ],
-        limit_page_length: 0,
-        order_by: "provider_name asc",
-      })
+      // Admin gets full detail via dedicated API
+      const result = await apiCall("jana.api.providers.list_providers")
       providers.value = result as JanaProvider[]
     } catch {
-      providers.value = []
+      // Fallback for non-admin (limited fields)
+      try {
+        const result = await apiCall("frappe.client.get_list", {
+          doctype: "Jana Provider",
+          fields: [
+            "name", "provider_name", "provider_type",
+            "enabled", "is_default", "auth_method",
+          ],
+          limit_page_length: 0,
+          order_by: "provider_name asc",
+        })
+        providers.value = result as JanaProvider[]
+      } catch {
+        providers.value = []
+      }
     }
   }
 
@@ -175,6 +176,36 @@ export function useSettings() {
     } finally {
       testingProvider.value = null
     }
+  }
+
+  async function saveProvider(
+    providerName: string,
+    data: Record<string, unknown>,
+  ): Promise<JanaProvider> {
+    const result = (await apiCall("jana.api.providers.save_provider", {
+      provider_name: providerName,
+      data: JSON.stringify(data),
+    })) as JanaProvider
+    const idx = providers.value.findIndex((p) => p.name === providerName)
+    if (idx >= 0) {
+      providers.value[idx] = result
+    }
+    return result
+  }
+
+  async function createProvider(data: Record<string, unknown>): Promise<JanaProvider> {
+    const result = (await apiCall("jana.api.providers.create_provider", {
+      data: JSON.stringify(data),
+    })) as JanaProvider
+    providers.value.push(result)
+    return result
+  }
+
+  async function deleteProvider(providerName: string): Promise<void> {
+    await apiCall("jana.api.providers.delete_provider", {
+      provider_name: providerName,
+    })
+    providers.value = providers.value.filter((p) => p.name !== providerName)
   }
 
   // --- User Keys (BYOK) ---
@@ -263,6 +294,9 @@ export function useSettings() {
     loadProviders,
     loadModelsFor,
     testConnection,
+    saveProvider,
+    createProvider,
+    deleteProvider,
     loadUserKeys,
     addUserKey,
     deleteUserKey,

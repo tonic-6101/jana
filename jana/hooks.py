@@ -30,6 +30,10 @@ export_python_type_annotations = True
 app_include_js = "jana.bundle.ts"
 app_include_css = "jana.bundle.css"
 
+# Also load the chat widget on website pages (other app SPAs, portals, etc.)
+web_include_js = "jana.bundle.ts"
+web_include_css = "jana.bundle.css"
+
 # Home Pages
 # ----------
 

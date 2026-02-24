@@ -1,17 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 Tonic
 
+export type ProviderType = "openai" | "anthropic" | "google" | "openrouter" | "ollama" | "vllm" | "custom";
+export type AuthMethod = "API Key" | "OAuth";
+export type PiiOverride = "Global Default" | "Always On" | "Always Off";
+
 export interface JanaProvider {
   name: string;
   provider_name: string;
-  provider_type: "openai" | "anthropic" | "google" | "openrouter" | "ollama" | "vllm" | "custom";
+  provider_type: ProviderType;
   api_base_url?: string;
   available_models?: string;
-  auth_method: "API Key" | "OAuth";
+  auth_method: AuthMethod;
   connected_app?: string;
   openrouter_callback_url?: string;
   is_default: boolean;
   enabled: boolean;
+  mask_pii_override?: PiiOverride;
+  /** Only present in get_provider detail response */
+  has_api_key?: boolean;
 }
 
 export interface JanaOAuthProvider {
@@ -186,4 +193,48 @@ export interface OAuthProviderStatus {
   connected: boolean;
   provider_type: string;
   provider_name: string;
+}
+
+// --- Agent form types ---
+
+/** Tool row in an agent's tools child table */
+export interface AgentToolRow {
+  tool: string;
+  enabled: boolean;
+}
+
+/** Knowledge row in an agent's knowledge child table */
+export interface AgentKnowledgeRow {
+  knowledge_article: string;
+  enabled: boolean;
+}
+
+/** Full agent detail from get_agent API (admin view) */
+export interface AgentDetail {
+  name: string;
+  agent_name: string;
+  description: string | null;
+  system_prompt: string;
+  provider: string | null;
+  model: string | null;
+  temperature: number;
+  max_tokens: number;
+  is_template: boolean;
+  tools: AgentToolRow[];
+  knowledge: AgentKnowledgeRow[];
+}
+
+/** Tool summary for the tool selector */
+export interface ToolSummary {
+  name: string;
+  tool_name: string;
+  tool_type: "frappe_api" | "webhook" | "custom";
+  description: string;
+}
+
+/** Knowledge article summary for the knowledge selector */
+export interface KnowledgeArticleSummary {
+  name: string;
+  article_title: string;
+  category: string;
 }

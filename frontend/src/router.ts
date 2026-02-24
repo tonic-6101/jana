@@ -14,6 +14,21 @@ const routes = [
     component: () => import("./pages/Chat.vue"),
   },
   {
+    path: "/jana/agents",
+    name: "Agents",
+    component: () => import("./pages/Agents.vue"),
+  },
+  {
+    path: "/jana/agents/:name",
+    name: "AgentForm",
+    component: () => import("./pages/AgentForm.vue"),
+  },
+  {
+    path: "/jana/content",
+    name: "ContentGen",
+    component: () => import("./pages/ContentGen.vue"),
+  },
+  {
     path: "/jana/settings",
     name: "Settings",
     component: () => import("./pages/Settings.vue"),

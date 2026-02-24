@@ -8,6 +8,12 @@ def get_context(context):
 	csrf_token = frappe.sessions.get_csrf_token()
 	frappe.db.commit()
 	context.boot = get_boot()
+
+	# The Jana SPA is a standalone Vue app — it does not use the standard
+	# Frappe/ERPNext web bundles.  Clear the preload list so the framework
+	# does not emit HTTP Link:rel=preload headers for unused resources.
+	frappe.local.preload_assets = {"style": [], "script": [], "icons": []}
+
 	return context
 
 

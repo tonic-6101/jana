@@ -1,10 +1,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Tonic
 
+"""API endpoints for provider management and connectivity testing."""
+
+import json
 import time
 
 import frappe
 from frappe import _
+
+from jana.permissions import _is_jana_admin
 
 KNOWN_MODELS = {
 	"anthropic": [
@@ -152,3 +157,137 @@ def test_connection(provider_name: str) -> dict:
 			"latency_ms": 0,
 			"model": test_model,
 		}
+
+
+# -------------------------------------------------------------------
+# Provider fields returned to the SPA
+# -------------------------------------------------------------------
+
+_PROVIDER_FIELDS = [
+	"name", "provider_name", "provider_type", "enabled", "is_default",
+	"auth_method", "api_base_url", "available_models", "mask_pii_override",
+	"connected_app", "openrouter_callback_url",
+]
+
+
+@frappe.whitelist()
+def list_providers() -> list:
+	"""Return all providers with full detail for the Settings page."""
+	if not _is_jana_admin():
+		frappe.throw(_("Only administrators can manage providers"))
+
+	return frappe.get_all(
+		"Jana Provider",
+		fields=_PROVIDER_FIELDS,
+		limit_page_length=0,
+		order_by="provider_name asc",
+	)
+
+
+@frappe.whitelist()
+def get_provider(provider_name: str) -> dict:
+	"""Return full provider details including the API key status."""
+	if not _is_jana_admin():
+		frappe.throw(_("Only administrators can view provider details"))
+
+	doc = frappe.get_doc("Jana Provider", provider_name)
+	result = {f: getattr(doc, f, None) for f in _PROVIDER_FIELDS}
+	result["has_api_key"] = bool(doc.get_password("api_key", raise_exception=False))
+	return result
+
+
+@frappe.whitelist()
+def create_provider(data: str) -> dict:
+	"""Create a new provider.
+
+	Only Jana Admin or System Manager can create providers.
+	"""
+	if not _is_jana_admin():
+		frappe.throw(_("Only administrators can create providers"))
+
+	if isinstance(data, str):
+		data = json.loads(data)
+
+	doc = frappe.new_doc("Jana Provider")
+	doc.provider_name = (data.get("provider_name") or "").strip()
+	doc.provider_type = data.get("provider_type") or "custom"
+	doc.enabled = int(data.get("enabled", 1))
+	doc.is_default = int(data.get("is_default", 0))
+	doc.auth_method = data.get("auth_method") or "API Key"
+	doc.api_base_url = (data.get("api_base_url") or "").strip() or None
+	doc.available_models = (data.get("available_models") or "").strip() or None
+	doc.mask_pii_override = data.get("mask_pii_override") or "Global Default"
+
+	if data.get("api_key"):
+		doc.api_key = data["api_key"]
+
+	if data.get("connected_app"):
+		doc.connected_app = data["connected_app"]
+
+	doc.insert(ignore_permissions=True)
+
+	result = {f: getattr(doc, f, None) for f in _PROVIDER_FIELDS}
+	return result
+
+
+@frappe.whitelist()
+def save_provider(provider_name: str, data: str) -> dict:
+	"""Update an existing provider.
+
+	Only Jana Admin or System Manager can update providers.
+	"""
+	if not _is_jana_admin():
+		frappe.throw(_("Only administrators can update providers"))
+
+	if not provider_name:
+		frappe.throw(_("Provider name is required"))
+
+	if isinstance(data, str):
+		data = json.loads(data)
+
+	doc = frappe.get_doc("Jana Provider", provider_name)
+
+	# Update fields
+	for field in ("provider_type", "auth_method", "mask_pii_override"):
+		if field in data:
+			setattr(doc, field, data[field])
+
+	for field in ("api_base_url", "available_models"):
+		if field in data:
+			val = data[field]
+			setattr(doc, field, (val or "").strip() or None)
+
+	if "enabled" in data:
+		doc.enabled = int(data["enabled"])
+	if "is_default" in data:
+		doc.is_default = int(data["is_default"])
+
+	if "api_key" in data and data["api_key"]:
+		doc.api_key = data["api_key"]
+
+	if "connected_app" in data:
+		doc.connected_app = data["connected_app"] or None
+
+	doc.save(ignore_permissions=True)
+
+	result = {f: getattr(doc, f, None) for f in _PROVIDER_FIELDS}
+	return result
+
+
+@frappe.whitelist()
+def delete_provider(provider_name: str) -> dict:
+	"""Delete a provider.
+
+	Only Jana Admin or System Manager can delete providers.
+	The DocType's ``on_trash`` hook prevents deletion if
+	agents reference the provider.
+	"""
+	if not _is_jana_admin():
+		frappe.throw(_("Only administrators can delete providers"))
+
+	if not provider_name:
+		frappe.throw(_("Provider name is required"))
+
+	frappe.delete_doc("Jana Provider", provider_name, ignore_permissions=True)
+
+	return {"deleted": True, "provider_name": provider_name}

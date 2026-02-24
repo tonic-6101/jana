@@ -156,7 +156,29 @@
     </div>
 
     <!-- Footer -->
-    <div class="flex-shrink-0 border-t border-gray-200 px-4 py-3">
+    <div class="flex-shrink-0 border-t border-gray-200 px-4 py-3 space-y-1.5">
+      <router-link
+        to="/jana/agents"
+        class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        </svg>
+        {{ __('Agents') }}
+      </router-link>
+      <router-link
+        to="/jana/content"
+        class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+        {{ __('Content') }}
+      </router-link>
       <router-link
         to="/jana/settings"
         class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"

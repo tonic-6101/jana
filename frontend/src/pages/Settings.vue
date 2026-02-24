@@ -81,24 +81,118 @@
           <!-- Providers -->
           <div v-else-if="tab.label === __('Providers')" class="max-w-3xl mx-auto px-6 py-6 space-y-4">
             <div class="flex items-center justify-between">
-              <SectionTitle :title="__('Configured Providers')" />
-              <a
-                href="/app/jana-provider/new"
-                target="_blank"
-                class="text-sm text-blue-600 hover:text-blue-700"
+              <SectionTitle :title="__('Configured Providers')" :description="__('Click a provider to expand and edit all settings.')" />
+              <button
+                class="text-sm font-medium text-blue-600 hover:text-blue-700"
+                @click="showNewProvider = !showNewProvider"
               >
-                + {{ __('Add Provider') }}
-              </a>
+                {{ showNewProvider ? __('Cancel') : '+ ' + __('Add Provider') }}
+              </button>
             </div>
 
-            <div v-if="!st.providers.value.length" class="py-8 text-center text-sm text-gray-400">
+            <!-- New Provider form -->
+            <div v-if="showNewProvider" class="rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/30 p-4 space-y-4">
+              <h3 class="text-sm font-semibold text-gray-900">{{ __('New Provider') }}</h3>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Provider Name') }} *</label>
+                  <input
+                    v-model="newProvider.provider_name"
+                    type="text"
+                    :placeholder="__('e.g. My OpenAI')"
+                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Provider Type') }} *</label>
+                  <select
+                    v-model="newProvider.provider_type"
+                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  >
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                    <option value="google">Google</option>
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="ollama">Ollama</option>
+                    <option value="vllm">vLLM</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Authentication') }}</label>
+                  <select
+                    v-model="newProvider.auth_method"
+                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  >
+                    <option value="API Key">{{ __('API Key') }}</option>
+                    <option value="OAuth">{{ __('OAuth') }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('API Key') }}</label>
+                  <input
+                    v-model="newProvider.api_key"
+                    type="password"
+                    :placeholder="__('Paste your API key')"
+                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                           placeholder:text-gray-300
+                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('API Base URL') }}</label>
+                  <input
+                    v-model="newProvider.api_base_url"
+                    type="text"
+                    :placeholder="__('Optional — for Ollama, vLLM, custom')"
+                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                           placeholder:text-gray-300
+                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('PII Masking') }}</label>
+                  <select
+                    v-model="newProvider.mask_pii_override"
+                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  >
+                    <option value="Global Default">{{ __('Global Default') }}</option>
+                    <option value="Always On">{{ __('Always On') }}</option>
+                    <option value="Always Off">{{ __('Always Off') }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input v-model="newProvider.enabled" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                  <span class="text-sm text-gray-700">{{ __('Enabled') }}</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input v-model="newProvider.is_default" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                  <span class="text-sm text-gray-700">{{ __('Is Default') }}</span>
+                </label>
+              </div>
+              <button
+                class="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700
+                       disabled:opacity-50 transition-colors"
+                :disabled="!newProvider.provider_name.trim() || creatingProvider"
+                @click="handleCreateProvider"
+              >
+                {{ creatingProvider ? __('Creating…') : __('Create Provider') }}
+              </button>
+            </div>
+
+            <!-- Empty state -->
+            <div v-if="!st.providers.value.length && !showNewProvider" class="py-8 text-center text-sm text-gray-400">
               {{ __('No providers configured.') }}
-              <a href="/app/jana-provider/new" target="_blank" class="text-blue-600 hover:underline">
-                {{ __('Add one in Desk') }}
-              </a>
             </div>
 
-            <div v-else class="grid gap-3">
+            <!-- Provider cards -->
+            <div v-if="st.providers.value.length" class="space-y-3">
               <ProviderCard
                 v-for="p in st.providers.value"
                 :key="p.name"
@@ -106,14 +200,10 @@
                 :test-result="st.testResults.value[p.name]"
                 :testing="st.testingProvider.value === p.name"
                 @test="handleTestConnection"
+                @save="handleSaveProvider"
+                @delete="handleDeleteProvider"
               />
             </div>
-
-            <p class="text-xs text-gray-400 mt-2">
-              <a href="/app/jana-provider" target="_blank" class="hover:underline">
-                {{ __('Manage all providers in Desk') }} &rarr;
-              </a>
-            </p>
           </div>
 
           <!-- Capabilities -->
@@ -257,7 +347,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, defineComponent, h } from "vue"
+import { ref, reactive, computed, watch, onMounted, defineComponent, h } from "vue"
 import { Tabs, Button, FormControl, Switch, Badge, toast } from "frappe-ui"
 import { __ } from "@/composables/useTranslate"
 import { useSettings } from "@/composables/useSettings"
@@ -266,6 +356,20 @@ import type { OAuthProviderStatus } from "@/types/jana"
 
 const st = useSettings()
 const activeTab = ref(0)
+
+// --- New Provider form state ---
+const showNewProvider = ref(false)
+const creatingProvider = ref(false)
+const newProvider = reactive({
+  provider_name: "",
+  provider_type: "openai" as string,
+  auth_method: "API Key" as string,
+  api_key: "",
+  api_base_url: "",
+  mask_pii_override: "Global Default" as string,
+  enabled: true,
+  is_default: false,
+})
 
 // --- Admin tabs ---
 const adminTabs = computed(() => [
@@ -323,6 +427,59 @@ async function handleTestConnection(providerName: string) {
     toast.success(__("Connection successful") + ` (${result.latency_ms}ms)`)
   } else {
     toast.error(result.message)
+  }
+}
+
+async function handleSaveProvider(providerName: string, data: Record<string, unknown>) {
+  try {
+    await st.saveProvider(providerName, data)
+    toast.success(__("Provider saved"))
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : __("Failed to save provider")
+    toast.error(msg)
+  }
+}
+
+async function handleDeleteProvider(providerName: string) {
+  if (!confirm(__("Delete this provider? This cannot be undone."))) return
+  try {
+    await st.deleteProvider(providerName)
+    toast.success(__("Provider deleted"))
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : __("Failed to delete provider")
+    toast.error(msg)
+  }
+}
+
+async function handleCreateProvider() {
+  creatingProvider.value = true
+  try {
+    await st.createProvider({
+      provider_name: newProvider.provider_name.trim(),
+      provider_type: newProvider.provider_type,
+      auth_method: newProvider.auth_method,
+      api_key: newProvider.api_key || undefined,
+      api_base_url: newProvider.api_base_url || undefined,
+      mask_pii_override: newProvider.mask_pii_override,
+      enabled: newProvider.enabled ? 1 : 0,
+      is_default: newProvider.is_default ? 1 : 0,
+    })
+    toast.success(__("Provider created"))
+    showNewProvider.value = false
+    // Reset form
+    newProvider.provider_name = ""
+    newProvider.provider_type = "openai"
+    newProvider.auth_method = "API Key"
+    newProvider.api_key = ""
+    newProvider.api_base_url = ""
+    newProvider.mask_pii_override = "Global Default"
+    newProvider.enabled = true
+    newProvider.is_default = false
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : __("Failed to create provider")
+    toast.error(msg)
+  } finally {
+    creatingProvider.value = false
   }
 }
 

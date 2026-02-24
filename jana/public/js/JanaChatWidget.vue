@@ -24,6 +24,16 @@
 				<div class="jana-panel-title">
 					<strong>Jana</strong>
 					<span v-if="currentView === 'sessions'" class="jana-header-label">{{ __('Chats') }}</span>
+					<select
+						v-else-if="agents.length > 1 && !sessionId"
+						v-model="currentAgent"
+						class="jana-agent-select"
+						:title="__('Select Agent')"
+					>
+						<option v-for="a in agents" :key="a.name" :value="a.agent_name">
+							{{ a.agent_name }}
+						</option>
+					</select>
 					<span v-else class="jana-agent-name">{{ currentAgent }}</span>
 				</div>
 				<div class="jana-panel-actions">
@@ -106,7 +116,16 @@
 						:key="msg.name || msg.id"
 						:class="['jana-message', 'jana-message-' + msg.role, { 'jana-message-streaming': msg._streaming }]"
 					>
-						<div class="jana-message-content">{{ msg.content }}</div>
+						<div v-if="msg.role === 'user'" class="jana-message-content">{{ msg.content }}</div>
+						<div v-else class="jana-message-content jana-markdown" v-html="renderMarkdown(msg.content)" @click="handleLinkClick"></div>
+						<div v-if="msg.role === 'assistant' && !msg._streaming && msg.content" class="jana-message-actions">
+							<button class="jana-btn-copy" @click="copyMessage(msg.content)" :title="__('Copy')">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+								</svg>
+							</button>
+						</div>
 					</div>
 
 					<!-- Loading indicator (typing dots while waiting for first chunk) -->
@@ -124,10 +143,22 @@
 						v-model="userInput"
 						:placeholder="__('Ask Jana...')"
 						@keydown.enter.exact.prevent="sendMessage"
+						@input="autoResize"
 						rows="1"
 						class="jana-input"
 					></textarea>
 					<button
+						v-if="isStreamingMsg"
+						class="jana-btn-stop"
+						@click="abortStream"
+						:title="__('Stop generating')"
+					>
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+							<rect x="6" y="6" width="12" height="12" rx="2"></rect>
+						</svg>
+					</button>
+					<button
+						v-else
 						class="jana-btn-send"
 						@click="sendMessage"
 						:disabled="!userInput.trim() || loading"
@@ -141,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from "vue";
 
 // --- Types ---
 
@@ -178,14 +209,43 @@ interface PageContext {
 	docname: string;
 }
 
-declare const frappe: {
-	__: (text: string) => string;
-	csrf_token: string;
-	get_route: () => string[];
-	call: (args: { method: string; args?: Record<string, unknown> }) => Promise<{ message: Record<string, unknown> }>;
-	datetime: { prettyDate: (dt: string) => string };
-	msgprint: (args: { title: string; message: string; indicator: string }) => void;
-};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const frappe: any;
+
+// --- Helpers that work on both Desk and non-Desk pages ---
+
+function getCsrfToken(): string {
+	if (typeof frappe !== "undefined" && frappe.csrf_token) {
+		return frappe.csrf_token;
+	}
+	const win = window as Record<string, unknown>;
+	if (win.csrf_token) return win.csrf_token as string;
+	const match = document.cookie.match(/csrf_token=([^;]+)/);
+	return match ? decodeURIComponent(match[1]) : "";
+}
+
+/**
+ * Call a Frappe API method. Uses fetch() directly so it works on any page.
+ */
+async function apiCall(
+	method: string,
+	args: Record<string, unknown> = {},
+): Promise<unknown> {
+	const resp = await fetch(`/api/method/${method}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"X-Frappe-CSRF-Token": getCsrfToken(),
+		},
+		body: JSON.stringify(args),
+	});
+	if (!resp.ok) {
+		const text = await resp.text();
+		throw new Error(text || `API call failed: ${resp.status}`);
+	}
+	const data = await resp.json();
+	return data.message;
+}
 
 // --- Props ---
 
@@ -217,6 +277,9 @@ const currentAgent = ref(props.defaultAgent);
 const currentView = ref<"chat" | "sessions">("chat");
 const sessions = ref<SessionInfo[]>([]);
 const sessionsLoading = ref(false);
+const agents = ref<Array<{ name: string; agent_name: string; description: string | null }>>([]);
+const agentsLoaded = ref(false);
+let abortController: AbortController | null = null;
 
 // --- Template refs ---
 
@@ -231,16 +294,25 @@ function __(text: string): string {
 
 // --- Computed ---
 
-const settingsUrl = computed(() => "/app/jana-settings");
+const settingsUrl = computed(() => "/jana/settings");
 
 const unconnectedOAuth = computed(() =>
 	props.oauthProviders.filter((p) => !p.connected),
 );
 
 const pageContext = computed((): PageContext | null => {
-	const route = frappe.get_route();
-	if (route && route[0] === "Form" && route.length >= 3) {
-		return { doctype: route[1], docname: route[2] };
+	// Desk mode: frappe.get_route() returns ["Form", "DocType", "name"]
+	if (typeof frappe !== "undefined" && frappe.get_route) {
+		const route = frappe.get_route();
+		if (route && route[0] === "Form" && route.length >= 3) {
+			return { doctype: route[1], docname: route[2] };
+		}
+	}
+	// Non-Desk: try to parse /app/doctype/name from the URL
+	const match = window.location.pathname.match(/^\/app\/([^/]+)\/([^/]+)/);
+	if (match) {
+		const doctype = match[1].replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+		return { doctype, docname: decodeURIComponent(match[2]) };
 	}
 	return null;
 });
@@ -261,8 +333,66 @@ function scrollToBottom(): void {
 	});
 }
 
+function renderMarkdown(text: string): string {
+	if (!text) return "";
+	// Use Desk's markdown renderer if available
+	if (typeof frappe !== "undefined" && frappe.markdown) {
+		return frappe.markdown(text);
+	}
+	// Basic fallback: escape HTML, preserve newlines
+	return text
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/\n/g, "<br>");
+}
+
+async function copyMessage(text: string): Promise<void> {
+	try {
+		await navigator.clipboard.writeText(text);
+		if (typeof frappe !== "undefined" && frappe.show_alert) {
+			frappe.show_alert({ message: __("Copied to clipboard"), indicator: "green" }, 2);
+		}
+	} catch {
+		// Fallback for non-HTTPS or older browsers
+	}
+}
+
+/**
+ * Intercept clicks on internal links inside assistant messages.
+ * Uses frappe.set_route() for SPA navigation within Desk, or
+ * falls back to window.location for non-Desk pages.
+ */
+function handleLinkClick(event: MouseEvent): void {
+	const target = event.target as HTMLElement;
+	const link = target.closest("a");
+	if (!link) return;
+
+	const href = link.getAttribute("href");
+	if (!href) return;
+
+	// Only intercept internal Frappe routes
+	if (href.startsWith("/app/") || href.startsWith("/api/")) {
+		event.preventDefault();
+		event.stopPropagation();
+		if (typeof frappe !== "undefined" && frappe.set_route) {
+			frappe.set_route(href);
+		} else {
+			window.location.href = href;
+		}
+	}
+}
+
+function autoResize(): void {
+	const el = inputField.value;
+	if (!el) return;
+	el.style.height = "auto";
+	el.style.height = Math.min(el.scrollHeight, 120) + "px";
+}
+
 function openPanel(): void {
 	isOpen.value = true;
+	fetchAgents();
 	if (sessionId.value) {
 		currentView.value = "chat";
 	} else {
@@ -280,8 +410,21 @@ function closePanel(): void {
 	isOpen.value = false;
 }
 
+function togglePanel(): void {
+	if (isOpen.value) {
+		closePanel();
+	} else {
+		openPanel();
+	}
+}
+
+function abortStream(): void {
+	abortController?.abort();
+	abortController = null;
+}
+
 function openSettings(): void {
-	window.open("/app/jana-settings", "_blank");
+	window.open(settingsUrl.value, "_blank");
 }
 
 function startNewChat(): void {
@@ -289,7 +432,11 @@ function startNewChat(): void {
 	sessionId.value = null;
 	userInput.value = "";
 	currentView.value = "chat";
-	nextTick(() => inputField.value?.focus());
+	fetchAgents();
+	nextTick(() => {
+		inputField.value?.focus();
+		autoResize();
+	});
 }
 
 async function showSessionList(): Promise<void> {
@@ -297,21 +444,27 @@ async function showSessionList(): Promise<void> {
 	await fetchSessions();
 }
 
+async function fetchAgents(): Promise<void> {
+	if (agentsLoaded.value) return;
+	try {
+		const result = await apiCall("jana.api.agents.list_agents");
+		agents.value = (result as typeof agents.value) || [];
+		agentsLoaded.value = true;
+	} catch {
+		// Silently fail — agent selector just won't appear
+	}
+}
+
 async function fetchSessions(): Promise<void> {
 	sessionsLoading.value = true;
 	try {
-		const response = await frappe.call({
-			method: "jana.api.chat.get_sessions",
-			args: { limit: 20, status: "active" },
+		const result = await apiCall("jana.api.chat.get_sessions", {
+			limit: 20,
+			status: "active",
 		});
-		sessions.value = (response.message as SessionInfo[]) || [];
+		sessions.value = (result as SessionInfo[]) || [];
 	} catch {
 		sessions.value = [];
-		frappe.msgprint({
-			title: __("Error"),
-			message: __("Could not load chat history."),
-			indicator: "red",
-		});
 	} finally {
 		sessionsLoading.value = false;
 	}
@@ -320,11 +473,9 @@ async function fetchSessions(): Promise<void> {
 async function loadSession(id: string): Promise<void> {
 	sessionsLoading.value = true;
 	try {
-		const response = await frappe.call({
-			method: "jana.api.chat.get_session",
-			args: { session_id: id },
-		});
-		const data = response.message as {
+		const data = (await apiCall("jana.api.chat.get_session", {
+			session_id: id,
+		})) as {
 			session: { name: string; agent?: string };
 			messages: ChatMessage[];
 		};
@@ -340,11 +491,7 @@ async function loadSession(id: string): Promise<void> {
 		currentView.value = "chat";
 		scrollToBottom();
 	} catch {
-		frappe.msgprint({
-			title: __("Error"),
-			message: __("Could not load this conversation."),
-			indicator: "red",
-		});
+		console.error("[Jana] Could not load session");
 	} finally {
 		sessionsLoading.value = false;
 	}
@@ -352,10 +499,25 @@ async function loadSession(id: string): Promise<void> {
 
 function formatTime(datetime: string): string {
 	if (!datetime) return "";
+	// Use Desk's pretty date if available
 	if (typeof frappe !== "undefined" && frappe.datetime?.prettyDate) {
 		return frappe.datetime.prettyDate(datetime);
 	}
-	return datetime;
+	// Basic fallback
+	try {
+		const d = new Date(datetime);
+		const now = new Date();
+		const diffMs = now.getTime() - d.getTime();
+		const diffMins = Math.floor(diffMs / 60000);
+		if (diffMins < 1) return __("just now");
+		if (diffMins < 60) return `${diffMins}m ago`;
+		const diffHrs = Math.floor(diffMins / 60);
+		if (diffHrs < 24) return `${diffHrs}h ago`;
+		const diffDays = Math.floor(diffHrs / 24);
+		return `${diffDays}d ago`;
+	} catch {
+		return datetime;
+	}
 }
 
 async function ensureSession(): Promise<void> {
@@ -363,22 +525,14 @@ async function ensureSession(): Promise<void> {
 
 	const ctx = pageContext.value;
 	try {
-		const response = await frappe.call({
-			method: "jana.api.chat.create_session",
-			args: {
-				agent: currentAgent.value,
-				context_doctype: ctx?.doctype ?? null,
-				context_docname: ctx?.docname ?? null,
-			},
-		});
-		const data = response.message as { session_id: string };
+		const data = (await apiCall("jana.api.chat.create_session", {
+			agent: currentAgent.value,
+			context_doctype: ctx?.doctype ?? null,
+			context_docname: ctx?.docname ?? null,
+		})) as { session_id: string };
 		sessionId.value = data.session_id;
 	} catch {
-		frappe.msgprint({
-			title: __("Error"),
-			message: __("Could not create chat session. Please try again."),
-			indicator: "red",
-		});
+		console.error("[Jana] Could not create chat session");
 	}
 }
 
@@ -386,6 +540,7 @@ async function sendMessageStreaming(
 	content: string,
 	ctx: PageContext | null,
 ): Promise<void> {
+	abortController = new AbortController();
 	const response = await fetch(
 		"/api/method/jana.api.chat.send_message_stream",
 		{
@@ -393,8 +548,9 @@ async function sendMessageStreaming(
 			headers: {
 				"Content-Type": "application/json",
 				Accept: "application/x-ndjson",
-				"X-Frappe-CSRF-Token": frappe.csrf_token,
+				"X-Frappe-CSRF-Token": getCsrfToken(),
 			},
+			signal: abortController.signal,
 			body: JSON.stringify({
 				session_id: sessionId.value,
 				content,
@@ -408,13 +564,13 @@ async function sendMessageStreaming(
 		throw new Error(`Stream request failed: ${response.status}`);
 	}
 
-	const assistantMsg: ChatMessage = {
+	messages.value.push({
 		id: Date.now() + 1,
 		role: "assistant",
 		content: "",
 		_streaming: true,
-	};
-	messages.value.push(assistantMsg);
+	});
+	const msgIdx = messages.value.length - 1;
 	scrollToBottom();
 
 	const reader = response.body!.getReader();
@@ -434,17 +590,17 @@ async function sendMessageStreaming(
 			try {
 				const data: StreamChunk = JSON.parse(line);
 				if (data.error) {
-					assistantMsg.content += "\n\n" + data.error;
-					assistantMsg._streaming = false;
+					messages.value[msgIdx].content += "\n\n" + data.error;
+					messages.value[msgIdx]._streaming = false;
 					scrollToBottom();
 					return;
 				}
 				if (data.content) {
-					assistantMsg.content += data.content;
+					messages.value[msgIdx].content += data.content;
 					scrollToBottom();
 				}
 				if (data.done) {
-					assistantMsg._streaming = false;
+					messages.value[msgIdx]._streaming = false;
 					scrollToBottom();
 					return;
 				}
@@ -454,7 +610,8 @@ async function sendMessageStreaming(
 		}
 	}
 
-	assistantMsg._streaming = false;
+	messages.value[msgIdx]._streaming = false;
+	abortController = null;
 	scrollToBottom();
 }
 
@@ -462,16 +619,12 @@ async function sendMessageNonStreaming(
 	content: string,
 	ctx: PageContext | null,
 ): Promise<void> {
-	const response = await frappe.call({
-		method: "jana.api.chat.send_message",
-		args: {
-			session_id: sessionId.value,
-			content,
-			context_doctype: ctx?.doctype ?? null,
-			context_docname: ctx?.docname ?? null,
-		},
-	});
-	const data = response.message as { content: string };
+	const data = (await apiCall("jana.api.chat.send_message", {
+		session_id: sessionId.value,
+		content,
+		context_doctype: ctx?.doctype ?? null,
+		context_docname: ctx?.docname ?? null,
+	})) as { content: string };
 	messages.value.push({
 		id: Date.now() + 1,
 		role: "assistant",
@@ -533,20 +686,32 @@ async function connectOAuth(provider: OAuthProvider): Promise<void> {
 			? "jana.api.oauth.initiate_google_oauth"
 			: "jana.api.oauth.initiate_openrouter_oauth";
 	try {
-		const response = await frappe.call({
-			method: methodName,
-			args: { provider_name: provider.name },
-		});
-		const data = response.message as { auth_url?: string };
+		const data = (await apiCall(methodName, {
+			provider_name: provider.name,
+		})) as { auth_url?: string };
 		if (data?.auth_url) {
 			window.location.href = data.auth_url;
 		}
 	} catch {
-		frappe.msgprint({
-			title: __("Error"),
-			message: __("Could not start OAuth flow. Please try again."),
-			indicator: "red",
-		});
+		console.error("[Jana] Could not start OAuth flow");
 	}
 }
+
+// --- Watchers ---
+
+watch(userInput, () => nextTick(autoResize));
+
+// --- Lifecycle ---
+
+function handleToggle(): void {
+	togglePanel();
+}
+
+onMounted(() => {
+	document.addEventListener("jana:toggle", handleToggle);
+});
+
+onUnmounted(() => {
+	document.removeEventListener("jana:toggle", handleToggle);
+});
 </script>

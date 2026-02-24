@@ -62,11 +62,13 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	min-width: 0;
 }
 
 .jana-panel-title strong {
 	font-size: 16px;
 	color: var(--text-color, #1a202c);
+	flex-shrink: 0;
 }
 
 .jana-agent-name {
@@ -75,11 +77,31 @@
 	background: var(--subtle-fg, #f7fafc);
 	padding: 2px 8px;
 	border-radius: 10px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.jana-agent-select {
+	font-size: 12px;
+	padding: 2px 8px;
+	border: 1px solid var(--border-color, #e2e8f0);
+	border-radius: 6px;
+	background: var(--control-bg, #fff);
+	color: var(--text-color, #1a202c);
+	outline: none;
+	max-width: 140px;
+	font-family: inherit;
+}
+
+.jana-agent-select:focus {
+	border-color: var(--primary, #2490ef);
 }
 
 .jana-panel-actions {
 	display: flex;
 	gap: 4px;
+	flex-shrink: 0;
 }
 
 .jana-btn-icon {
@@ -244,19 +266,96 @@
 	padding: 10px 14px;
 	border-radius: 12px;
 	word-wrap: break-word;
-	white-space: pre-wrap;
 }
 
 .jana-message-user .jana-message-content {
 	background: var(--primary, #2490ef);
 	color: white;
 	border-bottom-right-radius: 4px;
+	white-space: pre-wrap;
 }
 
 .jana-message-assistant .jana-message-content {
 	background: var(--subtle-fg, #f7fafc);
 	color: var(--text-color, #1a202c);
 	border-bottom-left-radius: 4px;
+}
+
+/* Markdown rendering in assistant messages */
+.jana-markdown p { margin: 0 0 8px 0; }
+.jana-markdown p:last-child { margin-bottom: 0; }
+.jana-markdown h1 { font-size: 18px; font-weight: 700; margin: 0 0 8px 0; }
+.jana-markdown h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px 0; }
+.jana-markdown h3 { font-size: 14px; font-weight: 700; margin: 0 0 4px 0; }
+.jana-markdown code {
+	background: rgba(0, 0, 0, 0.07);
+	padding: 1px 6px;
+	border-radius: 4px;
+	font-size: 0.85em;
+	font-family: var(--font-mono, monospace);
+}
+.jana-markdown pre {
+	background: #1e1e1e;
+	color: #d4d4d4;
+	padding: 12px;
+	border-radius: 8px;
+	overflow-x: auto;
+	margin: 8px 0;
+}
+.jana-markdown pre code {
+	background: transparent;
+	padding: 0;
+	color: inherit;
+}
+.jana-markdown ul { list-style: disc; padding-left: 20px; margin: 0 0 8px 0; }
+.jana-markdown ol { list-style: decimal; padding-left: 20px; margin: 0 0 8px 0; }
+.jana-markdown li { margin: 0 0 4px 0; }
+.jana-markdown a { color: var(--primary, #2490ef); text-decoration: none; }
+.jana-markdown a:hover { text-decoration: underline; }
+.jana-markdown blockquote {
+	border-left: 4px solid var(--border-color, #e2e8f0);
+	padding-left: 12px;
+	font-style: italic;
+	color: var(--text-muted, #718096);
+	margin: 8px 0;
+}
+.jana-markdown table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+.jana-markdown th,
+.jana-markdown td {
+	border: 1px solid var(--border-color, #e2e8f0);
+	padding: 6px 12px;
+	text-align: left;
+	font-size: 13px;
+}
+.jana-markdown th {
+	background: var(--subtle-fg, #f7fafc);
+	font-weight: 500;
+}
+
+/* Copy button on messages */
+.jana-message-actions {
+	display: none;
+	margin-top: 4px;
+}
+
+.jana-message:hover .jana-message-actions {
+	display: flex;
+}
+
+.jana-btn-copy {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 2px 4px;
+	color: var(--text-muted, #718096);
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+}
+
+.jana-btn-copy:hover {
+	background: var(--subtle-fg, #f7fafc);
+	color: var(--text-color, #1a202c);
 }
 
 /* Typing indicator */
@@ -317,6 +416,7 @@
 	min-height: 40px;
 	max-height: 120px;
 	outline: none;
+	overflow-y: auto;
 	background: var(--control-bg, #fff);
 	color: var(--text-color, #1a202c);
 }
@@ -346,6 +446,51 @@
 .jana-btn-send:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;
+}
+
+/* Stop streaming button */
+.jana-btn-stop {
+	background: var(--red-500, #e53e3e);
+	color: white;
+	border: none;
+	border-radius: 8px;
+	padding: 10px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.jana-btn-stop:hover {
+	opacity: 0.9;
+}
+
+/* OAuth divider */
+.jana-divider {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 16px 0;
+	color: var(--text-muted, #718096);
+	font-size: 12px;
+}
+
+.jana-divider::before,
+.jana-divider::after {
+	content: "";
+	flex: 1;
+	border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.jana-oauth-btn {
+	display: block;
+	width: 100%;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+	font-size: 14px;
 }
 
 /* Responsive */
