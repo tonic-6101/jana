@@ -32,10 +32,11 @@ class ToolExecutor:
 	Instantiate once per ``send_message()`` call.
 	"""
 
-	def __init__(self, agent_doc, settings: dict | None = None):
+	def __init__(self, agent_doc, settings: dict | None = None, chain_monitor=None):
 		self.agent = agent_doc
 		self.settings = settings or self._load_settings()
 		self._tools: list[dict] = self._resolve_tools()
+		self._chain_monitor = chain_monitor
 
 	@property
 	def has_tools(self) -> bool:
@@ -122,6 +123,8 @@ class ToolExecutor:
 		Returns ``{"tool_call_id": "...", "content": "..."}`` suitable
 		for appending as a ``role: "tool"`` message.
 		"""
+		from jana.services.guardrails.tool_annotations import annotate_tool_result
+
 		call_id = tool_call.get("id", "")
 		func = tool_call.get("function", {})
 		name = func.get("name", "")
@@ -130,22 +133,50 @@ class ToolExecutor:
 		try:
 			args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
 		except json.JSONDecodeError:
-			return {"tool_call_id": call_id, "content": _("Invalid tool arguments")}
+			error_result = annotate_tool_result(
+				_("Invalid tool arguments"), name, status="error"
+			)
+			return {"tool_call_id": call_id, "content": json.dumps(error_result, default=str, ensure_ascii=False)}
 
 		handler = getattr(self, f"_handle_{name}", None)
 		if handler is None:
-			return {"tool_call_id": call_id, "content": _("Unknown tool: {0}").format(name)}
+			error_result = annotate_tool_result(
+				_("Unknown tool: {0}").format(name), name, status="error"
+			)
+			return {"tool_call_id": call_id, "content": json.dumps(error_result, default=str, ensure_ascii=False)}
+
+		# Chain monitor: record call and check write limits
+		if self._chain_monitor:
+			self._chain_monitor.record(name, args)
+			write_block = self._chain_monitor.check_write_allowed(name)
+			if write_block:
+				error_result = annotate_tool_result(write_block, name, status="error")
+				return {"tool_call_id": call_id, "content": json.dumps(error_result, default=str, ensure_ascii=False)}
 
 		try:
 			result = handler(**args)
-			content = json.dumps(result, default=str, ensure_ascii=False)
+			annotated = annotate_tool_result(result, name, status="success")
+			content = json.dumps(annotated, default=str, ensure_ascii=False)
 		except frappe.PermissionError:
-			content = json.dumps({"error": _("Permission denied")})
+			error_result = annotate_tool_result(
+				{"error": _("Permission denied")}, name, status="error"
+			)
+			content = json.dumps(error_result, default=str, ensure_ascii=False)
 		except frappe.DoesNotExistError:
-			content = json.dumps({"error": _("Document does not exist")})
+			error_result = annotate_tool_result(
+				{"error": _("Document does not exist")}, name, status="error"
+			)
+			content = json.dumps(error_result, default=str, ensure_ascii=False)
 		except Exception:
 			frappe.log_error(title=f"Jana Tool Error: {name}")
-			content = json.dumps({"error": _("An error occurred while executing the tool")})
+			error_result = annotate_tool_result(
+				{"error": _("An error occurred while executing the tool")}, name, status="error"
+			)
+			content = json.dumps(error_result, default=str, ensure_ascii=False)
+
+		# Log suspicious patterns at end of execution
+		if self._chain_monitor:
+			self._chain_monitor.log_if_suspicious()
 
 		return {"tool_call_id": call_id, "content": content}
 
@@ -153,11 +184,38 @@ class ToolExecutor:
 	# Handlers
 	# ------------------------------------------------------------------
 
+	def _validate_doctype_exists(self, doctype: str) -> dict | None:
+		"""Check that a DocType exists. Returns error dict if not."""
+		if not frappe.db.exists("DocType", doctype):
+			return {"error": _("DocType '{0}' does not exist on this site").format(doctype)}
+		return None
+
+	@staticmethod
+	def _filter_password_fields(data: dict, doctype: str) -> dict:
+		"""Remove Password-type fields from document data."""
+		try:
+			meta = frappe.get_meta(doctype)
+		except Exception:
+			return data
+
+		password_fields = {
+			df.fieldname for df in meta.fields if df.fieldtype == "Password"
+		}
+		if not password_fields:
+			return data
+
+		return {k: v for k, v in data.items() if k not in password_fields}
+
 	def _handle_read_document(self, doctype: str, name: str, **_kw) -> dict:
 		"""Read a single document."""
+		dt_error = self._validate_doctype_exists(doctype)
+		if dt_error:
+			return dt_error
+
 		frappe.has_permission(doctype, doc=name, throw=True)
 		doc = frappe.get_doc(doctype, name)
-		return doc.as_dict()
+		data = doc.as_dict()
+		return self._filter_password_fields(data, doctype)
 
 	def _handle_list_documents(
 		self,
@@ -169,6 +227,10 @@ class ToolExecutor:
 		**_kw,
 	) -> dict:
 		"""List documents with optional filters."""
+		dt_error = self._validate_doctype_exists(doctype)
+		if dt_error:
+			return dt_error
+
 		frappe.has_permission(doctype, throw=True)
 
 		limit = max(1, min(limit or 20, 100))
@@ -190,6 +252,10 @@ class ToolExecutor:
 
 	def _handle_create_document(self, doctype: str, values: dict, **_kw) -> dict:
 		"""Create a new document, or return a preview if confirmation is required."""
+		dt_error = self._validate_doctype_exists(doctype)
+		if dt_error:
+			return dt_error
+
 		frappe.has_permission(doctype, ptype="create", throw=True)
 
 		if cint(self.settings.get("require_write_confirmation")):
@@ -224,6 +290,10 @@ class ToolExecutor:
 		self, doctype: str, name: str, values: dict, **_kw
 	) -> dict:
 		"""Update fields on an existing document, or return a preview if confirmation is required."""
+		dt_error = self._validate_doctype_exists(doctype)
+		if dt_error:
+			return dt_error
+
 		frappe.has_permission(doctype, doc=name, ptype="write", throw=True)
 
 		if cint(self.settings.get("require_write_confirmation")):
@@ -333,7 +403,10 @@ class ToolExecutor:
 	) -> dict:
 		"""Return a navigation URL for the frontend."""
 		if url:
-			return {"url": url, "action": "navigate"}
+			from jana.services.security.validators import validate_navigation_url
+
+			validated = validate_navigation_url(url)
+			return {"url": validated, "action": "navigate"}
 
 		if doctype and name:
 			route = f"/app/{frappe.scrub(doctype)}/{name}"

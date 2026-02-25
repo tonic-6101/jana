@@ -20,6 +20,8 @@
   "openrouter_callback_url",
   "models_section",
   "available_models",
+  "column_break_models",
+  "provider_tier",
   "privacy_section",
   "mask_pii_override"
  ],
@@ -121,6 +123,18 @@
    "fieldname": "available_models",
    "fieldtype": "Small Text",
    "label": "Available Models"
+  },
+  {
+   "fieldname": "column_break_models",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Auto-detect",
+   "description": "Controls guardrail strictness. Auto-detect uses the model name to determine the tier. Tier 3 (Weak) applies maximum guardrails.",
+   "fieldname": "provider_tier",
+   "fieldtype": "Select",
+   "label": "Provider Tier",
+   "options": "Auto-detect\nTier 1 (Strong)\nTier 2 (Medium)\nTier 3 (Weak)"
   },
   {
    "fieldname": "privacy_section",

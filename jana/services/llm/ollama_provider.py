@@ -39,13 +39,12 @@ class OllamaProvider(LLMProvider):
 			response.raise_for_status()
 		except requests.exceptions.HTTPError:
 			status = response.status_code
-			try:
-				detail = response.json().get("error", str(response.text))
-			except Exception:
-				detail = response.text[:200]
-			frappe.throw(
-				_("Ollama error ({0}): {1}").format(status, detail)
-			)
+			if status >= 500:
+				frappe.throw(_("Ollama is experiencing issues. Please try again later."))
+			elif status == 404:
+				frappe.throw(_("Model not found on Ollama. Check that the model is pulled."))
+			else:
+				frappe.throw(_("Ollama request failed (HTTP {0}). Please try again.").format(status))
 		except requests.exceptions.ConnectionError:
 			frappe.throw(
 				_("Could not connect to Ollama at {0}. Is Ollama running?").format(
@@ -93,13 +92,12 @@ class OllamaProvider(LLMProvider):
 			response.raise_for_status()
 		except requests.exceptions.HTTPError:
 			status = response.status_code
-			try:
-				detail = response.json().get("error", str(response.text))
-			except Exception:
-				detail = response.text[:200]
-			frappe.throw(
-				_("Ollama error ({0}): {1}").format(status, detail)
-			)
+			if status >= 500:
+				frappe.throw(_("Ollama is experiencing issues. Please try again later."))
+			elif status == 404:
+				frappe.throw(_("Model not found on Ollama. Check that the model is pulled."))
+			else:
+				frappe.throw(_("Ollama request failed (HTTP {0}). Please try again.").format(status))
 		except requests.exceptions.ConnectionError:
 			frappe.throw(
 				_("Could not connect to Ollama at {0}. Is Ollama running?").format(

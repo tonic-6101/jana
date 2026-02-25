@@ -31,6 +31,15 @@ class JanaProvider(Document):
 		if self.provider_type in ("ollama", "vllm"):
 			self.auth_method = "API Key"
 
+		# SSRF validation: block internal network URLs (except for local providers)
+		if self.api_base_url:
+			from jana.services.security.ssrf import validate_provider_url
+
+			validate_provider_url(
+				self.api_base_url,
+				allow_local=(self.provider_type in ("ollama", "vllm")),
+			)
+
 	def validate_oauth(self):
 		if self.auth_method == "OAuth":
 			if self.provider_type == "google" and not self.connected_app:

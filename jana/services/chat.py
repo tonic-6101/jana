@@ -92,19 +92,36 @@ class ChatService:
 		model = agent.model or settings.get("default_model")
 		if not model:
 			frappe.throw(_("No model configured. Set a model on the agent or in Jana Settings."))
-		temperature = agent.temperature or 0.7
+		base_temperature = agent.temperature or 0.7
 		max_tokens = agent.max_tokens or None
 
+		# Determine provider tier for guardrail escalation
+		from jana.services.guardrails.provider_tiers import get_provider_tier
+
+		provider_tier_str = getattr(provider.provider_doc, "provider_tier", None)
+		provider_type = getattr(provider.provider_doc, "provider_type", None)
+		provider_tier = get_provider_tier(model, provider_tier_str, provider_type)
+
 		# Resolve available tools for this agent
-		executor = ToolExecutor(agent)
+		from jana.services.guardrails.chain_monitor import ToolChainMonitor
+
+		chain_monitor = ToolChainMonitor()
+		executor = ToolExecutor(agent, chain_monitor=chain_monitor)
 		tools_spec = executor.get_tools_for_llm() if executor.has_tools else None
 
 		# Multi-turn tool loop
+		previous_had_tool_calls = False
 		for _iteration in range(MAX_TOOL_ITERATIONS):
+			# Temperature control: force 0 after tool calls or for Tier 3
+			if previous_had_tool_calls or provider_tier == 3:
+				turn_temperature = 0
+			else:
+				turn_temperature = base_temperature
+
 			result = provider.complete(
 				messages=messages,
 				model=model,
-				temperature=temperature,
+				temperature=turn_temperature,
 				max_tokens=max_tokens,
 				tools=tools_spec,
 			)
@@ -112,6 +129,8 @@ class ChatService:
 			tool_calls = result.get("tool_calls")
 			if not tool_calls:
 				break
+
+			previous_had_tool_calls = True
 
 			# LLM wants to call tools — save the assistant message with tool_calls
 			assistant_content = result.get("content", "") or ""
@@ -252,7 +271,14 @@ class ChatService:
 		if not model:
 			yield json.dumps({"content": "", "done": True, "error": _("No model configured. Set a model on the agent or in Jana Settings.")}) + "\n"
 			return
-		temperature = agent.temperature or 0.7
+
+		# Temperature control for streaming: Tier 3 providers always get 0
+		from jana.services.guardrails.provider_tiers import get_provider_tier
+
+		provider_tier_str = getattr(provider.provider_doc, "provider_tier", None)
+		provider_type = getattr(provider.provider_doc, "provider_type", None)
+		stream_tier = get_provider_tier(model, provider_tier_str, provider_type)
+		temperature = 0 if stream_tier == 3 else (agent.temperature or 0.7)
 		max_tokens = agent.max_tokens or None
 
 		full_content = ""
@@ -330,33 +356,30 @@ class ChatService:
 	def _build_messages(self, session, agent, masker=None) -> list:
 		"""Build the message list for the LLM call.
 
-		Prompt assembly order:
-		1. Business description (global, from Jana Settings)
-		2. Knowledge articles (agent-attached + scope-matched)
-		3. Agent system prompt
-		4. Page context (with PII masking)
+		Prompt assembly order (via prompt_builder):
+		1. Instruction hierarchy (priority declaration)
+		2. Agent system prompt (personality, capabilities)
+		3. Knowledge articles (wrapped in boundary markers)
+		4. Page context (wrapped in boundary markers, with PII masking)
+		5. Language instructions
+		6. Guardrail rules (pinned LAST — recency bias)
 
 		Includes tool messages and assistant tool_calls in history so the
 		LLM can see previous tool interactions in the conversation.
 		"""
+		from jana.services.guardrails.prompt_builder import build_system_prompt, get_guardrail_settings
+		from jana.services.language import get_language_instructions
+
 		messages = []
-		parts = []
+		guardrail_settings = get_guardrail_settings()
 
-		# 1. Business description (global)
+		# Business description (prepended to agent prompt)
 		business_desc = frappe.db.get_single_value("Jana Settings", "business_description")
+
+		# Agent system prompt (with dynamic report injection for Ask AI)
+		agent_prompt = ""
 		if business_desc:
-			parts.append(business_desc)
-
-		# 2. Knowledge articles (agent-attached + scope-matched)
-		context_doctype = session.context_doctype if session.context_doctype else None
-		knowledge_articles = get_knowledge_for_prompt(agent.name, context_doctype)
-		if knowledge_articles:
-			token_budget = frappe.db.get_single_value("Jana Settings", "knowledge_token_budget") or 30000
-			knowledge_text = format_knowledge_for_prompt(knowledge_articles, token_budget)
-			if knowledge_text:
-				parts.append(knowledge_text)
-
-		# 3. Agent system prompt (with dynamic report injection for Ask AI)
+			agent_prompt = business_desc + "\n\n---\n\n"
 		if agent.system_prompt:
 			prompt_text = agent.system_prompt
 			if "{{AVAILABLE_REPORTS}}" in prompt_text:
@@ -366,29 +389,37 @@ class ChatService:
 				prompt_text = prompt_text.replace(
 					"{{AVAILABLE_REPORTS}}", format_reports_for_prompt(reports)
 				)
-			parts.append(prompt_text)
+			agent_prompt += prompt_text
 
-		# 4. Page context (with PII masking)
+		# Knowledge articles (agent-attached + scope-matched)
+		knowledge_text = ""
+		context_doctype = session.context_doctype if session.context_doctype else None
+		knowledge_articles = get_knowledge_for_prompt(agent.name, context_doctype)
+		if knowledge_articles:
+			token_budget = frappe.db.get_single_value("Jana Settings", "knowledge_token_budget") or 30000
+			knowledge_text = format_knowledge_for_prompt(knowledge_articles, token_budget) or ""
+
+		# Page context (with PII masking)
+		context_text = ""
 		if session.context_doctype and session.context_docname:
 			context = get_page_context(session.context_doctype, session.context_docname)
-			# Structured PII masking while fieldtype metadata is available
 			if masker and masker.enabled and context:
 				context = masker.mask_context_fields(context)
-			context_text = format_context_for_prompt(context)
-			if context_text:
-				parts.append(context_text)
+			context_text = format_context_for_prompt(context) or ""
 
-		system_prompt = "\n\n---\n\n".join(parts) if parts else ""
+		# Language instructions
+		user_language = getattr(frappe.local, "lang", None)
+		lang_instructions = get_language_instructions(user_language) or ""
 
-		# 5. Language resilience instructions (non-English users)
-		from jana.services.language import get_language_instructions
-
-		lang_instructions = get_language_instructions(getattr(frappe.local, "lang", None))
-		if lang_instructions:
-			if system_prompt:
-				system_prompt += "\n\n---\n\n" + lang_instructions
-			else:
-				system_prompt = lang_instructions
+		# Assemble via prompt builder (handles boundary markers + guardrail pinning)
+		system_prompt = build_system_prompt(
+			agent_prompt=agent_prompt,
+			knowledge_text=knowledge_text,
+			context_text=context_text,
+			user_language=user_language,
+			lang_instructions=lang_instructions,
+			enable_guardrails=guardrail_settings["enable_guardrails"],
+		)
 
 		if system_prompt:
 			messages.append({"role": "system", "content": system_prompt})

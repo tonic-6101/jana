@@ -364,4 +364,6 @@ class TestExecuteConfirmWrite(unittest.TestCase):
 		content = json.loads(result["content"])
 
 		self.assertEqual(result["tool_call_id"], "call_test")
-		self.assertEqual(content["status"], "created")
+		# Tool results are now wrapped by annotate_tool_result
+		self.assertEqual(content["status"], "success")
+		self.assertEqual(content["data"]["status"], "created")

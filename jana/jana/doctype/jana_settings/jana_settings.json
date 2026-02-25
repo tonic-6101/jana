@@ -32,6 +32,12 @@
   "enable_report_queries",
   "enable_modify_documents",
   "require_write_confirmation",
+  "guardrails_section",
+  "enable_guardrails",
+  "max_message_length",
+  "column_break_guardrails",
+  "guardrail_reground_interval",
+  "guardrails_description",
   "privacy_section",
   "mask_pii",
   "column_break_privacy",
@@ -193,6 +199,41 @@
    "fieldname": "require_write_confirmation",
    "fieldtype": "Check",
    "label": "Require Write Confirmation"
+  },
+  {
+   "fieldname": "guardrails_section",
+   "fieldtype": "Section Break",
+   "label": "Security & Guardrails"
+  },
+  {
+   "default": "1",
+   "description": "When enabled, anti-hallucination and security rules are injected into every AI conversation. Strongly recommended to keep enabled.",
+   "fieldname": "enable_guardrails",
+   "fieldtype": "Check",
+   "label": "Enable Guardrails"
+  },
+  {
+   "default": "32000",
+   "description": "Maximum number of characters allowed per user message. Set to 0 to disable the limit.",
+   "fieldname": "max_message_length",
+   "fieldtype": "Int",
+   "label": "Max Message Length"
+  },
+  {
+   "fieldname": "column_break_guardrails",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "5",
+   "description": "Re-inject guardrail reminders every N conversation turns to counter context drift.",
+   "fieldname": "guardrail_reground_interval",
+   "fieldtype": "Int",
+   "label": "Re-grounding Interval (turns)"
+  },
+  {
+   "fieldname": "guardrails_description",
+   "fieldtype": "HTML",
+   "options": "<p class='text-muted small'>Guardrails enforce anti-hallucination rules, prompt boundary markers, and security constraints in every AI conversation. Disabling guardrails removes these protections.</p>"
   },
   {
    "fieldname": "privacy_section",

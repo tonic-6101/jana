@@ -143,10 +143,6 @@ class OpenAIProvider(LLMProvider):
 
 	def _handle_http_error(self, error, response):
 		status = response.status_code
-		try:
-			detail = response.json().get("error", {}).get("message", str(error))
-		except Exception:
-			detail = str(error)
 
 		if status == 401:
 			frappe.throw(_("Invalid API key. Please check your OpenAI API key in Jana Settings."))
@@ -154,5 +150,7 @@ class OpenAIProvider(LLMProvider):
 			frappe.throw(_("Rate limit exceeded. Please wait and try again."))
 		elif status == 404:
 			frappe.throw(_("Model not found. Please check the model name."))
+		elif status >= 500:
+			frappe.throw(_("The AI provider is experiencing issues. Please try again later."))
 		else:
-			frappe.throw(_("OpenAI API error ({0}): {1}").format(status, detail))
+			frappe.throw(_("AI provider request failed (HTTP {0}). Please try again.").format(status))

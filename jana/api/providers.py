@@ -149,11 +149,11 @@ def test_connection(provider_name: str) -> dict:
 			"model": result.get("model", test_model),
 		}
 
-	except Exception as e:
+	except Exception:
 		frappe.log_error(title="Jana Provider Health Check Failed")
 		return {
 			"success": False,
-			"message": str(e),
+			"message": _("Connection failed. Check the API key and endpoint URL."),
 			"latency_ms": 0,
 			"model": test_model,
 		}

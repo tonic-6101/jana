@@ -38,6 +38,9 @@ def send_message(
 	if not content or not content.strip():
 		frappe.throw(_("Message content is required"))
 
+	from jana.services.security.validators import validate_message_length
+	validate_message_length(content)
+
 	service = ChatService()
 	return service.send_message(
 		session_id=session_id,
@@ -64,6 +67,9 @@ def send_message_stream(
 		frappe.throw(_("Session ID is required"))
 	if not content or not content.strip():
 		frappe.throw(_("Message content is required"))
+
+	from jana.services.security.validators import validate_message_length
+	validate_message_length(content)
 
 	content = content.strip()
 	service = ChatService()
