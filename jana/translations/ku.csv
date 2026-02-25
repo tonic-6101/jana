@@ -5,16 +5,16 @@ Close,Bigire
 Chat,Sohbet
 Save,Tomar bike
 — Select —,— Hilbijêre —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Mercên Bikaranînê
+"Before using Jana, please review and accept the following terms:","Berî bikaranîna Jana, ji kerema xwe mercên jêrîn bixwînin û qebûl bikin:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana arîkarek AI ye. Bersivên ku ji hêla AI ve hatine çêkirin dibe ku ne rast, ne temam an kevn bin. Berî ku hûn tevbigerin, piştrastkirina hemû agahiyan berpirsyariya we ye."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Heke hûn mifteyên xwe yên API (BYOK) bikar tînin, hûn berpirsiyar in ji bo hemû lêçûn û bikaranînê bi dabînkerê xwe yê LLM re. Jana fatûrekirina dabînkerê we birêve nabe, sînordar nake an naçavdêrî nake."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana rastbûn, pêbawerî an guncaniya bersivên AI ji bo tu armanceke taybetî garantî nake."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Danûstandinên we li ser vê malpera Frappe têne hilanîn. Daneyên ku ji dabînkerên LLM ên ewr re hatine şandin tabi siyasetên rêvebirina daneyên wan in.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition di bin AGPL-3.0 de lîsanskirî ye. Ji bo mercan lîsansa tevahî bibînin.
+I have read and agree to the Terms of Use,Min Mercên Bikaranînê xwand û razî me
+View Full Terms of Use,Mercên Bikaranînê yên tevahî bibînin
+Accept and Continue,Qebûl bike û bidomîne
+You must accept the Terms of Use to continue.,Divê hûn Mercên Bikaranînê qebûl bikin da ku bidomînin.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana bi zimanê we bersiv dide. Naveroka teknîkî ya tevlihev dibe ku di navbera zimanan de ji hêla kalîteyê ve cûda be.
+Could not save acceptance. Please try again.,Qebûlkirin nehat tomarkirin. Ji kerema xwe dîsa biceribînin.

@@ -5,16 +5,16 @@ Close,Bezárás
 Chat,Csevegés
 Save,Mentés
 — Select —,— Válasszon —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Használati feltételek
+"Before using Jana, please review and accept the following terms:","A Jana használata előtt kérjük, olvassa el és fogadja el a következő feltételeket:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","A Jana egy MI-asszisztens. Az MI által generált válaszok pontatlanok, hiányosak vagy elavultak lehetnek. Ön felelős minden információ ellenőrzéséért, mielőtt cselekedne."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Ha saját API-kulcsokat (BYOK) használ, Ön felelős az LLM-szolgáltatójánál felmerülő összes költségért és használatért. A Jana nem kezeli, nem korlátozza és nem figyeli a szolgáltatója számlázását."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","A Jana nem garantálja az MI-válaszok pontosságát, megbízhatóságát vagy alkalmasságát semmilyen konkrét célra."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Beszélgetéseit ez a Frappe webhely tárolja. A felhőalapú LLM-szolgáltatóknak küldött adatokra azok adatkezelési szabályzatai vonatkoznak.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,A Jana Community Edition az AGPL-3.0 licenc alatt áll. A feltételeket a teljes licencben találja.
+I have read and agree to the Terms of Use,Elolvastam és elfogadom a Használati feltételeket
+View Full Terms of Use,Teljes Használati feltételek megtekintése
+Accept and Continue,Elfogadás és folytatás
+You must accept the Terms of Use to continue.,A folytatáshoz el kell fogadnia a Használati feltételeket.
+Jana responds in your language. Complex technical content may vary in quality across languages.,A Jana az Ön nyelvén válaszol. Az összetett technikai tartalom minősége nyelvenként eltérhet.
+Could not save acceptance. Please try again.,Az elfogadás nem menthető. Kérjük, próbálja újra.

@@ -5,16 +5,16 @@ Close,ပိတ်
 Chat,ချက်တင်
 Save,သိမ်းဆည်း
 — Select —,— ရွေးချယ်ပါ —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,အသုံးပြုမှု စည်းကမ်းချက်များ
+"Before using Jana, please review and accept the following terms:",Jana အသုံးမပြုမီ အောက်ပါစည်းကမ်းချက်များကို ဖတ်ရှုပြီး လက်ခံပါ:
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",Jana သည် AI အကူအညီပေးသူဖြစ်သည်။ AI မှ ထုတ်လုပ်သော အဖြေများသည် မမှန်ကန်နိုင်ပါ၊ မပြည့်စုံနိုင်ပါ သို့မဟုတ် ခေတ်မမီနိုင်ပါ။ လုပ်ဆောင်မှု မပြုမီ အချက်အလက်အားလုံးကို စစ်ဆေးရန် သင့်တာဝန်ဖြစ်သည်။
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",သင့်ကိုယ်ပိုင် API key များ (BYOK) အသုံးပြုပါက၊ သင်၏ LLM ဝန်ဆောင်မှုပေးသူနှင့် ကုန်ကျစရိတ်နှင့် အသုံးပြုမှုအားလုံးအတွက် သင်တာဝန်ရှိသည်။ Jana သည် သင့်ဝန်ဆောင်မှုပေးသူ၏ ငွေတောင်းခံမှုကို စီမံ၊ ကန့်သတ် သို့မဟုတ် စောင့်ကြည့်ခြင်း မပြုပါ။
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",Jana သည် မည်သည့်ရည်ရွယ်ချက်အတွက်မဆို AI အဖြေများ၏ တိကျမှု၊ ယုံကြည်စိတ်ချရမှု သို့မဟုတ် သင့်လျော်မှုကို အာမမခံပါ။
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,သင့်စကားပြောဆိုမှုများကို ဤ Frappe site တွင် သိမ်းဆည်းထားသည်။ Cloud LLM ဝန်ဆောင်မှုပေးသူများထံ ပေးပို့သော ဒေတာသည် ၎င်းတို့၏ ဒေတာကိုင်တွယ်မှု မူဝါဒများအရ ဖြစ်သည်။
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition သည် AGPL-3.0 အောက်တွင် လိုင်စင်ရထားသည်။ စည်းကမ်းချက်များအတွက် လိုင်စင်အပြည့်အစုံကို ကြည့်ပါ။
+I have read and agree to the Terms of Use,အသုံးပြုမှု စည်းကမ်းချက်များကို ဖတ်ပြီး သဘောတူပါသည်
+View Full Terms of Use,အသုံးပြုမှု စည်းကမ်းချက်အပြည့်အစုံ ကြည့်ရှုရန်
+Accept and Continue,လက်ခံပြီး ဆက်လုပ်ရန်
+You must accept the Terms of Use to continue.,ဆက်လုပ်ရန် အသုံးပြုမှု စည်းကမ်းချက်များကို လက်ခံရပါမည်။
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana သည် သင့်ဘာသာစကားဖြင့် တုံ့ပြန်သည်။ ရှုပ်ထွေးသော နည်းပညာဆိုင်ရာ အကြောင်းအရာသည် ဘာသာစကားများကြား အရည်အသွေး ကွဲပြားနိုင်သည်။
+Could not save acceptance. Please try again.,လက်ခံမှုကို သိမ်းဆည်း၍ မရပါ။ ထပ်စမ်းကြည့်ပါ။

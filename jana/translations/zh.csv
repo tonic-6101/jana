@@ -23,16 +23,16 @@ Generate,生成
 Result,结果
 Content,内容
 — Select —,— 选择 —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,使用条款
+"Before using Jana, please review and accept the following terms:","在使用 Jana 之前，请阅读并接受以下条款："
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana 是一个 AI 助手。AI 生成的回复可能不准确、不完整或已过时。您有责任在采取行动之前验证所有信息。"
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","如果您使用自己的 API 密钥（BYOK），您将自行承担与 LLM 提供商之间的所有费用和使用责任。Jana 不管理、限制或监控您的提供商账单。"
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana 不保证 AI 回复的准确性、可靠性或对任何特定目的的适用性。"
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,您的对话存储在此 Frappe 站点上。发送给云端 LLM 提供商的数据受其数据处理政策约束。
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana 社区版根据 AGPL-3.0 许可证授权。请参阅完整许可证以了解条款和条件。
+I have read and agree to the Terms of Use,我已阅读并同意使用条款
+View Full Terms of Use,查看完整使用条款
+Accept and Continue,接受并继续
+You must accept the Terms of Use to continue.,您必须接受使用条款才能继续。
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana 以您的语言进行回复。复杂的技术内容在不同语言之间可能存在质量差异。
+Could not save acceptance. Please try again.,无法保存同意记录。请重试。

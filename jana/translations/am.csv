@@ -5,16 +5,16 @@ Close,ዝጋ
 Chat,ውይይት
 Save,አስቀምጥ
 — Select —,— ምረጥ —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,የአጠቃቀም ውሎች
+"Before using Jana, please review and accept the following terms:",Jana ን ከመጠቀምዎ በፊት እባክዎ የሚከተሉትን ውሎች ያንብቡ እና ይቀበሉ:
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",Jana የ AI ረዳት ነው። በ AI የተፈጠሩ ምላሾች ትክክል ላይሆኑ፣ ያልተሟሉ ወይም ያረጁ ሊሆኑ ይችላሉ። ከመንቀሳቀስዎ በፊት ሁሉንም መረጃዎች ማረጋገጥ የእርስዎ ኃላፊነት ነው።
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",የራስዎን API ቁልፎች (BYOK) ከተጠቀሙ፣ ከ LLM አቅራቢዎ ጋር ለሁሉም ወጪዎች እና አጠቃቀም ኃላፊነት የእርስዎ ነው። Jana የአቅራቢዎን ክፍያ አያስተዳድርም፣ አይገድብም ወይም አይከታተልም።
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",Jana ለማንኛውም የተወሰነ ዓላማ የ AI ምላሾችን ትክክለኛነት፣ አስተማማኝነት ወይም ተስማሚነት አይዋስም።
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,ውይይቶችዎ በዚህ Frappe ጣቢያ ላይ ተከማችተዋል። ወደ ደመና LLM አቅራቢዎች የተላከ ውሂብ ለእነሱ የውሂብ አያያዝ ፖሊሲዎች ተገዢ ነው።
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition በ AGPL-3.0 ስር ፈቃድ ተሰጥቶታል። ለውሎች እና ሁኔታዎች ሙሉ ፈቃዱን ይመልከቱ።
+I have read and agree to the Terms of Use,የአጠቃቀም ውሎችን አንብቤ ተስማምቻለሁ
+View Full Terms of Use,ሙሉ የአጠቃቀም ውሎችን ይመልከቱ
+Accept and Continue,ይቀበሉ እና ይቀጥሉ
+You must accept the Terms of Use to continue.,ለመቀጠል የአጠቃቀም ውሎችን መቀበል አለብዎት።
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana በቋንቋዎ ይመልሳል። ውስብስብ ቴክኒካዊ ይዘት በቋንቋዎች መካከል በጥራት ሊለያይ ይችላል።
+Could not save acceptance. Please try again.,ተቀባይነትን ማስቀመጥ አልተቻለም። እባክዎ እንደገና ይሞክሩ።

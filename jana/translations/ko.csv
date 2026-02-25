@@ -17,16 +17,16 @@ Generate,생성
 Result,결과
 Content,콘텐츠
 — Select —,— 선택 —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,이용약관
+"Before using Jana, please review and accept the following terms:","Jana를 사용하기 전에 다음 약관을 검토하고 동의해 주십시오:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana는 AI 어시스턴트입니다. AI가 생성한 응답은 부정확하거나 불완전하거나 오래된 정보일 수 있습니다. 모든 정보를 행동에 옮기기 전에 확인하는 것은 귀하의 책임입니다."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","자체 API 키(BYOK)를 사용하시는 경우, LLM 제공자와의 모든 비용 및 사용에 대한 책임은 귀하에게 있습니다. Jana는 귀하의 제공자 요금 청구를 관리, 제한 또는 모니터링하지 않습니다."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana는 특정 목적에 대한 AI 응답의 정확성, 신뢰성 또는 적합성을 보장하지 않습니다."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,귀하의 대화는 이 Frappe 사이트에 저장됩니다. 클라우드 LLM 제공자에게 전송된 데이터는 해당 제공자의 데이터 처리 정책에 따릅니다.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition은 AGPL-3.0에 따라 라이선스됩니다. 약관 및 조건은 전체 라이선스를 참조하십시오.
+I have read and agree to the Terms of Use,이용약관을 읽었으며 동의합니다
+View Full Terms of Use,전체 이용약관 보기
+Accept and Continue,동의하고 계속하기
+You must accept the Terms of Use to continue.,계속하려면 이용약관에 동의해야 합니다.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana는 귀하의 언어로 응답합니다. 복잡한 기술적 콘텐츠는 언어에 따라 품질이 다를 수 있습니다.
+Could not save acceptance. Please try again.,동의를 저장할 수 없습니다. 다시 시도해 주십시오.

@@ -5,16 +5,16 @@ Close,Isara
 Chat,Chat
 Save,I-save
 — Select —,— Pumili —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Mga Tuntunin ng Paggamit
+"Before using Jana, please review and accept the following terms:","Bago gamitin ang Jana, pakibasa at tanggapin ang mga sumusunod na tuntunin:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Ang Jana ay isang AI assistant. Ang mga tugon na gawa ng AI ay maaaring hindi tama, hindi kumpleto, o lipas na. Ikaw ang may pananagutan sa pag-verify ng lahat ng impormasyon bago kumilos."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Kung gagamit ka ng sarili mong API keys (BYOK), ikaw ang responsable sa lahat ng gastos at paggamit sa iyong LLM provider. Hindi pinamamahalaan, nililimitahan, o minomonitor ng Jana ang billing ng iyong provider."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Hindi ginagarantiyahan ng Jana ang katumpakan, pagiging maaasahan, o angkop na paggamit ng mga tugon ng AI para sa anumang partikular na layunin."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Ang iyong mga pag-uusap ay naka-imbak sa Frappe site na ito. Ang data na ipinadala sa cloud LLM providers ay napapailalim sa kanilang mga patakaran sa pangangasiwa ng data.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Ang Jana Community Edition ay lisensyado sa ilalim ng AGPL-3.0. Tingnan ang buong lisensya para sa mga tuntunin at kundisyon.
+I have read and agree to the Terms of Use,Nabasa ko at sumasang-ayon ako sa Mga Tuntunin ng Paggamit
+View Full Terms of Use,Tingnan ang Buong Mga Tuntunin ng Paggamit
+Accept and Continue,Tanggapin at Magpatuloy
+You must accept the Terms of Use to continue.,Kailangan mong tanggapin ang Mga Tuntunin ng Paggamit upang makapagpatuloy.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Ang Jana ay sumasagot sa iyong wika. Ang kumplikadong teknikal na nilalaman ay maaaring mag-iba sa kalidad sa iba't ibang wika.
+Could not save acceptance. Please try again.,Hindi ma-save ang pagtanggap. Pakisubukan muli.

@@ -5,16 +5,16 @@ Close,වසන්න
 Chat,කතාබහ
 Save,සුරකින්න
 — Select —,— තෝරන්න —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,භාවිත නියම
+"Before using Jana, please review and accept the following terms:","Jana භාවිත කිරීමට පෙර, කරුණාකර පහත නියම කියවා පිළිගන්න:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana AI සහායකයෙකි. AI මඟින් ජනනය කරන ලද පිළිතුරු නිවැරදි නොවිය හැකිය, අසම්පූර්ණ හෝ යල් පැන ගිය ඒවා විය හැකිය. කටයුතු කිරීමට පෙර සියලු තොරතුරු තහවුරු කර ගැනීම ඔබේ වගකීමයි."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","ඔබ ඔබේම API යතුරු (BYOK) භාවිත කරන්නේ නම්, ඔබේ LLM සපයන්නා සමඟ සියලු වියදම් සහ භාවිතය සඳහා ඔබ වගකිව යුතුය. Jana ඔබේ සපයන්නාගේ බිල්පත් කළමනාකරණය, සීමා කිරීම හෝ අධීක්ෂණය නොකරයි."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana කිසිදු විශේෂ අරමුණක් සඳහා AI පිළිතුරුවල නිවැරදිභාවය, විශ්වාසනීයත්වය හෝ යෝග්‍යතාවය සහතික නොකරයි."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,ඔබේ සංවාද මෙම Frappe අඩවියේ ගබඩා කර ඇත. වලාකුළු LLM සපයන්නන්ට යවන දත්ත ඔවුන්ගේ දත්ත හැසිරවීමේ ප්‍රතිපත්තිවලට යටත් වේ.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition AGPL-3.0 යටතේ බලපත්‍ර ලබා ඇත. නියම සඳහා සම්පූර්ණ බලපත්‍රය බලන්න.
+I have read and agree to the Terms of Use,මම භාවිත නියම කියවා එකඟ වෙමි
+View Full Terms of Use,සම්පූර්ණ භාවිත නියම බලන්න
+Accept and Continue,පිළිගෙන ඉදිරියට යන්න
+You must accept the Terms of Use to continue.,ඉදිරියට යාමට ඔබ භාවිත නියම පිළිගත යුතුය.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana ඔබේ භාෂාවෙන් පිළිතුරු දෙයි. සංකීර්ණ තාක්ෂණික අන්තර්ගතය භාෂා අතර ගුණාත්මක බවින් වෙනස් විය හැකිය.
+Could not save acceptance. Please try again.,පිළිගැනීම සුරැකිය නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.

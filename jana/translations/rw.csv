@@ -5,16 +5,16 @@ Close,Funga
 Chat,Ibiganiro
 Save,Bika
 — Select —,— Hitamo —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Amabwiriza y'imikoreshereze
+"Before using Jana, please review and accept the following terms:","Mbere yo gukoresha Jana, soma kandi wemere amabwiriza akurikira:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana ni umufasha wa AI. Ibisubizo byakozwe na AI bishobora kutaba byo, gutuzura cyangwa gushaje. Ni inshingano yawe kugenzura amakuru yose mbere yo gukora."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Niba ukoresha urupfunguzo rwawe rwa API (BYOK), uri umwishingizi w'amafaranga yose n'imikoreshereze ku mutanga wawe wa LLM. Jana ntiyobora, ntilimita cyangwa ntigenzura inyemezabuguzi z'umutanga wawe."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana ntihamya ukuri, kwizerana cyangwa kubereha kw'ibisubizo bya AI ku ntego iyo ari yo yose."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Ibibarizwa byawe bibitswe kuri uru rubuga rwa Frappe. Amakuru yoherejwe ku batanga LLM bo mu bicu akurikira politiki zabo zo gucunga amakuru.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition ifite uruhushya rwa AGPL-3.0. Reba uruhushya rwose ku mabwiriza.
+I have read and agree to the Terms of Use,Nasomye kandi nemeye Amabwiriza y'imikoreshereze
+View Full Terms of Use,Reba Amabwiriza yose y'imikoreshereze
+Accept and Continue,Emera kandi ukomeze
+You must accept the Terms of Use to continue.,Ugomba kwemera Amabwiriza y'imikoreshereze kugira ngo ukomeze.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana isubiza mu rurimi rwawe. Ibikubiye mu bya tekinike bigoye bishobora gutandukana ku kuri mu ndimi zitandukanye.
+Could not save acceptance. Please try again.,Kwemera ntibyashobotse kubikwa. Ongera ugerageze.

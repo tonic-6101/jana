@@ -5,16 +5,16 @@ Close,Ttz'apij
 Chat,Tzijonik
 Save,Tiyak
 — Select —,— Tacha' —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Uwach taq ucholajil rech ukojik
+"Before using Jana, please review and accept the following terms:","Chuwach ukojik ri Jana, tab'ana' utzil kasik'ij xuqujeꞌ kak'ulu' ri re taq ucholajil:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Ri Jana jun to'onel AI. Ri taq tzij ri kuya ri AI rik'in juba' man e utz ta, man e tz'aqat ta o e ojer chik. At at k'o chi achomaj ronojel ri etamab'al chuwach asamaj."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","We kawokisaj ri awech API taq llave (BYOK), at at k'o chi pa ronojel ri rajil xuqujeꞌ ri ukojik rik'in ri LLM ajawal. Ri Jana man kuya ta ucholajil ri q'atoj rajil ri ajawal."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Ri Jana man kuya ta uq'alajisaxik chi ri taq tzij ri kuya ri AI e utz, e k'o kik'ij, o e k'amon chirij jun cholajil."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Ri ach'ab'al e k'o waral pa re ruxaq Frappe. Ri taq tzij ri etaqon chi ke ri LLM jawalil pa sutz' e k'o pa ri kicholajil.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Ri Jana Community Edition k'o ulicencia pa AGPL-3.0. Tatz'eta' ri nimalaj licencia rech ri ucholajil.
+I have read and agree to the Terms of Use,Xinsik'ij xuqujeꞌ kinwetamaj ri Uwach taq ucholajil rech ukojik
+View Full Terms of Use,Tatz'eta' ronojel ri Uwach taq ucholajil rech ukojik
+Accept and Continue,Tak'ulu' xuqujeꞌ tasamajij
+You must accept the Terms of Use to continue.,K'o chi kak'ulu' ri Uwach taq ucholajil rech ukojik rech kasamajij.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Ri Jana kutzijoj pa ri ach'ab'al. Ri nimalaj taq tzij ri man e are ta rech k'o juba' man e junam ta pa ronojel ch'ab'al.
+Could not save acceptance. Please try again.,Man xtikir ta xkeyak ri uk'ulaxik. Tab'ana' utzil tachapa' chik.

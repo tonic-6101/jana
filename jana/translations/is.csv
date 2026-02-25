@@ -5,16 +5,16 @@ Close,Loka
 Chat,Spjall
 Save,Vista
 — Select —,— Velja —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Notkunarskilmálar
+"Before using Jana, please review and accept the following terms:","Áður en þú notar Jana, vinsamlegast lestu og samþykktu eftirfarandi skilmála:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana er gervigreindaaðstoðarmaður. Svör sem gervigreind býr til geta verið ónákvæm, ófullnægjandi eða úrelt. Þú berð ábyrgð á að staðfesta allar upplýsingar áður en þú bregst við."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Ef þú notar eigin API-lykla (BYOK) berð þú ábyrgð á öllum kostnaði og notkun hjá LLM-veitanda þínum. Jana stjórnar, takmarkar né fylgist með reikningum veitanda þíns."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana ábyrgist ekki nákvæmni, áreiðanleika eða hæfi gervigreindarsvara fyrir neinn sérstakan tilgang."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Samtöl þín eru geymd á þessari Frappe-síðu. Gögn sem send eru til skýja-LLM-veitenda lúta gagnavinnslustefnum þeirra.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition er gefið út undir AGPL-3.0 leyfi. Sjá fullt leyfi fyrir skilmála.
+I have read and agree to the Terms of Use,Ég hef lesið og samþykki Notkunarskilmálana
+View Full Terms of Use,Skoða fulla Notkunarskilmála
+Accept and Continue,Samþykkja og halda áfram
+You must accept the Terms of Use to continue.,Þú verður að samþykkja Notkunarskilmálana til að halda áfram.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana svarar á tungumálinu þínu. Flókið tæknilegt efni getur verið misjafnt að gæðum eftir tungumálum.
+Could not save acceptance. Please try again.,Ekki tókst að vista samþykki. Vinsamlegast reyndu aftur.

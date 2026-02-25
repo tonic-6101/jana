@@ -5,16 +5,16 @@ Close,סגור
 Chat,צ'אט
 Save,שמור
 — Select —,— בחר —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,תנאי שימוש
+"Before using Jana, please review and accept the following terms:","לפני השימוש ב-Jana, אנא קראו וקבלו את התנאים הבאים:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana הוא עוזר בינה מלאכותית. תשובות שנוצרו על ידי AI עשויות להיות לא מדויקות, לא שלמות או מיושנות. האחריות לאימות כל המידע לפני פעולה היא עליכם."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","אם אתם משתמשים במפתחות API משלכם (BYOK), אתם אחראים לכל העלויות והשימוש אצל ספק ה-LLM שלכם. Jana אינה מנהלת, מגבילה או מנטרת את החיוב של הספק שלכם."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana אינה מבטיחה את הדיוק, האמינות או ההתאמה של תשובות AI לכל מטרה מסוימת."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,השיחות שלכם מאוחסנות באתר Frappe זה. נתונים הנשלחים לספקי LLM בענן כפופים למדיניות הטיפול בנתונים שלהם.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition מורשה תחת AGPL-3.0. ראו את הרישיון המלא לתנאים.
+I have read and agree to the Terms of Use,קראתי ואני מסכים/ה לתנאי השימוש
+View Full Terms of Use,הצג את תנאי השימוש המלאים
+Accept and Continue,קבל והמשך
+You must accept the Terms of Use to continue.,עליכם לקבל את תנאי השימוש כדי להמשיך.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana מגיבה בשפה שלכם. תוכן טכני מורכב עשוי להשתנות באיכותו בין שפות.
+Could not save acceptance. Please try again.,לא ניתן לשמור את ההסכמה. אנא נסו שוב.

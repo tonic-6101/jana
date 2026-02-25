@@ -5,16 +5,16 @@ Close,Κλείσιμο
 Chat,Συνομιλία
 Save,Αποθήκευση
 — Select —,— Επιλέξτε —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Όροι Χρήσης
+"Before using Jana, please review and accept the following terms:","Πριν χρησιμοποιήσετε το Jana, παρακαλούμε διαβάστε και αποδεχτείτε τους ακόλουθους όρους:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Το Jana είναι ένας βοηθός AI. Οι απαντήσεις που δημιουργούνται από AI μπορεί να είναι ανακριβείς, ελλιπείς ή παρωχημένες. Είστε υπεύθυνοι για την επαλήθευση όλων των πληροφοριών πριν ενεργήσετε."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Εάν χρησιμοποιείτε τα δικά σας κλειδιά API (BYOK), είστε υπεύθυνοι για όλα τα κόστη και τη χρήση με τον πάροχο LLM σας. Το Jana δεν διαχειρίζεται, δεν περιορίζει ούτε παρακολουθεί τη χρέωση του παρόχου σας."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Το Jana δεν εγγυάται την ακρίβεια, αξιοπιστία ή καταλληλότητα των απαντήσεων AI για οποιονδήποτε συγκεκριμένο σκοπό."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Οι συνομιλίες σας αποθηκεύονται σε αυτόν τον ιστότοπο Frappe. Τα δεδομένα που αποστέλλονται σε παρόχους LLM στο cloud υπόκεινται στις πολιτικές διαχείρισης δεδομένων τους.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Το Jana Community Edition αδειοδοτείται υπό AGPL-3.0. Δείτε την πλήρη άδεια για τους όρους και τις προϋποθέσεις.
+I have read and agree to the Terms of Use,Έχω διαβάσει και αποδέχομαι τους Όρους Χρήσης
+View Full Terms of Use,Προβολή πλήρων Όρων Χρήσης
+Accept and Continue,Αποδοχή και συνέχεια
+You must accept the Terms of Use to continue.,Πρέπει να αποδεχτείτε τους Όρους Χρήσης για να συνεχίσετε.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Το Jana απαντά στη γλώσσα σας. Το σύνθετο τεχνικό περιεχόμενο μπορεί να διαφέρει σε ποιότητα ανάλογα με τη γλώσσα.
+Could not save acceptance. Please try again.,Δεν ήταν δυνατή η αποθήκευση της αποδοχής. Παρακαλούμε δοκιμάστε ξανά.

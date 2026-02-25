@@ -5,16 +5,16 @@ Close,Funga
 Chat,Mazungumzo
 Save,Hifadhi
 — Select —,— Chagua —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Masharti ya Matumizi
+"Before using Jana, please review and accept the following terms:","Kabla ya kutumia Jana, tafadhali soma na ukubali masharti yafuatayo:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana ni msaidizi wa AI. Majibu yanayotengenezwa na AI yanaweza kuwa yasiyo sahihi, kamili, au ya zamani. Wewe una wajibu wa kuthibitisha taarifa zote kabla ya kuchukua hatua."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Ukitumia funguo zako za API (BYOK), wewe una wajibu wa gharama zote na matumizi na mtoa huduma wako wa LLM. Jana haisimamii, haipunguzi wala haifuatilii utozaji wa mtoa huduma wako."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana haitoi dhamana ya usahihi, uaminifu, au ufaafu wa majibu ya AI kwa madhumuni yoyote maalum."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Mazungumzo yako yamehifadhiwa kwenye tovuti hii ya Frappe. Data inayotumwa kwa watoa huduma wa LLM wa wingu inategemea sera zao za kushughulikia data.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition ina leseni chini ya AGPL-3.0. Tazama leseni kamili kwa masharti.
+I have read and agree to the Terms of Use,Nimesoma na ninakubali Masharti ya Matumizi
+View Full Terms of Use,Tazama Masharti Kamili ya Matumizi
+Accept and Continue,Kubali na Endelea
+You must accept the Terms of Use to continue.,Lazima ukubali Masharti ya Matumizi ili kuendelea.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana inajibu kwa lugha yako. Maudhui changamano ya kiufundi yanaweza kutofautiana kwa ubora kati ya lugha.
+Could not save acceptance. Please try again.,Haikuweza kuhifadhi kukubalika. Tafadhali jaribu tena.

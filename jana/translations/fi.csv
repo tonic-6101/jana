@@ -9,16 +9,16 @@ Chat,Keskustelu
 Save,Tallenna
 Cancel,Peruuta
 — Select —,— Valitse —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Käyttöehdot
+"Before using Jana, please review and accept the following terms:","Ennen Janan käyttöä, lue ja hyväksy seuraavat ehdot:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana on tekoälyavustaja. Tekoälyn tuottamat vastaukset voivat olla epätarkkoja, puutteellisia tai vanhentuneita. Olet itse vastuussa kaiken tiedon tarkistamisesta ennen toimimista."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Jos käytät omia API-avaimiasi (BYOK), olet vastuussa kaikista kuluista ja käytöstä LLM-palveluntarjoajasi kanssa. Jana ei hallinnoi, rajoita tai seuraa palveluntarjoajasi laskutusta."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana ei takaa tekoälyvastausten tarkkuutta, luotettavuutta tai soveltuvuutta mihinkään tiettyyn tarkoitukseen."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Keskustelusi tallennetaan tälle Frappe-sivustolle. Pilvi-LLM-palveluntarjoajille lähetetty data on heidän tietojenkäsittelykäytäntöjensä alaista.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition on lisensoitu AGPL-3.0:n mukaisesti. Katso täydellinen lisenssi ehdoista.
+I have read and agree to the Terms of Use,Olen lukenut ja hyväksyn Käyttöehdot
+View Full Terms of Use,Näytä täydelliset Käyttöehdot
+Accept and Continue,Hyväksy ja jatka
+You must accept the Terms of Use to continue.,Sinun on hyväksyttävä Käyttöehdot jatkaaksesi.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana vastaa kielellesi. Monimutkainen tekninen sisältö voi vaihdella laadultaan kielten välillä.
+Could not save acceptance. Please try again.,Hyväksynnän tallentaminen epäonnistui. Yritä uudelleen.

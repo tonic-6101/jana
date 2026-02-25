@@ -5,16 +5,16 @@ Close,Đóng
 Chat,Trò chuyện
 Save,Lưu
 — Select —,— Chọn —
-Terms of Use,
-"Before using Jana, please review and accept the following terms:",
-"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.",
-"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.",
-"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.",
-Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,
-Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,
-I have read and agree to the Terms of Use,
-View Full Terms of Use,
-Accept and Continue,
-You must accept the Terms of Use to continue.,
-Jana responds in your language. Complex technical content may vary in quality across languages.,
-Could not save acceptance. Please try again.,
+Terms of Use,Điều khoản sử dụng
+"Before using Jana, please review and accept the following terms:","Trước khi sử dụng Jana, vui lòng đọc và chấp nhận các điều khoản sau:"
+"Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.","Jana là trợ lý AI. Các câu trả lời do AI tạo ra có thể không chính xác, không đầy đủ hoặc đã lỗi thời. Bạn có trách nhiệm xác minh tất cả thông tin trước khi hành động."
+"If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.","Nếu bạn sử dụng khóa API của riêng mình (BYOK), bạn chịu trách nhiệm về tất cả chi phí và sử dụng với nhà cung cấp LLM của bạn. Jana không quản lý, giới hạn hoặc giám sát việc thanh toán của nhà cung cấp."
+"Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.","Jana không đảm bảo tính chính xác, độ tin cậy hoặc sự phù hợp của các câu trả lời AI cho bất kỳ mục đích cụ thể nào."
+Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.,Các cuộc trò chuyện của bạn được lưu trữ trên trang Frappe này. Dữ liệu gửi đến các nhà cung cấp LLM đám mây tuân theo chính sách xử lý dữ liệu của họ.
+Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.,Jana Community Edition được cấp phép theo AGPL-3.0. Xem giấy phép đầy đủ để biết các điều khoản và điều kiện.
+I have read and agree to the Terms of Use,Tôi đã đọc và đồng ý với Điều khoản sử dụng
+View Full Terms of Use,Xem Điều khoản sử dụng đầy đủ
+Accept and Continue,Chấp nhận và tiếp tục
+You must accept the Terms of Use to continue.,Bạn phải chấp nhận Điều khoản sử dụng để tiếp tục.
+Jana responds in your language. Complex technical content may vary in quality across languages.,Jana phản hồi bằng ngôn ngữ của bạn. Nội dung kỹ thuật phức tạp có thể khác nhau về chất lượng giữa các ngôn ngữ.
+Could not save acceptance. Please try again.,Không thể lưu sự chấp nhận. Vui lòng thử lại.
