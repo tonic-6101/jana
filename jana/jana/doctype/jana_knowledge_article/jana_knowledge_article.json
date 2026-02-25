@@ -11,6 +11,7 @@
   "doctype_scope",
   "enabled",
   "content_section",
+  "source_file",
   "content"
  ],
  "fields": [
@@ -54,10 +55,15 @@
    "label": "Content"
   },
   {
+   "description": "Attach a PDF, DOCX, or TXT file. Text will be extracted into Content when you save.",
+   "fieldname": "source_file",
+   "fieldtype": "Attach",
+   "label": "Source File"
+  },
+  {
    "fieldname": "content",
    "fieldtype": "Text Editor",
-   "label": "Content",
-   "reqd": 1
+   "label": "Content"
   }
  ],
  "links": [],

@@ -21,10 +21,29 @@ class JanaKnowledgeArticle(Document):
 		content: DF.TextEditor
 		doctype_scope: DF.Link | None
 		enabled: DF.Check
+		source_file: DF.Attach | None
 	# end: auto-generated types
+
+	def before_validate(self):
+		self.extract_content_from_file()
 
 	def validate(self):
 		self.validate_content()
+
+	def extract_content_from_file(self):
+		"""If a source file is attached and content is empty, extract text."""
+		if not self.source_file:
+			return
+
+		# Don't overwrite existing content
+		if self.get_plain_content():
+			return
+
+		from jana.services.knowledge.extractor import extract_text
+
+		extracted = extract_text(self.source_file)
+		if extracted:
+			self.content = extracted
 
 	def validate_content(self):
 		plain = self.get_plain_content()
