@@ -11,15 +11,16 @@ import type {
 import { __ } from "@/composables/useTranslate"
 
 function getBootConfig(): JanaBootConfig | null {
-  const w = window as Record<string, unknown>
+  const w = window as unknown as Record<string, unknown>
   if (w.frappe && typeof w.frappe === "object") {
-    return (w.frappe as Record<string, unknown>).boot?.jana as JanaBootConfig ?? null
+    const boot = (w.frappe as Record<string, unknown>).boot as Record<string, unknown> | undefined
+    return boot?.jana as JanaBootConfig ?? null
   }
   return null
 }
 
 function getCsrfToken(): string {
-  return (window as Record<string, unknown>).csrf_token as string ?? ""
+  return (window as unknown as Record<string, unknown>).csrf_token as string ?? ""
 }
 
 export function useChat() {

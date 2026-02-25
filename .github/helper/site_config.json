@@ -1,0 +1,11 @@
+{
+  "db_host": "127.0.0.1",
+  "db_port": 3306,
+  "db_name": "test_site",
+  "db_password": "test_site",
+  "db_type": "mariadb",
+  "redis_cache": "redis://127.0.0.1:13000",
+  "redis_queue": "redis://127.0.0.1:11000",
+  "redis_socketio": "redis://127.0.0.1:13000",
+  "allow_tests": true
+}

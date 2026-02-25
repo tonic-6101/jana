@@ -108,7 +108,7 @@ async function handleAccept(): Promise<void> {
 
 function getCsrfToken(): string {
   if (typeof window !== "undefined") {
-    const w = window as Record<string, unknown>
+    const w = window as unknown as Record<string, unknown>
     if (w.frappe && (w.frappe as Record<string, unknown>).csrf_token) {
       return (w.frappe as Record<string, unknown>).csrf_token as string
     }
