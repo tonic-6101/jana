@@ -60,6 +60,8 @@
         </div>
       </header>
 
+      <DisclaimerBanner />
+
       <!-- Messages -->
       <ChatMessages
         :messages="chat.messages.value"
@@ -85,6 +87,7 @@ import { useAgents } from "@/composables/useAgents"
 import ChatSidebar from "@/components/chat/ChatSidebar.vue"
 import ChatMessages from "@/components/chat/ChatMessages.vue"
 import ChatInput from "@/components/chat/ChatInput.vue"
+import DisclaimerBanner from "@/components/chat/DisclaimerBanner.vue"
 
 const chat = useChat()
 const { agents, fetchAgents } = useAgents()

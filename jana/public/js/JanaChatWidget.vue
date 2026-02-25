@@ -52,6 +52,19 @@
 				</div>
 			</div>
 
+			<!-- Legal disclaimer -->
+			<div v-if="showDisclaimer && currentView === 'chat'" class="jana-disclaimer">
+				<svg class="jana-disclaimer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="10"></circle>
+					<line x1="12" y1="8" x2="12" y2="12"></line>
+					<line x1="12" y1="16" x2="12.01" y2="16"></line>
+				</svg>
+				<span class="jana-disclaimer-text">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
+				<button class="jana-disclaimer-close" @click="dismissDisclaimer" :title="__('Dismiss')">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+				</button>
+			</div>
+
 			<!-- Session List view -->
 			<div v-if="currentView === 'sessions'" class="jana-sessions">
 				<div v-if="sessionsLoading" class="jana-sessions-loading">
@@ -279,6 +292,7 @@ const sessions = ref<SessionInfo[]>([]);
 const sessionsLoading = ref(false);
 const agents = ref<Array<{ name: string; agent_name: string; description: string | null }>>([]);
 const agentsLoaded = ref(false);
+const disclaimerDismissed = ref(false);
 let abortController: AbortController | null = null;
 
 // --- Template refs ---
@@ -323,7 +337,21 @@ const isStreamingMsg = computed(() => {
 	return last?._streaming === true;
 });
 
+const showDisclaimer = computed(() =>
+	(props.capabilities.create_documents || props.capabilities.modify_documents)
+	&& !disclaimerDismissed.value,
+);
+
 // --- Methods ---
+
+function dismissDisclaimer(): void {
+	disclaimerDismissed.value = true;
+	try {
+		sessionStorage.setItem("jana_disclaimer_dismissed", "1");
+	} catch {
+		// sessionStorage unavailable — dismiss for this component lifecycle only
+	}
+}
 
 function scrollToBottom(): void {
 	nextTick(() => {
@@ -709,6 +737,11 @@ function handleToggle(): void {
 
 onMounted(() => {
 	document.addEventListener("jana:toggle", handleToggle);
+	try {
+		disclaimerDismissed.value = sessionStorage.getItem("jana_disclaimer_dismissed") === "1";
+	} catch {
+		// sessionStorage unavailable
+	}
 });
 
 onUnmounted(() => {
