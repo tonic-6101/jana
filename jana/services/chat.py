@@ -380,6 +380,16 @@ class ChatService:
 
 		system_prompt = "\n\n---\n\n".join(parts) if parts else ""
 
+		# 5. Language resilience instructions (non-English users)
+		from jana.services.language import get_language_instructions
+
+		lang_instructions = get_language_instructions(getattr(frappe.local, "lang", None))
+		if lang_instructions:
+			if system_prompt:
+				system_prompt += "\n\n---\n\n" + lang_instructions
+			else:
+				system_prompt = lang_instructions
+
 		if system_prompt:
 			messages.append({"role": "system", "content": system_prompt})
 

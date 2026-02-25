@@ -24,7 +24,7 @@
     </svg>
     <div class="flex-1">
       <span v-if="showWriteDisclaimer">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
-      <span v-if="isNonEnglish" class="block mt-0.5 italic opacity-85">{{ __('AI responses may be less accurate in languages other than English.') }}</span>
+      <span v-if="isNonEnglish" class="block mt-0.5 italic opacity-85">{{ __('Jana responds in your language. Complex technical content may vary in quality across languages.') }}</span>
     </div>
     <button
       class="flex-shrink-0 rounded p-0.5 hover:bg-amber-100 text-amber-700"
