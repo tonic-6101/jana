@@ -126,6 +126,15 @@ When Jana is first installed, capabilities are set conservatively:
 
 This ensures Jana starts in a safe, read-only mode and only gains write capabilities when the admin decides.
 
+## Terms Acceptance
+
+When a user opens Jana for the first time, they are asked to accept the [Terms of Use](terms-of-use.md) before proceeding. This is a one-time action stored permanently in the database.
+
+- Acceptance is per-user and per-terms-version
+- When terms are updated (new version), users are asked to re-accept
+- Administrators can view all acceptance records at `/app/jana-terms-acceptance`
+- The boot configuration includes `terms_accepted` and `terms_version` fields
+
 ## Boot Configuration
 
 Jana injects its configuration into Frappe's boot process via `extend_bootinfo`. The client-side JavaScript receives:
@@ -135,12 +144,14 @@ frappe.boot.jana = {
   enabled: true,          // Whether Jana has a working provider
   default_agent: "General Assistant",
   streaming: true,
+  terms_accepted: true,   // Whether user accepted current terms
+  terms_version: "1.0",   // Current terms version
   capabilities: { ... },  // Capability toggles
   oauth_providers: [ ... ] // Available OAuth providers
 }
 ```
 
-This allows the frontend widget to know whether to show itself, which capabilities are active, and whether streaming is available — all without additional API calls.
+This allows the frontend widget to know whether to show itself, which capabilities are active, whether terms are accepted, and whether streaming is available — all without additional API calls.
 
 ## Roles
 

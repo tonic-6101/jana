@@ -84,6 +84,8 @@ For detailed setup instructions, see the [Getting Started Guide](docs/getting-st
 | [Privacy & Data Handling](docs/privacy.md) | PII auto-masking, data flow, and GDPR compliance |
 | [Developer Guide](docs/developer-guide.md) | Architecture, extending Jana, and contributing |
 | [API Reference](docs/api-reference.md) | All REST API endpoints |
+| [Terms of Use](docs/terms-of-use.md) | Legal terms for using Jana |
+| [Language Support](docs/language-support.md) | Multilingual AI response quality and supported languages |
 | [FAQ](docs/faq.md) | Frequently asked questions |
 | [Changelog](docs/CHANGELOG.md) | Release history |
 

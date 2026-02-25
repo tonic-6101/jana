@@ -79,9 +79,20 @@ No. Chat sessions are private. Each session is owned by the user who created it,
 
 Not by default. Write capabilities (Create, Modify) are disabled when Jana is installed. An administrator must explicitly enable them in Jana Settings. Even when enabled, Jana will ask for confirmation before performing any write action.
 
+### Why am I asked to accept terms before using Jana?
+
+Jana uses AI providers that process your data. The terms acceptance ensures you understand that:
+- AI responses are generated and may be inaccurate
+- You are responsible for your own API keys and costs
+- Data is sent to your configured LLM provider
+
+You only need to accept once. If the terms are materially updated, you will be asked again. See [Terms of Use](terms-of-use.md) for the full terms.
+
 ### What languages does Jana support?
 
-Jana's interface is internationalized and can be translated into any language Frappe supports. The AI responses depend on the LLM model — most major providers support English and many other languages natively.
+Jana's interface supports 75+ languages. AI response quality is enhanced by Jana's language resilience system, which automatically instructs the LLM to respond in your Frappe locale with appropriate formality (e.g., formal German with Sie, formal French with vous, polite Japanese with keigo).
+
+For best multilingual results, use a capable model like GPT-4o, Claude, or Gemini Pro. See [Language Support](language-support.md) for details.
 
 ## Privacy & Security
 
