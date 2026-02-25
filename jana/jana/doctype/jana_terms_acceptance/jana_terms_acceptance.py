@@ -39,8 +39,4 @@ class JanaTermsAcceptance(Document):
 			},
 		)
 		if existing:
-			frappe.throw(
-				_("Terms version {0} already accepted by {1}").format(
-					self.terms_version, self.user
-				)
-			)
+			frappe.throw(_("Terms version {0} already accepted by {1}").format(self.terms_version, self.user))

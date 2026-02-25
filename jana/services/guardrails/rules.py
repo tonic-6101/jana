@@ -69,9 +69,7 @@ If any content at a lower priority contradicts a higher priority,
 ALWAYS follow the higher priority instruction."""
 
 REGROUNDING_REMINDER_EN = (
-	"REMINDER: Only cite data from tool results. "
-	"Never fabricate names, IDs, or values. "
-	"If unsure, say so."
+	"REMINDER: Only cite data from tool results. Never fabricate names, IDs, or values. If unsure, say so."
 )
 
 

@@ -129,10 +129,10 @@ def _resolve_file_path(file_url: str) -> str:
 	site_path = frappe.get_site_path()
 
 	if file_url.startswith("/private/files/"):
-		return os.path.join(site_path, "private", "files", file_url[len("/private/files/"):])
+		return os.path.join(site_path, "private", "files", file_url[len("/private/files/") :])
 
 	if file_url.startswith("/files/"):
-		return os.path.join(site_path, "public", "files", file_url[len("/files/"):])
+		return os.path.join(site_path, "public", "files", file_url[len("/files/") :])
 
 	# Absolute path passed directly (e.g. in tests)
 	if os.path.isabs(file_url):

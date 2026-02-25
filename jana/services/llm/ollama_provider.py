@@ -3,9 +3,8 @@
 
 import json
 
-import requests
-
 import frappe
+import requests
 from frappe import _
 
 from jana.services.llm.base import LLMProvider
@@ -47,9 +46,7 @@ class OllamaProvider(LLMProvider):
 				frappe.throw(_("Ollama request failed (HTTP {0}). Please try again.").format(status))
 		except requests.exceptions.ConnectionError:
 			frappe.throw(
-				_("Could not connect to Ollama at {0}. Is Ollama running?").format(
-					self._get_base_url()
-				)
+				_("Could not connect to Ollama at {0}. Is Ollama running?").format(self._get_base_url())
 			)
 		except requests.exceptions.Timeout:
 			frappe.throw(_("Ollama request timed out. The model may be loading."))
@@ -64,9 +61,7 @@ class OllamaProvider(LLMProvider):
 		result = {
 			"content": message.get("content", ""),
 			"model": data.get("model", model),
-			"tokens_used": (
-				data.get("prompt_eval_count", 0) + data.get("eval_count", 0)
-			),
+			"tokens_used": (data.get("prompt_eval_count", 0) + data.get("eval_count", 0)),
 		}
 
 		if message.get("tool_calls"):
@@ -100,9 +95,7 @@ class OllamaProvider(LLMProvider):
 				frappe.throw(_("Ollama request failed (HTTP {0}). Please try again.").format(status))
 		except requests.exceptions.ConnectionError:
 			frappe.throw(
-				_("Could not connect to Ollama at {0}. Is Ollama running?").format(
-					self._get_base_url()
-				)
+				_("Could not connect to Ollama at {0}. Is Ollama running?").format(self._get_base_url())
 			)
 
 		chunk_count = 0
@@ -135,12 +128,14 @@ class OllamaProvider(LLMProvider):
 		formatted = []
 		for tool in tools:
 			func = tool.get("function", tool)
-			formatted.append({
-				"type": "function",
-				"function": {
-					"name": func.get("name", ""),
-					"description": func.get("description", ""),
-					"parameters": func.get("parameters", {}),
-				},
-			})
+			formatted.append(
+				{
+					"type": "function",
+					"function": {
+						"name": func.get("name", ""),
+						"description": func.get("description", ""),
+						"parameters": func.get("parameters", {}),
+					},
+				}
+			)
 		return formatted

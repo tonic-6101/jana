@@ -35,9 +35,7 @@ class TestCreateDocumentConfirmation(unittest.TestCase):
 		mock_frappe.cache = MagicMock()
 
 		executor = self._make_executor({"require_write_confirmation": 1})
-		result = executor._handle_create_document(
-			doctype="ToDo", values={"description": "Test"}
-		)
+		result = executor._handle_create_document(doctype="ToDo", values={"description": "Test"})
 
 		self.assertEqual(result["status"], "pending_confirmation")
 		self.assertIn("confirmation_id", result)
@@ -58,9 +56,7 @@ class TestCreateDocumentConfirmation(unittest.TestCase):
 		mock_frappe.new_doc = MagicMock(return_value=mock_doc)
 
 		executor = self._make_executor({"require_write_confirmation": 0})
-		result = executor._handle_create_document(
-			doctype="ToDo", values={"description": "Test"}
-		)
+		result = executor._handle_create_document(doctype="ToDo", values={"description": "Test"})
 
 		self.assertEqual(result["status"], "created")
 		self.assertEqual(result["name"], "TODO-001")
@@ -76,9 +72,7 @@ class TestCreateDocumentConfirmation(unittest.TestCase):
 		mock_frappe.cache = MagicMock()
 
 		executor = self._make_executor({"require_write_confirmation": 1})
-		result = executor._handle_create_document(
-			doctype="ToDo", values={"description": "Cache test"}
-		)
+		result = executor._handle_create_document(doctype="ToDo", values={"description": "Cache test"})
 
 		cache_call = mock_frappe.cache.set_value.call_args
 		cache_key = cache_call[0][0]
@@ -246,12 +240,14 @@ class TestConfirmWrite(unittest.TestCase):
 		"""confirm_write rejects actions belonging to a different user."""
 		mock_frappe.session = SimpleNamespace(user="other@example.com")
 		mock_frappe.cache = MagicMock()
-		mock_frappe.cache.get_value = MagicMock(return_value={
-			"type": "create",
-			"doctype": "ToDo",
-			"values": {},
-			"user": "test@example.com",
-		})
+		mock_frappe.cache.get_value = MagicMock(
+			return_value={
+				"type": "create",
+				"doctype": "ToDo",
+				"values": {},
+				"user": "test@example.com",
+			}
+		)
 
 		executor = self._make_executor()
 		result = executor._handle_confirm_write(confirmation_id="stolen-id")
@@ -269,12 +265,14 @@ class TestConfirmWrite(unittest.TestCase):
 		mock_frappe.new_doc = MagicMock(return_value=mock_doc)
 
 		mock_frappe.cache = MagicMock()
-		mock_frappe.cache.get_value = MagicMock(return_value={
-			"type": "create",
-			"doctype": "ToDo",
-			"values": {},
-			"user": "test@example.com",
-		})
+		mock_frappe.cache.get_value = MagicMock(
+			return_value={
+				"type": "create",
+				"doctype": "ToDo",
+				"values": {},
+				"user": "test@example.com",
+			}
+		)
 
 		executor = self._make_executor()
 		executor._handle_confirm_write(confirmation_id="one-time")
@@ -335,21 +333,26 @@ class TestExecuteConfirmWrite(unittest.TestCase):
 		mock_frappe.has_permission = MagicMock()
 		mock_frappe.scrub = MagicMock(return_value="todo")
 		mock_frappe.cache = MagicMock()
-		mock_frappe.cache.get_value = MagicMock(return_value={
-			"type": "create",
-			"doctype": "ToDo",
-			"values": {"description": "Dispatch test"},
-			"user": "test@example.com",
-		})
+		mock_frappe.cache.get_value = MagicMock(
+			return_value={
+				"type": "create",
+				"doctype": "ToDo",
+				"values": {"description": "Dispatch test"},
+				"user": "test@example.com",
+			}
+		)
 		mock_doc = MagicMock()
 		mock_doc.name = "TODO-DISPATCH"
 		mock_frappe.new_doc = MagicMock(return_value=mock_doc)
 
 		agent = SimpleNamespace(tools=[], knowledge=[])
-		executor = ToolExecutor(agent, settings={
-			"enable_tool_calling": 1,
-			"require_write_confirmation": 1,
-		})
+		executor = ToolExecutor(
+			agent,
+			settings={
+				"enable_tool_calling": 1,
+				"require_write_confirmation": 1,
+			},
+		)
 
 		tool_call = {
 			"id": "call_test",

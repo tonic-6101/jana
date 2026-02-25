@@ -60,6 +60,7 @@ class ChatService:
 
 		# Rate limiting — check before doing any work
 		from jana.services.rate_limiter import check_rate_limit
+
 		check_rate_limit()
 
 		# Update context if the user navigated to a new page
@@ -162,11 +163,13 @@ class ChatService:
 				result_content = tool_result["content"]
 				if masker.enabled:
 					result_content = masker.mask_text(result_content)
-				messages.append({
-					"role": "tool",
-					"tool_call_id": tool_result["tool_call_id"],
-					"content": result_content,
-				})
+				messages.append(
+					{
+						"role": "tool",
+						"tool_call_id": tool_result["tool_call_id"],
+						"content": result_content,
+					}
+				)
 
 		# Final text response (no tool_calls)
 		response_content = result.get("content", "")
@@ -184,6 +187,7 @@ class ChatService:
 
 		# Rate counter — successful AI response
 		from jana.services.rate_limiter import increment_rate_counter
+
 		increment_rate_counter()
 
 		# Auto-title on first exchange
@@ -219,15 +223,30 @@ class ChatService:
 		session = frappe.get_doc("Jana Chat Session", session_id)
 
 		if session.user != frappe.session.user:
-			yield json.dumps({"content": "", "done": True, "error": _("You do not have access to this session")}) + "\n"
+			yield (
+				json.dumps(
+					{"content": "", "done": True, "error": _("You do not have access to this session")}
+				)
+				+ "\n"
+			)
 			return
 
 		# Rate limiting — check before doing any work
 		from jana.services.rate_limiter import check_rate_limit
+
 		try:
 			check_rate_limit()
 		except frappe.ValidationError:
-			yield json.dumps({"content": "", "done": True, "error": _("Rate limit exceeded. Please wait before sending more messages.")}) + "\n"
+			yield (
+				json.dumps(
+					{
+						"content": "",
+						"done": True,
+						"error": _("Rate limit exceeded. Please wait before sending more messages."),
+					}
+				)
+				+ "\n"
+			)
 			return
 
 		# Check if agent has tools — if so, delegate to non-streaming path
@@ -242,7 +261,12 @@ class ChatService:
 					context_doctype=context_doctype,
 					context_docname=context_docname,
 				)
-				yield json.dumps({"content": result.get("content", ""), "done": True, "model": result.get("model", "")}) + "\n"
+				yield (
+					json.dumps(
+						{"content": result.get("content", ""), "done": True, "model": result.get("model", "")}
+					)
+					+ "\n"
+				)
 			except Exception:
 				frappe.log_error(title="Jana Tool Streaming Error")
 				yield json.dumps({"content": "", "done": True, "error": _("An error occurred")}) + "\n"
@@ -269,7 +293,16 @@ class ChatService:
 		stream_settings = get_jana_settings()
 		model = agent.model or stream_settings.get("default_model")
 		if not model:
-			yield json.dumps({"content": "", "done": True, "error": _("No model configured. Set a model on the agent or in Jana Settings.")}) + "\n"
+			yield (
+				json.dumps(
+					{
+						"content": "",
+						"done": True,
+						"error": _("No model configured. Set a model on the agent or in Jana Settings."),
+					}
+				)
+				+ "\n"
+			)
 			return
 
 		# Temperature control for streaming: Tier 3 providers always get 0
@@ -313,6 +346,7 @@ class ChatService:
 
 					# Rate counter — successful streaming response
 					from jana.services.rate_limiter import increment_rate_counter
+
 					increment_rate_counter()
 
 					if not session.session_title:
@@ -329,7 +363,10 @@ class ChatService:
 				remaining = masker.flush_buffer()
 				if remaining:
 					yield json.dumps({"content": remaining, "done": False}) + "\n"
-			yield json.dumps({"content": "", "done": True, "error": _("An error occurred during streaming")}) + "\n"
+			yield (
+				json.dumps({"content": "", "done": True, "error": _("An error occurred during streaming")})
+				+ "\n"
+			)
 			return
 
 		# Provider ended without done=True — save what we have
@@ -347,7 +384,16 @@ class ChatService:
 		messages = frappe.get_all(
 			"Jana Chat Message",
 			filters={"session": session_id},
-			fields=["name", "role", "content", "model", "tokens_used", "tool_calls", "tool_call_id", "creation"],
+			fields=[
+				"name",
+				"role",
+				"content",
+				"model",
+				"tokens_used",
+				"tool_calls",
+				"tool_call_id",
+				"creation",
+			],
 			order_by="creation asc",
 			limit_page_length=limit,
 		)
@@ -386,9 +432,7 @@ class ChatService:
 				from jana.services.query import format_reports_for_prompt, get_available_reports
 
 				reports = get_available_reports(limit=50)
-				prompt_text = prompt_text.replace(
-					"{{AVAILABLE_REPORTS}}", format_reports_for_prompt(reports)
-				)
+				prompt_text = prompt_text.replace("{{AVAILABLE_REPORTS}}", format_reports_for_prompt(reports))
 			agent_prompt += prompt_text
 
 		# Knowledge articles (agent-attached + scope-matched)

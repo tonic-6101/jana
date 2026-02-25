@@ -48,8 +48,8 @@ class JanaAgent(Document):
 		)
 		if active_sessions:
 			frappe.throw(
-				_("Cannot delete agent {0}: {1} active session(s) still reference it. "
-				  "Archive or delete those sessions first.").format(
-					self.agent_name, active_sessions
-				)
+				_(
+					"Cannot delete agent {0}: {1} active session(s) still reference it. "
+					"Archive or delete those sessions first."
+				).format(self.agent_name, active_sessions)
 			)

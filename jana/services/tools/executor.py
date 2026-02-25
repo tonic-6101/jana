@@ -70,12 +70,14 @@ class ToolExecutor:
 			if toggle and not cint(self.settings.get(toggle)):
 				continue
 
-			resolved.append({
-				"tool_name": tool_doc.tool_name,
-				"description": tool_doc.description,
-				"parameters_schema": tool_doc.parameters_schema,
-				"method": tool_doc.method,
-			})
+			resolved.append(
+				{
+					"tool_name": tool_doc.tool_name,
+					"description": tool_doc.description,
+					"parameters_schema": tool_doc.parameters_schema,
+					"method": tool_doc.method,
+				}
+			)
 
 		return resolved
 
@@ -95,14 +97,16 @@ class ToolExecutor:
 			if isinstance(schema, str):
 				schema = json.loads(schema)
 
-			specs.append({
-				"type": "function",
-				"function": {
-					"name": tool["tool_name"],
-					"description": tool["description"],
-					"parameters": schema,
-				},
-			})
+			specs.append(
+				{
+					"type": "function",
+					"function": {
+						"name": tool["tool_name"],
+						"description": tool["description"],
+						"parameters": schema,
+					},
+				}
+			)
 		return specs
 
 	# ------------------------------------------------------------------
@@ -114,11 +118,11 @@ class ToolExecutor:
 
 		*tool_call* follows the OpenAI format::
 
-			{
-				"id": "call_abc123",
-				"type": "function",
-				"function": {"name": "read_document", "arguments": "{...}"}
-			}
+		        {
+		            "id": "call_abc123",
+		            "type": "function",
+		            "function": {"name": "read_document", "arguments": "{...}"},
+		        }
 
 		Returns ``{"tool_call_id": "...", "content": "..."}`` suitable
 		for appending as a ``role: "tool"`` message.
@@ -133,17 +137,19 @@ class ToolExecutor:
 		try:
 			args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
 		except json.JSONDecodeError:
-			error_result = annotate_tool_result(
-				_("Invalid tool arguments"), name, status="error"
-			)
-			return {"tool_call_id": call_id, "content": json.dumps(error_result, default=str, ensure_ascii=False)}
+			error_result = annotate_tool_result(_("Invalid tool arguments"), name, status="error")
+			return {
+				"tool_call_id": call_id,
+				"content": json.dumps(error_result, default=str, ensure_ascii=False),
+			}
 
 		handler = getattr(self, f"_handle_{name}", None)
 		if handler is None:
-			error_result = annotate_tool_result(
-				_("Unknown tool: {0}").format(name), name, status="error"
-			)
-			return {"tool_call_id": call_id, "content": json.dumps(error_result, default=str, ensure_ascii=False)}
+			error_result = annotate_tool_result(_("Unknown tool: {0}").format(name), name, status="error")
+			return {
+				"tool_call_id": call_id,
+				"content": json.dumps(error_result, default=str, ensure_ascii=False),
+			}
 
 		# Chain monitor: record call and check write limits
 		if self._chain_monitor:
@@ -151,21 +157,20 @@ class ToolExecutor:
 			write_block = self._chain_monitor.check_write_allowed(name)
 			if write_block:
 				error_result = annotate_tool_result(write_block, name, status="error")
-				return {"tool_call_id": call_id, "content": json.dumps(error_result, default=str, ensure_ascii=False)}
+				return {
+					"tool_call_id": call_id,
+					"content": json.dumps(error_result, default=str, ensure_ascii=False),
+				}
 
 		try:
 			result = handler(**args)
 			annotated = annotate_tool_result(result, name, status="success")
 			content = json.dumps(annotated, default=str, ensure_ascii=False)
 		except frappe.PermissionError:
-			error_result = annotate_tool_result(
-				{"error": _("Permission denied")}, name, status="error"
-			)
+			error_result = annotate_tool_result({"error": _("Permission denied")}, name, status="error")
 			content = json.dumps(error_result, default=str, ensure_ascii=False)
 		except frappe.DoesNotExistError:
-			error_result = annotate_tool_result(
-				{"error": _("Document does not exist")}, name, status="error"
-			)
+			error_result = annotate_tool_result({"error": _("Document does not exist")}, name, status="error")
 			content = json.dumps(error_result, default=str, ensure_ascii=False)
 		except Exception:
 			frappe.log_error(title=f"Jana Tool Error: {name}")
@@ -198,9 +203,7 @@ class ToolExecutor:
 		except Exception:
 			return data
 
-		password_fields = {
-			df.fieldname for df in meta.fields if df.fieldtype == "Password"
-		}
+		password_fields = {df.fieldname for df in meta.fields if df.fieldtype == "Password"}
 		if not password_fields:
 			return data
 
@@ -261,12 +264,16 @@ class ToolExecutor:
 		if cint(self.settings.get("require_write_confirmation")):
 			confirmation_id = str(uuid.uuid4())
 			cache_key = f"jana_pending_write:{frappe.session.user}:{confirmation_id}"
-			frappe.cache.set_value(cache_key, {
-				"type": "create",
-				"doctype": doctype,
-				"values": values,
-				"user": frappe.session.user,
-			}, expires_in_sec=300)
+			frappe.cache.set_value(
+				cache_key,
+				{
+					"type": "create",
+					"doctype": doctype,
+					"values": values,
+					"user": frappe.session.user,
+				},
+				expires_in_sec=300,
+			)
 			return {
 				"status": "pending_confirmation",
 				"confirmation_id": confirmation_id,
@@ -286,9 +293,7 @@ class ToolExecutor:
 		url = f"/app/{frappe.scrub(doctype)}/{doc.name}"
 		return {"doctype": doctype, "name": doc.name, "status": "created", "url": url}
 
-	def _handle_update_document(
-		self, doctype: str, name: str, values: dict, **_kw
-	) -> dict:
+	def _handle_update_document(self, doctype: str, name: str, values: dict, **_kw) -> dict:
 		"""Update fields on an existing document, or return a preview if confirmation is required."""
 		dt_error = self._validate_doctype_exists(doctype)
 		if dt_error:
@@ -302,13 +307,17 @@ class ToolExecutor:
 
 			confirmation_id = str(uuid.uuid4())
 			cache_key = f"jana_pending_write:{frappe.session.user}:{confirmation_id}"
-			frappe.cache.set_value(cache_key, {
-				"type": "update",
-				"doctype": doctype,
-				"name": name,
-				"values": values,
-				"user": frappe.session.user,
-			}, expires_in_sec=300)
+			frappe.cache.set_value(
+				cache_key,
+				{
+					"type": "update",
+					"doctype": doctype,
+					"name": name,
+					"values": values,
+					"user": frappe.session.user,
+				},
+				expires_in_sec=300,
+			)
 			return {
 				"status": "pending_confirmation",
 				"confirmation_id": confirmation_id,
@@ -383,8 +392,7 @@ class ToolExecutor:
 		)
 
 		col_labels = [
-			c.get("label", c.get("fieldname", "")) if isinstance(c, dict) else str(c)
-			for c in (columns or [])
+			c.get("label", c.get("fieldname", "")) if isinstance(c, dict) else str(c) for c in (columns or [])
 		]
 
 		return {

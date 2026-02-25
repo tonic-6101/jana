@@ -49,8 +49,10 @@ class ToolChainMonitor:
 				message=f"Blocked {tool_name} — already {self._write_count} writes this turn",
 			)
 			return {
-				"error": _("Only one write operation is allowed per turn. "
-						   "Please send a new message to perform another write.")
+				"error": _(
+					"Only one write operation is allowed per turn. "
+					"Please send a new message to perform another write."
+				)
 			}
 		return None
 

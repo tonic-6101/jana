@@ -20,6 +20,7 @@ from frappe import _
 def _check_draft_content_enabled():
 	"""Raise if the draft-content capability is disabled."""
 	from frappe.utils import cint
+
 	from jana.utils import get_jana_settings
 
 	settings = get_jana_settings()
@@ -111,9 +112,7 @@ def draft_email(
 	context = get_page_context(doctype, docname)
 	if not context:
 		frappe.throw(
-			_("Cannot access {0} {1}. Check that it exists and you have permission.").format(
-				doctype, docname
-			)
+			_("Cannot access {0} {1}. Check that it exists and you have permission.").format(doctype, docname)
 		)
 
 	context_text = format_context_for_prompt(context)
@@ -129,15 +128,11 @@ def draft_email(
 			"clarification or additional information."
 		),
 		"follow_up": (
-			"Write a follow-up email referencing this document, checking on "
-			"progress or next steps."
+			"Write a follow-up email referencing this document, checking on progress or next steps."
 		),
-		"thank_you": (
-			"Write a brief thank-you email related to this document."
-		),
+		"thank_you": ("Write a brief thank-you email related to this document."),
 		"complaint": (
-			"Write a professional complaint or issue-report email referencing "
-			"the details in this document."
+			"Write a professional complaint or issue-report email referencing the details in this document."
 		),
 	}
 
@@ -207,17 +202,13 @@ def generate_description(
 	context = get_page_context(doctype, docname)
 	if not context:
 		frappe.throw(
-			_("Cannot access {0} {1}. Check that it exists and you have permission.").format(
-				doctype, docname
-			)
+			_("Cannot access {0} {1}. Check that it exists and you have permission.").format(doctype, docname)
 		)
 
 	context_text = format_context_for_prompt(context)
 
 	style_guidance = {
-		"professional": (
-			"Write a clear, professional description suitable for business documentation."
-		),
+		"professional": ("Write a clear, professional description suitable for business documentation."),
 		"marketing": (
 			"Write an engaging, benefit-focused description suitable for a "
 			"website or catalogue. Highlight key features and value propositions."
@@ -226,9 +217,7 @@ def generate_description(
 			"Write a precise technical description covering specifications, "
 			"capabilities, and relevant details."
 		),
-		"brief": (
-			"Write a concise one-to-two sentence summary."
-		),
+		"brief": ("Write a concise one-to-two sentence summary."),
 	}
 
 	style_text = style_guidance.get(style, style_guidance["professional"])
@@ -293,9 +282,7 @@ def summarize_report(
 	except Exception:
 		frappe.log_error(title="Jana Report Summary Error")
 		frappe.throw(
-			_("Could not run report {0}. Check that it exists and you have permission.").format(
-				report_name
-			)
+			_("Could not run report {0}. Check that it exists and you have permission.").format(report_name)
 		)
 
 	columns = report_data.get("columns", [])
@@ -317,7 +304,12 @@ def summarize_report(
 
 	for row in rows:
 		if isinstance(row, dict):
-			values = [str(row.get(c.get("fieldname", ""), "")) if isinstance(c, dict) else str(row.get(str(c).split(":")[0], "")) for c in columns]
+			values = [
+				str(row.get(c.get("fieldname", ""), ""))
+				if isinstance(c, dict)
+				else str(row.get(str(c).split(":")[0], ""))
+				for c in columns
+			]
 		elif isinstance(row, (list, tuple)):
 			values = [str(v) for v in row]
 		else:

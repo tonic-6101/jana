@@ -32,8 +32,10 @@ def check_rate_limit(user: str = None) -> None:
 
 	if current_count >= limit:
 		frappe.throw(
-			_("Rate limit exceeded. You can send up to {0} messages per hour. "
-			  "Please wait before sending more.").format(limit),
+			_(
+				"Rate limit exceeded. You can send up to {0} messages per hour. "
+				"Please wait before sending more."
+			).format(limit),
 			title=_("Rate Limit Exceeded"),
 		)
 

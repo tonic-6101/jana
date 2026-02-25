@@ -36,9 +36,7 @@ def extend_bootinfo(bootinfo):
 			provider = frappe.get_doc("Jana Provider", settings.default_provider)
 
 			# Check system-level API key
-			api_key = get_decrypted_password(
-				"Jana Provider", provider.name, "api_key", raise_exception=False
-			)
+			api_key = get_decrypted_password("Jana Provider", provider.name, "api_key", raise_exception=False)
 
 			# Check per-user key
 			user_key = frappe.db.get_value(
@@ -71,19 +69,17 @@ def extend_bootinfo(bootinfo):
 				except Exception:
 					pass
 
-			jana_config["oauth_providers"].append({
-				"name": p.name,
-				"provider_name": p.provider_name,
-				"provider_type": p.provider_type,
-				"connected": connected,
-			})
+			jana_config["oauth_providers"].append(
+				{
+					"name": p.name,
+					"provider_name": p.provider_name,
+					"provider_type": p.provider_type,
+					"connected": connected,
+				}
+			)
 
 			# If this OAuth provider is the default and user is connected, enable
-			if (
-				connected
-				and settings.default_provider
-				and p.name == settings.default_provider
-			):
+			if connected and settings.default_provider and p.name == settings.default_provider:
 				jana_config["enabled"] = True
 
 		jana_config["streaming"] = bool(settings.enable_streaming)
@@ -137,9 +133,7 @@ def get_widget_config() -> dict:
 		if settings.default_provider:
 			provider = frappe.get_doc("Jana Provider", settings.default_provider)
 
-			api_key = get_decrypted_password(
-				"Jana Provider", provider.name, "api_key", raise_exception=False
-			)
+			api_key = get_decrypted_password("Jana Provider", provider.name, "api_key", raise_exception=False)
 
 			user_key = frappe.db.get_value(
 				"Jana User Key",
@@ -169,18 +163,16 @@ def get_widget_config() -> dict:
 				except Exception:
 					pass
 
-			jana_config["oauth_providers"].append({
-				"name": p.name,
-				"provider_name": p.provider_name,
-				"provider_type": p.provider_type,
-				"connected": connected,
-			})
+			jana_config["oauth_providers"].append(
+				{
+					"name": p.name,
+					"provider_name": p.provider_name,
+					"provider_type": p.provider_type,
+					"connected": connected,
+				}
+			)
 
-			if (
-				connected
-				and settings.default_provider
-				and p.name == settings.default_provider
-			):
+			if connected and settings.default_provider and p.name == settings.default_provider:
 				jana_config["enabled"] = True
 
 		jana_config["streaming"] = bool(settings.enable_streaming)

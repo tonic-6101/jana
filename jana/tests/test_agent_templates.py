@@ -83,10 +83,6 @@ class TestCRMAssistantInstall(unittest.TestCase):
 
 		_install_crm_assistant()
 
-		# At least one new_doc call should set category = "crm"
-		all_assigns = []
-		for c in mock_frappe.new_doc.return_value.method_calls:
-			pass
 		# Check template category via attribute assignment
 		self.assertEqual(mock_doc.category, "crm")
 
@@ -101,10 +97,7 @@ class TestCRMAssistantInstall(unittest.TestCase):
 		_install_crm_assistant()
 
 		# new_doc should NOT be called for Jana Agent
-		agent_calls = [
-			c for c in mock_frappe.new_doc.call_args_list
-			if c[0][0] == "Jana Agent"
-		]
+		agent_calls = [c for c in mock_frappe.new_doc.call_args_list if c[0][0] == "Jana Agent"]
 		self.assertEqual(len(agent_calls), 0)
 
 	@patch("jana.install.frappe")
@@ -241,10 +234,7 @@ class TestKnowledgeArticleInstall(unittest.TestCase):
 		_install_knowledge_articles()
 
 		# Count new_doc calls for Jana Knowledge Article
-		article_calls = [
-			c for c in mock_frappe.new_doc.call_args_list
-			if c[0][0] == "Jana Knowledge Article"
-		]
+		article_calls = [c for c in mock_frappe.new_doc.call_args_list if c[0][0] == "Jana Knowledge Article"]
 		# Should be 8: 3 accounting + 2 CRM + 2 HR + 1 data analysis
 		self.assertEqual(len(article_calls), 8)
 
@@ -255,10 +245,7 @@ class TestKnowledgeArticleInstall(unittest.TestCase):
 
 		_install_knowledge_articles()
 
-		article_calls = [
-			c for c in mock_frappe.new_doc.call_args_list
-			if c[0][0] == "Jana Knowledge Article"
-		]
+		article_calls = [c for c in mock_frappe.new_doc.call_args_list if c[0][0] == "Jana Knowledge Article"]
 		self.assertEqual(len(article_calls), 0)
 
 	def test_crm_articles_included(self):

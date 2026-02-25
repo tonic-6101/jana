@@ -169,7 +169,7 @@ class PIIMasker:
 
 		for span in reversed(spans):
 			token = self._get_or_create_token(span.value, span.category)
-			text = text[:span.start] + token + text[span.end:]
+			text = text[: span.start] + token + text[span.end :]
 
 		return text
 

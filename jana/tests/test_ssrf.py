@@ -14,6 +14,7 @@ class TestValidateProviderUrl(unittest.TestCase):
 	def _make_throw():
 		def throw(msg):
 			raise Exception(msg)
+
 		return throw
 
 	@patch("jana.services.security.ssrf.frappe")

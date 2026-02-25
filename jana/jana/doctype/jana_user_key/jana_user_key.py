@@ -16,8 +16,4 @@ class JanaUserKey(Document):
 			{"user": self.user, "provider": self.provider, "name": ("!=", self.name)},
 		)
 		if existing:
-			frappe.throw(
-				_("A key for {0} already exists for user {1}").format(
-					self.provider, self.user
-				)
-			)
+			frappe.throw(_("A key for {0} already exists for user {1}").format(self.provider, self.user))

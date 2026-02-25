@@ -72,33 +72,43 @@ class TestDisclaimerVisibility(unittest.TestCase):
 		"""Disclaimer should show when create_documents is true."""
 		capabilities = {"create_documents": True, "modify_documents": False}
 		dismissed = False
-		visible = (capabilities.get("create_documents") or capabilities.get("modify_documents")) and not dismissed
+		visible = (
+			capabilities.get("create_documents") or capabilities.get("modify_documents")
+		) and not dismissed
 		self.assertTrue(visible)
 
 	def test_show_when_modify_enabled(self):
 		"""Disclaimer should show when modify_documents is true."""
 		capabilities = {"create_documents": False, "modify_documents": True}
 		dismissed = False
-		visible = (capabilities.get("create_documents") or capabilities.get("modify_documents")) and not dismissed
+		visible = (
+			capabilities.get("create_documents") or capabilities.get("modify_documents")
+		) and not dismissed
 		self.assertTrue(visible)
 
 	def test_hide_when_both_disabled(self):
 		"""Disclaimer should hide when neither write capability is enabled."""
 		capabilities = {"create_documents": False, "modify_documents": False}
 		dismissed = False
-		visible = (capabilities.get("create_documents") or capabilities.get("modify_documents")) and not dismissed
+		visible = (
+			capabilities.get("create_documents") or capabilities.get("modify_documents")
+		) and not dismissed
 		self.assertFalse(visible)
 
 	def test_hide_when_dismissed(self):
 		"""Disclaimer should hide after user dismisses it."""
 		capabilities = {"create_documents": True, "modify_documents": True}
 		dismissed = True
-		visible = (capabilities.get("create_documents") or capabilities.get("modify_documents")) and not dismissed
+		visible = (
+			capabilities.get("create_documents") or capabilities.get("modify_documents")
+		) and not dismissed
 		self.assertFalse(visible)
 
 	def test_show_when_both_enabled(self):
 		"""Disclaimer should show when both write capabilities are enabled."""
 		capabilities = {"create_documents": True, "modify_documents": True}
 		dismissed = False
-		visible = (capabilities.get("create_documents") or capabilities.get("modify_documents")) and not dismissed
+		visible = (
+			capabilities.get("create_documents") or capabilities.get("modify_documents")
+		) and not dismissed
 		self.assertTrue(visible)

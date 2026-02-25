@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Copyright (C) 2026 Tonic
 
-import requests
-
 import frappe
+import requests
 from frappe import _
 from frappe.utils import now_datetime
 
@@ -21,9 +20,7 @@ def initiate_openrouter_oauth(provider_name: str) -> dict:
 	if provider.auth_method != "OAuth":
 		frappe.throw(_("Provider is not configured for OAuth"))
 
-	callback_url = (
-		f"{frappe.utils.get_url()}/api/method/jana.api.oauth.openrouter_callback"
-	)
+	callback_url = f"{frappe.utils.get_url()}/api/method/jana.api.oauth.openrouter_callback"
 
 	auth_url = f"https://openrouter.ai/auth?callback_url={callback_url}"
 
@@ -144,18 +141,22 @@ def get_oauth_status() -> dict:
 		connected = False
 
 		if p.provider_type == "openrouter":
-			connected = bool(frappe.db.get_value(
-				"Jana User Key",
-				{"user": frappe.session.user, "provider": p.name, "enabled": 1},
-				"name",
-			))
+			connected = bool(
+				frappe.db.get_value(
+					"Jana User Key",
+					{"user": frappe.session.user, "provider": p.name, "enabled": 1},
+					"name",
+				)
+			)
 		elif p.provider_type == "google":
 			# Check Frappe's Token Cache for an existing token
-			connected = bool(frappe.db.get_value(
-				"Token Cache",
-				{"user": frappe.session.user, "connected_app": p.name},
-				"name",
-			))
+			connected = bool(
+				frappe.db.get_value(
+					"Token Cache",
+					{"user": frappe.session.user, "connected_app": p.name},
+					"name",
+				)
+			)
 
 		result[p.name] = {
 			"connected": connected,

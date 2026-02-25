@@ -73,8 +73,7 @@ class TestAgentPromptSecurity(unittest.TestCase):
 		"""Agents with conversational guidance must have 'How to Communicate'."""
 		# Data Analyst uses "How to Present Results" instead of "How to Communicate"
 		prompts_with_communicate = {
-			name: prompt for name, prompt in self._get_all_prompts().items()
-			if name != "Data Analyst"
+			name: prompt for name, prompt in self._get_all_prompts().items() if name != "Data Analyst"
 		}
 		for name, prompt in prompts_with_communicate.items():
 			with self.subTest(agent=name):
@@ -87,8 +86,9 @@ class TestAgentPromptSecurity(unittest.TestCase):
 				cannot_pos = prompt.find("What You Cannot Do")
 				fabricate_pos = prompt.find("Fabricate document names")
 
-				self.assertGreater(fabricate_pos, cannot_pos,
-					f"{name}: security rules must come after 'What You Cannot Do'")
+				self.assertGreater(
+					fabricate_pos, cannot_pos, f"{name}: security rules must come after 'What You Cannot Do'"
+				)
 
 	def test_prompt_count_is_five(self):
 		"""There must be exactly 5 built-in agent prompts."""
@@ -102,8 +102,13 @@ class TestUpdateAgentSecurityRulesPatch(unittest.TestCase):
 		"""Patch must update all 5 built-in agents."""
 		from jana.patches.v0_1.update_agent_security_rules import _AGENT_PROMPTS
 
-		expected = {"General Assistant", "CRM Assistant", "HR Assistant",
-					"Data Analyst", "Accounting Assistant"}
+		expected = {
+			"General Assistant",
+			"CRM Assistant",
+			"HR Assistant",
+			"Data Analyst",
+			"Accounting Assistant",
+		}
 		self.assertEqual(set(_AGENT_PROMPTS.keys()), expected)
 
 	def test_patch_prompts_match_install(self):

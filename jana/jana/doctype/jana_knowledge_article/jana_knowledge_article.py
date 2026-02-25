@@ -76,8 +76,10 @@ class JanaKnowledgeArticle(Document):
 
 		if matches:
 			frappe.msgprint(
-				_("This article contains patterns that may interfere with AI behaviour. "
-				  "Please review the content carefully."),
+				_(
+					"This article contains patterns that may interfere with AI behaviour. "
+					"Please review the content carefully."
+				),
 				indicator="orange",
 				title=_("Content Review Recommended"),
 			)

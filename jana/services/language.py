@@ -22,9 +22,7 @@ LANGUAGE_CONFIG = {
 	"de": {
 		"name": "German",
 		"native_name": "Deutsch",
-		"register": (
-			"Use the formal register (Sie) unless the user explicitly uses informal language (du)."
-		),
+		"register": ("Use the formal register (Sie) unless the user explicitly uses informal language (du)."),
 	},
 	"es": {
 		"name": "Spanish",
@@ -59,9 +57,7 @@ LANGUAGE_CONFIG = {
 	"ko": {
 		"name": "Korean",
 		"native_name": "한국어",
-		"register": (
-			"Use the formal polite register (합쇼체 / hapshoche). Use honorifics when appropriate."
-		),
+		"register": ("Use the formal polite register (합쇼체 / hapshoche). Use honorifics when appropriate."),
 	},
 	"pt": {
 		"name": "Portuguese",
@@ -71,9 +67,7 @@ LANGUAGE_CONFIG = {
 	"ru": {
 		"name": "Russian",
 		"native_name": "Русский",
-		"register": (
-			"Use the formal register (Вы) unless the user uses informal language (ты)."
-		),
+		"register": ("Use the formal register (Вы) unless the user uses informal language (ты)."),
 	},
 	"tr": {
 		"name": "Turkish",
@@ -101,9 +95,7 @@ def get_language_name(lang_code: str) -> str:
 
 	Checks LANGUAGE_CONFIG first, then falls back to Frappe's Language list.
 	"""
-	config = LANGUAGE_CONFIG.get(lang_code) or LANGUAGE_CONFIG.get(
-		lang_code.split("-")[0]
-	)
+	config = LANGUAGE_CONFIG.get(lang_code) or LANGUAGE_CONFIG.get(lang_code.split("-")[0])
 	if config:
 		return config["name"]
 

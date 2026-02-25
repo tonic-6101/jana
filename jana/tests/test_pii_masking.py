@@ -109,34 +109,22 @@ class TestFieldClassification(unittest.TestCase):
 	# ---- Fieldname heuristics ----
 
 	def test_customer_name_heuristic(self):
-		self.assertEqual(
-			classify_field("Data", None, fieldname="customer_name"), "PERSON"
-		)
+		self.assertEqual(classify_field("Data", None, fieldname="customer_name"), "PERSON")
 
 	def test_employee_name_heuristic(self):
-		self.assertEqual(
-			classify_field("Small Text", None, fieldname="employee_name"), "PERSON"
-		)
+		self.assertEqual(classify_field("Small Text", None, fieldname="employee_name"), "PERSON")
 
 	def test_name_suffix_heuristic(self):
-		self.assertEqual(
-			classify_field("Data", None, fieldname="billing_contact_name"), "PERSON"
-		)
+		self.assertEqual(classify_field("Data", None, fieldname="billing_contact_name"), "PERSON")
 
 	def test_email_fieldname_heuristic(self):
-		self.assertEqual(
-			classify_field("Data", None, fieldname="email_id"), "EMAIL"
-		)
+		self.assertEqual(classify_field("Data", None, fieldname="email_id"), "EMAIL")
 
 	def test_email_substring_heuristic(self):
-		self.assertEqual(
-			classify_field("Data", None, fieldname="notification_email"), "EMAIL"
-		)
+		self.assertEqual(classify_field("Data", None, fieldname="notification_email"), "EMAIL")
 
 	def test_phone_fieldname_heuristic(self):
-		self.assertEqual(
-			classify_field("Data", None, fieldname="mobile_no"), "PHONE"
-		)
+		self.assertEqual(classify_field("Data", None, fieldname="mobile_no"), "PHONE")
 
 	# ---- Non-PII fields ----
 
@@ -645,7 +633,7 @@ class TestKnownValueCrossReference(unittest.TestCase):
 		self.assertNotIn("Alice", masked)
 		self.assertNotIn("new@example.com", masked)
 		self.assertIn("[PERSON_1]", masked)  # from cross-ref
-		self.assertIn("[EMAIL_1]", masked)   # from regex
+		self.assertIn("[EMAIL_1]", masked)  # from regex
 
 
 # ---------------------------------------------------------------------------
@@ -710,9 +698,7 @@ class TestUnmasking(unittest.TestCase):
 		llm_response = "Customer [PERSON_1] can be reached at [EMAIL_1]."
 		unmasked = masker.unmask(llm_response)
 
-		self.assertEqual(
-			unmasked, "Customer John Smith can be reached at john@acme.com."
-		)
+		self.assertEqual(unmasked, "Customer John Smith can be reached at john@acme.com.")
 
 	def test_unmask_no_tokens_passthrough(self):
 		masker = _make_masker()

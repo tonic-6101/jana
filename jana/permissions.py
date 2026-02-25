@@ -60,9 +60,7 @@ def message_has_permission(doc, ptype="read", user=None):
 	if _is_jana_admin(user):
 		return True
 
-	session_user = frappe.db.get_value(
-		"Jana Chat Session", doc.session, "user"
-	)
+	session_user = frappe.db.get_value("Jana Chat Session", doc.session, "user")
 	return session_user == user
 
 

@@ -13,12 +13,12 @@ actual library installations (mocked imports).
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 from jana.services.knowledge.extractor import (
-	extract_text,
-	extract_from_txt,
 	_resolve_file_path,
+	extract_from_txt,
+	extract_text,
 )
 
 
@@ -116,6 +116,7 @@ class TestExtractFromPdf(unittest.TestCase):
 			with patch("jana.services.knowledge.extractor.extract_from_pdf") as mock_extract:
 				mock_extract.return_value = "Page one content\n\nPage two content"
 				from jana.services.knowledge.extractor import extract_from_pdf
+
 				result = mock_extract("/tmp/test.pdf")
 
 		self.assertEqual(result, "Page one content\n\nPage two content")
@@ -125,6 +126,7 @@ class TestExtractFromPdf(unittest.TestCase):
 		"""When PyPDF2 is not installed, return empty and log error."""
 		with patch.dict("sys.modules", {"PyPDF2": None}):
 			from jana.services.knowledge.extractor import extract_from_pdf
+
 			result = extract_from_pdf("/tmp/test.pdf")
 		# ImportError caught — returns empty
 		self.assertEqual(result, "")
@@ -138,6 +140,7 @@ class TestExtractFromDocx(unittest.TestCase):
 		"""When python-docx is not installed, return empty and log error."""
 		with patch.dict("sys.modules", {"docx": None}):
 			from jana.services.knowledge.extractor import extract_from_docx
+
 			result = extract_from_docx("/tmp/test.docx")
 		self.assertEqual(result, "")
 
@@ -152,8 +155,11 @@ class TestControllerExtraction(unittest.TestCase):
 		mock_doc.content = None
 		mock_doc.get_plain_content.return_value = ""
 
-		with patch("jana.services.knowledge.extractor.extract_text", return_value="Extracted text") as mock_extract:
+		with patch(
+			"jana.services.knowledge.extractor.extract_text", return_value="Extracted text"
+		) as mock_extract:
 			from jana.jana.doctype.jana_knowledge_article.jana_knowledge_article import JanaKnowledgeArticle
+
 			JanaKnowledgeArticle.extract_content_from_file(mock_doc)
 			mock_extract.assert_called_once_with("/files/guide.pdf")
 
@@ -166,6 +172,7 @@ class TestControllerExtraction(unittest.TestCase):
 
 		with patch("jana.services.knowledge.extractor.extract_text") as mock_extract:
 			from jana.jana.doctype.jana_knowledge_article.jana_knowledge_article import JanaKnowledgeArticle
+
 			JanaKnowledgeArticle.extract_content_from_file(mock_doc)
 			mock_extract.assert_not_called()
 
@@ -176,5 +183,6 @@ class TestControllerExtraction(unittest.TestCase):
 
 		with patch("jana.services.knowledge.extractor.extract_text") as mock_extract:
 			from jana.jana.doctype.jana_knowledge_article.jana_knowledge_article import JanaKnowledgeArticle
+
 			JanaKnowledgeArticle.extract_content_from_file(mock_doc)
 			mock_extract.assert_not_called()

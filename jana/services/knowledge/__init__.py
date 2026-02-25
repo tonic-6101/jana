@@ -9,8 +9,8 @@ from jana.services.knowledge.retriever import (
 )
 
 __all__ = [
-	"get_knowledge_for_prompt",
-	"format_knowledge_for_prompt",
 	"estimate_tokens",
 	"extract_text",
+	"format_knowledge_for_prompt",
+	"get_knowledge_for_prompt",
 ]

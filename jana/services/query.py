@@ -29,12 +29,14 @@ def get_available_reports(limit: int = 50) -> list[dict]:
 	for r in reports:
 		try:
 			if frappe.has_permission("Report", doc=r.name):
-				accessible.append({
-					"name": r.name,
-					"type": r.report_type,
-					"doctype": r.ref_doctype or "",
-					"module": r.module or "",
-				})
+				accessible.append(
+					{
+						"name": r.name,
+						"type": r.report_type,
+						"doctype": r.ref_doctype or "",
+						"module": r.module or "",
+					}
+				)
 		except frappe.PermissionError:
 			continue
 		if len(accessible) >= limit:
@@ -46,10 +48,7 @@ def get_available_reports(limit: int = 50) -> list[dict]:
 def format_reports_for_prompt(reports: list[dict]) -> str:
 	"""Format the report list as a markdown block for the system prompt."""
 	if not reports:
-		return (
-			"No reports are currently available. Use the list_documents "
-			"tool to query data directly."
-		)
+		return "No reports are currently available. Use the list_documents tool to query data directly."
 
 	lines = ["## Available Reports", ""]
 	for r in reports:

@@ -39,6 +39,7 @@ def send_message(
 		frappe.throw(_("Message content is required"))
 
 	from jana.services.security.validators import validate_message_length
+
 	validate_message_length(content)
 
 	service = ChatService()
@@ -69,13 +70,15 @@ def send_message_stream(
 		frappe.throw(_("Message content is required"))
 
 	from jana.services.security.validators import validate_message_length
+
 	validate_message_length(content)
 
 	content = content.strip()
 	service = ChatService()
 
-	from jana.utils import get_jana_settings
 	from frappe.utils import cint
+
+	from jana.utils import get_jana_settings
 
 	enable_streaming = cint(get_jana_settings().get("enable_streaming") or 0)
 	if not enable_streaming:
@@ -85,12 +88,17 @@ def send_message_stream(
 			context_doctype=context_doctype,
 			context_docname=context_docname,
 		)
-		body = json.dumps({
-			"content": result["content"],
-			"done": True,
-			"model": result.get("model"),
-			"tokens_used": result.get("tokens_used", 0),
-		}) + "\n"
+		body = (
+			json.dumps(
+				{
+					"content": result["content"],
+					"done": True,
+					"model": result.get("model"),
+					"tokens_used": result.get("tokens_used", 0),
+				}
+			)
+			+ "\n"
+		)
 		return Response(body, content_type="application/x-ndjson", status=200)
 
 	def generate():

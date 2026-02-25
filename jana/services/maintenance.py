@@ -4,7 +4,7 @@
 """Scheduled maintenance tasks for Jana."""
 
 import frappe
-from frappe.utils import add_days, now_datetime, cint
+from frappe.utils import add_days, cint, now_datetime
 
 
 def auto_archive_old_sessions():
@@ -35,7 +35,10 @@ def auto_archive_old_sessions():
 
 	for session in stale_sessions:
 		frappe.db.set_value(
-			"Jana Chat Session", session.name, "status", "archived",
+			"Jana Chat Session",
+			session.name,
+			"status",
+			"archived",
 			update_modified=False,
 		)
 
@@ -65,12 +68,12 @@ def cleanup_orphaned_messages():
 
 	for msg in orphaned:
 		frappe.delete_doc(
-			"Jana Chat Message", msg.name,
-			ignore_permissions=True, force=True,
+			"Jana Chat Message",
+			msg.name,
+			ignore_permissions=True,
+			force=True,
 		)
 
 	if orphaned:
 		frappe.db.commit()
-		frappe.logger("jana").info(
-			f"Cleaned up {len(orphaned)} orphaned messages"
-		)
+		frappe.logger("jana").info(f"Cleaned up {len(orphaned)} orphaned messages")

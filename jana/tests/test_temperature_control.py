@@ -30,9 +30,11 @@ class TestTemperatureControl(unittest.TestCase):
 		mock_frappe.local.lang = "en"
 
 		# Agent with temperature 0.7, Tier 1 model
-		provider = self._make_provider_mock([
-			{"content": "Hello!", "model": "gpt-4o", "tokens_used": 10},
-		])
+		provider = self._make_provider_mock(
+			[
+				{"content": "Hello!", "model": "gpt-4o", "tokens_used": 10},
+			]
+		)
 		mock_get_provider.return_value = provider
 
 		# We test the temperature logic directly since full integration

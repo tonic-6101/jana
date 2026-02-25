@@ -4,7 +4,6 @@
 import re
 from dataclasses import dataclass
 
-
 # Maps (fieldtype, options) pairs to a PII category token prefix.
 # Covers both Data and Small Text since ERPNext uses both for similar fields.
 FIELD_PII_MAP: dict[tuple[str, str | None], str] = {
@@ -25,23 +24,47 @@ ALWAYS_PII_FIELDTYPES: frozenset[str] = frozenset(["Phone", "Geolocation", "Pass
 
 # Fieldname-based heuristics — catches PII fields where ERPNext doesn't set
 # the ``options`` attribute (e.g. customer_name is Small Text with no options).
-_NAME_FIELDNAMES: frozenset[str] = frozenset({
-	"customer_name", "supplier_name", "employee_name", "lead_name",
-	"contact_name", "company_name", "full_name", "first_name",
-	"last_name", "middle_name", "contact_person", "patient_name",
-	"owner_name", "applicant_name", "guardian_name",
-})
+_NAME_FIELDNAMES: frozenset[str] = frozenset(
+	{
+		"customer_name",
+		"supplier_name",
+		"employee_name",
+		"lead_name",
+		"contact_name",
+		"company_name",
+		"full_name",
+		"first_name",
+		"last_name",
+		"middle_name",
+		"contact_person",
+		"patient_name",
+		"owner_name",
+		"applicant_name",
+		"guardian_name",
+	}
+)
 _NAME_SUFFIXES: tuple[str, ...] = ("_name", "_person", "_full_name")
 
-_EMAIL_FIELDNAMES: frozenset[str] = frozenset({
-	"email_id", "email", "contact_email", "personal_email", "company_email",
-	"notification_email",
-})
+_EMAIL_FIELDNAMES: frozenset[str] = frozenset(
+	{
+		"email_id",
+		"email",
+		"contact_email",
+		"personal_email",
+		"company_email",
+		"notification_email",
+	}
+)
 _EMAIL_SUFFIXES: tuple[str, ...] = ("_email", "_email_id", "_email_address")
 
-_PHONE_FIELDNAMES: frozenset[str] = frozenset({
-	"mobile_no", "phone", "contact_mobile", "contact_phone",
-})
+_PHONE_FIELDNAMES: frozenset[str] = frozenset(
+	{
+		"mobile_no",
+		"phone",
+		"contact_mobile",
+		"contact_phone",
+	}
+)
 _PHONE_SUFFIXES: tuple[str, ...] = ("_mobile", "_phone", "_mobile_no")
 
 # Link fields pointing to these DocTypes MAY contain personal entity references.
@@ -56,15 +79,26 @@ _PHONE_SUFFIXES: tuple[str, ...] = ("_mobile", "_phone", "_mobile_no")
 # These are handled by applying regex detection to the Link value in the
 # masker (find_pii_in_text fallback), rather than blindly classifying all
 # Link→personal-DocType as PERSON.
-_PERSONAL_LINK_DOCTYPES: frozenset[str] = frozenset({
-	"Customer", "Supplier", "Employee", "Lead", "Contact",
-	"Sales Partner", "User",
-})
+_PERSONAL_LINK_DOCTYPES: frozenset[str] = frozenset(
+	{
+		"Customer",
+		"Supplier",
+		"Employee",
+		"Lead",
+		"Contact",
+		"Sales Partner",
+		"User",
+	}
+)
 
 # Fieldtypes eligible for fieldname heuristic detection.
-_HEURISTIC_FIELDTYPES: frozenset[str] = frozenset({
-	"Data", "Small Text", "Read Only",
-})
+_HEURISTIC_FIELDTYPES: frozenset[str] = frozenset(
+	{
+		"Data",
+		"Small Text",
+		"Read Only",
+	}
+)
 
 
 @dataclass
@@ -153,9 +187,7 @@ def find_pii_in_text(text: str) -> list[PIISpan]:
 	spans: list[PIISpan] = []
 	for category, pattern in _PATTERNS:
 		for m in pattern.finditer(text):
-			spans.append(
-				PIISpan(value=m.group(), category=category, start=m.start(), end=m.end())
-			)
+			spans.append(PIISpan(value=m.group(), category=category, start=m.start(), end=m.end()))
 
 	spans.sort(key=lambda s: s.start)
 	deduped: list[PIISpan] = []

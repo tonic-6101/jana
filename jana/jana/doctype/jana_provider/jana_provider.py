@@ -24,9 +24,7 @@ class JanaProvider(Document):
 
 	def validate_connection(self):
 		if self.provider_type in ("ollama", "vllm", "custom") and not self.api_base_url:
-			frappe.throw(
-				_("API Base URL is required for {0} providers").format(self.provider_type)
-			)
+			frappe.throw(_("API Base URL is required for {0} providers").format(self.provider_type))
 		# Force API Key for local providers
 		if self.provider_type in ("ollama", "vllm"):
 			self.auth_method = "API Key"
@@ -50,9 +48,7 @@ class JanaProvider(Document):
 					f"{frappe.utils.get_url()}/api/method/jana.api.oauth.openrouter_callback"
 				)
 			if self.provider_type not in ("openrouter", "google"):
-				frappe.throw(
-					_("OAuth is only supported for OpenRouter and Google providers")
-				)
+				frappe.throw(_("OAuth is only supported for OpenRouter and Google providers"))
 
 	def on_update(self):
 		from jana.utils import clear_provider_cache
@@ -71,9 +67,7 @@ class JanaProvider(Document):
 		if referencing_agents:
 			names = ", ".join(a.agent_name for a in referencing_agents)
 			frappe.throw(
-				_("Cannot delete provider {0}: referenced by agent(s): {1}").format(
-					self.provider_name, names
-				)
+				_("Cannot delete provider {0}: referenced by agent(s): {1}").format(self.provider_name, names)
 			)
 
 		clear_provider_cache(self.name)

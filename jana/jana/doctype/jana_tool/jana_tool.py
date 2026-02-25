@@ -46,7 +46,5 @@ class JanaTool(Document):
 		if referencing:
 			agents = ", ".join(sorted({r.parent for r in referencing}))
 			frappe.throw(
-				_("Cannot delete tool {0}: referenced by agent(s): {1}").format(
-					self.tool_name, agents
-				)
+				_("Cannot delete tool {0}: referenced by agent(s): {1}").format(self.tool_name, agents)
 			)

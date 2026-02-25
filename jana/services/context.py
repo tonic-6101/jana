@@ -31,8 +31,12 @@ def get_page_context(doctype: str, docname: str) -> dict | None:
 
 		for field in meta.fields:
 			if field.fieldtype in (
-				"Section Break", "Column Break", "Tab Break",
-				"HTML", "HTML Editor", "Heading",
+				"Section Break",
+				"Column Break",
+				"Tab Break",
+				"HTML",
+				"HTML Editor",
+				"Heading",
 				"Password",
 			):
 				continue
@@ -172,7 +176,7 @@ def format_context_for_prompt(context: dict) -> str:
 	lines.append("")
 	lines.append("Document fields:")
 
-	for fieldname, info in context["fields"].items():
+	for _fieldname, info in context["fields"].items():
 		label = info["label"]
 		value = info["value"]
 		lines.append(f"  {label}: {value}")

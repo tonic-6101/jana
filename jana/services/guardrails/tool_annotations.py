@@ -20,8 +20,7 @@ _SUCCESS_INSTRUCTION = (
 )
 
 _ERROR_INSTRUCTION = (
-	"An error occurred. Report this error honestly. "
-	"Do NOT guess what the result should have been."
+	"An error occurred. Report this error honestly. Do NOT guess what the result should have been."
 )
 
 

@@ -317,18 +317,10 @@ class TestPIIMaskingOnKnowledge(unittest.TestCase):
 
 		# Knowledge article contains PII
 		knowledge_text = "Contact our sales team at sales@acme.com for quotes."
-		agent_prompt = "You are Jana."
-		system_prompt = f"{knowledge_text}\n\n---\n\n{agent_prompt}"
 
-		messages = [
-			{"role": "system", "content": system_prompt},
-			{"role": "user", "content": "Hello"},
-		]
-
-		# mask_messages skips system role, but mask_text on system content
-		# would catch it. In the actual flow, PII in the system prompt is
-		# sent as-is because it's trusted internal content. However, if
-		# the masker is applied to system messages, it works:
+		# mask_text on system content catches PII. In the actual flow,
+		# PII in the system prompt is sent as-is (trusted internal
+		# content), but the masker works when applied:
 		masked_text = masker.mask_text(knowledge_text)
 		self.assertNotIn("sales@acme.com", masked_text)
 		self.assertIn("[EMAIL_1]", masked_text)

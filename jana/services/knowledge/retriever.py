@@ -37,11 +37,13 @@ def get_knowledge_for_prompt(agent_name: str, context_doctype: str = None) -> li
 
 		plain = doc.get_plain_content()
 		if plain:
-			articles.append({
-				"name": doc.name,
-				"title": doc.article_title,
-				"content": plain,
-			})
+			articles.append(
+				{
+					"name": doc.name,
+					"title": doc.article_title,
+					"content": plain,
+				}
+			)
 			seen.add(article_name)
 
 	# 2. Scope-matched articles (auto-selected by doctype_scope)
@@ -60,11 +62,13 @@ def get_knowledge_for_prompt(agent_name: str, context_doctype: str = None) -> li
 			doc = frappe.get_doc("Jana Knowledge Article", article_name)
 			plain = doc.get_plain_content()
 			if plain:
-				articles.append({
-					"name": doc.name,
-					"title": doc.article_title,
-					"content": plain,
-				})
+				articles.append(
+					{
+						"name": doc.name,
+						"title": doc.article_title,
+						"content": plain,
+					}
+				)
 				seen.add(article_name)
 
 	return articles

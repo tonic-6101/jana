@@ -54,13 +54,9 @@ def get_agent(agent_name: str) -> dict:
 		"temperature": agent.temperature,
 		"max_tokens": agent.max_tokens,
 		"is_template": agent.is_template,
-		"tools": [
-			{"tool": t.tool, "enabled": t.enabled}
-			for t in agent.tools
-		],
+		"tools": [{"tool": t.tool, "enabled": t.enabled} for t in agent.tools],
 		"knowledge": [
-			{"knowledge_article": k.knowledge_article, "enabled": k.enabled}
-			for k in (agent.knowledge or [])
+			{"knowledge_article": k.knowledge_article, "enabled": k.enabled} for k in (agent.knowledge or [])
 		],
 	}
 
@@ -104,17 +100,23 @@ def create_agent(data: str) -> dict:
 
 	# Child table: tools
 	for tool_row in data.get("tools") or []:
-		agent.append("tools", {
-			"tool": tool_row["tool"],
-			"enabled": int(tool_row.get("enabled", 1)),
-		})
+		agent.append(
+			"tools",
+			{
+				"tool": tool_row["tool"],
+				"enabled": int(tool_row.get("enabled", 1)),
+			},
+		)
 
 	# Child table: knowledge
 	for k_row in data.get("knowledge") or []:
-		agent.append("knowledge", {
-			"knowledge_article": k_row["knowledge_article"],
-			"enabled": int(k_row.get("enabled", 1)),
-		})
+		agent.append(
+			"knowledge",
+			{
+				"knowledge_article": k_row["knowledge_article"],
+				"enabled": int(k_row.get("enabled", 1)),
+			},
+		)
 
 	agent.insert(ignore_permissions=True)
 
@@ -159,19 +161,25 @@ def update_agent(agent_name: str, data: str) -> dict:
 	if "tools" in data:
 		agent.tools = []
 		for tool_row in data["tools"] or []:
-			agent.append("tools", {
-				"tool": tool_row["tool"],
-				"enabled": int(tool_row.get("enabled", 1)),
-			})
+			agent.append(
+				"tools",
+				{
+					"tool": tool_row["tool"],
+					"enabled": int(tool_row.get("enabled", 1)),
+				},
+			)
 
 	# Replace child table: knowledge
 	if "knowledge" in data:
 		agent.knowledge = []
 		for k_row in data["knowledge"] or []:
-			agent.append("knowledge", {
-				"knowledge_article": k_row["knowledge_article"],
-				"enabled": int(k_row.get("enabled", 1)),
-			})
+			agent.append(
+				"knowledge",
+				{
+					"knowledge_article": k_row["knowledge_article"],
+					"enabled": int(k_row.get("enabled", 1)),
+				},
+			)
 
 	agent.save(ignore_permissions=True)
 

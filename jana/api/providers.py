@@ -71,9 +71,7 @@ def get_models_for_provider(provider_name: str) -> list:
 
 	# Merge user-defined models from the provider doc
 	if provider.available_models:
-		custom_models = [
-			m.strip() for m in provider.available_models.split(",") if m.strip()
-		]
+		custom_models = [m.strip() for m in provider.available_models.split(",") if m.strip()]
 		for m in custom_models:
 			if m not in models:
 				models.append(m)
@@ -164,9 +162,17 @@ def test_connection(provider_name: str) -> dict:
 # -------------------------------------------------------------------
 
 _PROVIDER_FIELDS = [
-	"name", "provider_name", "provider_type", "enabled", "is_default",
-	"auth_method", "api_base_url", "available_models", "mask_pii_override",
-	"connected_app", "openrouter_callback_url",
+	"name",
+	"provider_name",
+	"provider_type",
+	"enabled",
+	"is_default",
+	"auth_method",
+	"api_base_url",
+	"available_models",
+	"mask_pii_override",
+	"connected_app",
+	"openrouter_callback_url",
 ]
 
 
@@ -262,7 +268,7 @@ def save_provider(provider_name: str, data: str) -> dict:
 	if "is_default" in data:
 		doc.is_default = int(data["is_default"])
 
-	if "api_key" in data and data["api_key"]:
+	if data.get("api_key"):
 		doc.api_key = data["api_key"]
 
 	if "connected_app" in data:

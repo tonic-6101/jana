@@ -112,6 +112,7 @@ class TestValidateNavigationUrl(unittest.TestCase):
 	def _make_throw():
 		def throw(msg):
 			raise Exception(msg)
+
 		return throw
 
 

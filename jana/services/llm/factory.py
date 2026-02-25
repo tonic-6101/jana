@@ -4,8 +4,8 @@
 import frappe
 from frappe import _
 
-from jana.services.llm.base import LLMProvider
 from jana.services.llm.anthropic_provider import AnthropicProvider
+from jana.services.llm.base import LLMProvider
 from jana.services.llm.ollama_provider import OllamaProvider
 from jana.services.llm.openai_provider import OpenAIProvider
 
@@ -38,9 +38,7 @@ def get_provider(provider_name: str = None, user: str = None) -> LLMProvider:
 		provider_name = get_jana_settings().get("default_provider")
 
 	if not provider_name:
-		frappe.throw(
-			_("No AI provider configured. Please set up a provider in Jana Settings.")
-		)
+		frappe.throw(_("No AI provider configured. Please set up a provider in Jana Settings."))
 
 	from jana.utils import get_cached_provider
 
@@ -55,8 +53,6 @@ def get_provider(provider_name: str = None, user: str = None) -> LLMProvider:
 
 	provider_class = PROVIDER_MAP.get(provider_doc.provider_type)
 	if not provider_class:
-		frappe.throw(
-			_("Unsupported provider type: {0}").format(provider_doc.provider_type)
-		)
+		frappe.throw(_("Unsupported provider type: {0}").format(provider_doc.provider_type))
 
 	return provider_class(provider_doc, user=user)

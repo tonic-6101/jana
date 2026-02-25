@@ -32,17 +32,22 @@ class LLMProvider(ABC):
 		if user_key:
 			return user_key
 
-		system_key = get_decrypted_password(
-			"Jana Provider", self.provider_doc.name, "api_key",
-			raise_exception=False,
-		) or ""
+		system_key = (
+			get_decrypted_password(
+				"Jana Provider",
+				self.provider_doc.name,
+				"api_key",
+				raise_exception=False,
+			)
+			or ""
+		)
 
 		if not system_key:
 			frappe.throw(
-				_("No API key configured for provider {0}. "
-				  "Add a key in Jana Provider settings or your personal Jana User Key.").format(
-					self.provider_name
-				)
+				_(
+					"No API key configured for provider {0}. "
+					"Add a key in Jana Provider settings or your personal Jana User Key."
+				).format(self.provider_name)
 			)
 
 		return system_key
@@ -56,9 +61,7 @@ class LLMProvider(ABC):
 		)
 		if not key_name:
 			return ""
-		return get_decrypted_password(
-			"Jana User Key", key_name, "api_key", raise_exception=False
-		) or ""
+		return get_decrypted_password("Jana User Key", key_name, "api_key", raise_exception=False) or ""
 
 	def _get_oauth_token(self) -> str:
 		"""Fetch an OAuth token from Frappe's Token Cache (for Google OAuth)."""
@@ -73,8 +76,14 @@ class LLMProvider(ABC):
 			return ""
 
 	@abstractmethod
-	def complete(self, messages: list, model: str = None, temperature: float = 0.7,
-				max_tokens: int = None, tools: list = None) -> dict:
+	def complete(
+		self,
+		messages: list,
+		model: str = None,
+		temperature: float = 0.7,
+		max_tokens: int = None,
+		tools: list = None,
+	) -> dict:
 		"""Send messages to the LLM and return a complete response.
 
 		Returns:
@@ -83,8 +92,14 @@ class LLMProvider(ABC):
 		raise NotImplementedError
 
 	@abstractmethod
-	def stream(self, messages: list, model: str = None, temperature: float = 0.7,
-			  max_tokens: int = None, tools: list = None):
+	def stream(
+		self,
+		messages: list,
+		model: str = None,
+		temperature: float = 0.7,
+		max_tokens: int = None,
+		tools: list = None,
+	):
 		"""Send messages to the LLM and yield streaming response chunks.
 
 		Yields:

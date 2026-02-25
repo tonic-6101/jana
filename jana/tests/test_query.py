@@ -17,7 +17,6 @@ from unittest.mock import MagicMock, patch
 
 from jana.services.query import format_reports_for_prompt, get_available_reports
 
-
 # ---------------------------------------------------------------------------
 # 1. Report discovery
 # ---------------------------------------------------------------------------
@@ -29,10 +28,15 @@ class TestGetAvailableReports(unittest.TestCase):
 	@patch("jana.services.query.frappe")
 	def test_returns_accessible_reports(self, mock_frappe):
 		mock_frappe.get_all.return_value = [
-			SimpleNamespace(name="Sales Register", report_type="Script Report",
-				ref_doctype="Sales Invoice", module="Accounts"),
-			SimpleNamespace(name="Stock Balance", report_type="Script Report",
-				ref_doctype="Bin", module="Stock"),
+			SimpleNamespace(
+				name="Sales Register",
+				report_type="Script Report",
+				ref_doctype="Sales Invoice",
+				module="Accounts",
+			),
+			SimpleNamespace(
+				name="Stock Balance", report_type="Script Report", ref_doctype="Bin", module="Stock"
+			),
 		]
 		mock_frappe.has_permission.return_value = True
 		mock_frappe.PermissionError = PermissionError
@@ -47,10 +51,12 @@ class TestGetAvailableReports(unittest.TestCase):
 	@patch("jana.services.query.frappe")
 	def test_filters_out_inaccessible_reports(self, mock_frappe):
 		mock_frappe.get_all.return_value = [
-			SimpleNamespace(name="Allowed Report", report_type="Report Builder",
-				ref_doctype="Item", module="Stock"),
-			SimpleNamespace(name="Denied Report", report_type="Report Builder",
-				ref_doctype="Salary Slip", module="HR"),
+			SimpleNamespace(
+				name="Allowed Report", report_type="Report Builder", ref_doctype="Item", module="Stock"
+			),
+			SimpleNamespace(
+				name="Denied Report", report_type="Report Builder", ref_doctype="Salary Slip", module="HR"
+			),
 		]
 		mock_frappe.PermissionError = PermissionError
 
@@ -69,8 +75,9 @@ class TestGetAvailableReports(unittest.TestCase):
 	@patch("jana.services.query.frappe")
 	def test_respects_limit(self, mock_frappe):
 		mock_frappe.get_all.return_value = [
-			SimpleNamespace(name=f"Report {i}", report_type="Report Builder",
-				ref_doctype="Item", module="Stock")
+			SimpleNamespace(
+				name=f"Report {i}", report_type="Report Builder", ref_doctype="Item", module="Stock"
+			)
 			for i in range(20)
 		]
 		mock_frappe.has_permission.return_value = True
@@ -92,8 +99,9 @@ class TestGetAvailableReports(unittest.TestCase):
 	@patch("jana.services.query.frappe")
 	def test_handles_missing_fields(self, mock_frappe):
 		mock_frappe.get_all.return_value = [
-			SimpleNamespace(name="Minimal Report", report_type="Script Report",
-				ref_doctype=None, module=None),
+			SimpleNamespace(
+				name="Minimal Report", report_type="Script Report", ref_doctype=None, module=None
+			),
 		]
 		mock_frappe.has_permission.return_value = True
 		mock_frappe.PermissionError = PermissionError
@@ -121,8 +129,12 @@ class TestFormatReportsForPrompt(unittest.TestCase):
 
 	def test_formats_with_module_and_doctype(self):
 		reports = [
-			{"name": "Sales Register", "type": "Script Report",
-			 "doctype": "Sales Invoice", "module": "Accounts"},
+			{
+				"name": "Sales Register",
+				"type": "Script Report",
+				"doctype": "Sales Invoice",
+				"module": "Accounts",
+			},
 		]
 
 		result = format_reports_for_prompt(reports)
@@ -135,8 +147,7 @@ class TestFormatReportsForPrompt(unittest.TestCase):
 
 	def test_formats_without_optional_fields(self):
 		reports = [
-			{"name": "Custom Report", "type": "Report Builder",
-			 "doctype": "", "module": ""},
+			{"name": "Custom Report", "type": "Report Builder", "doctype": "", "module": ""},
 		]
 
 		result = format_reports_for_prompt(reports)
@@ -179,8 +190,12 @@ class TestReportInjection(unittest.TestCase):
 		"""Simulate the replacement logic from chat.py _build_messages."""
 		prompt = "You are a data analyst.\n\n{{AVAILABLE_REPORTS}}"
 		reports = [
-			{"name": "Sales Register", "type": "Script Report",
-			 "doctype": "Sales Invoice", "module": "Accounts"},
+			{
+				"name": "Sales Register",
+				"type": "Script Report",
+				"doctype": "Sales Invoice",
+				"module": "Accounts",
+			},
 		]
 
 		result = prompt.replace("{{AVAILABLE_REPORTS}}", format_reports_for_prompt(reports))

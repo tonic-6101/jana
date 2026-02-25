@@ -36,6 +36,8 @@ class JanaChatSession(Document):
 		)
 		for msg in messages:
 			frappe.delete_doc(
-				"Jana Chat Message", msg.name,
-				ignore_permissions=True, force=True,
+				"Jana Chat Message",
+				msg.name,
+				ignore_permissions=True,
+				force=True,
 			)

@@ -51,6 +51,8 @@ ignore = [
     "F403",
     "F405",
     "F722",
+    "RUF001",
+    "RUF013",
     "W191",
 ]
 typing-modules = ["frappe.types.DF"]

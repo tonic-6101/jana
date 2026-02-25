@@ -5,7 +5,8 @@
 
 import frappe
 
-from jana.services.terms import CURRENT_TERMS_VERSION, accept_terms as _accept, has_accepted_terms
+from jana.services.terms import CURRENT_TERMS_VERSION, has_accepted_terms
+from jana.services.terms import accept_terms as _accept
 
 
 @frappe.whitelist()

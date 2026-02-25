@@ -12,7 +12,6 @@ import json
 import frappe
 from frappe import _
 
-
 BUILTIN_TOOLS = [
 	{
 		"tool_name": "read_document",
@@ -22,20 +21,22 @@ BUILTIN_TOOLS = [
 			"Read a single Frappe document by DocType and name. "
 			"Returns all fields the current user has permission to see."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"doctype": {
-					"type": "string",
-					"description": "The DocType to read (e.g. 'Sales Invoice')",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"doctype": {
+						"type": "string",
+						"description": "The DocType to read (e.g. 'Sales Invoice')",
+					},
+					"name": {
+						"type": "string",
+						"description": "The document name/ID",
+					},
 				},
-				"name": {
-					"type": "string",
-					"description": "The document name/ID",
-				},
-			},
-			"required": ["doctype", "name"],
-		}),
+				"required": ["doctype", "name"],
+			}
+		),
 		"settings_toggle": "enable_read_documents",
 	},
 	{
@@ -46,35 +47,35 @@ BUILTIN_TOOLS = [
 			"List or search Frappe documents of a given DocType. "
 			"Supports filters, field selection, ordering, and pagination."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"doctype": {
-					"type": "string",
-					"description": "The DocType to list",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"doctype": {
+						"type": "string",
+						"description": "The DocType to list",
+					},
+					"filters": {
+						"type": "object",
+						"description": ("Filters as {field: value} or {field: ['operator', value]}"),
+					},
+					"fields": {
+						"type": "array",
+						"items": {"type": "string"},
+						"description": "Fields to return (default: name, modified)",
+					},
+					"order_by": {
+						"type": "string",
+						"description": "Field to order by (default: modified desc)",
+					},
+					"limit": {
+						"type": "integer",
+						"description": "Max results (default: 20, max: 100)",
+					},
 				},
-				"filters": {
-					"type": "object",
-					"description": (
-						"Filters as {field: value} or {field: ['operator', value]}"
-					),
-				},
-				"fields": {
-					"type": "array",
-					"items": {"type": "string"},
-					"description": "Fields to return (default: name, modified)",
-				},
-				"order_by": {
-					"type": "string",
-					"description": "Field to order by (default: modified desc)",
-				},
-				"limit": {
-					"type": "integer",
-					"description": "Max results (default: 20, max: 100)",
-				},
-			},
-			"required": ["doctype"],
-		}),
+				"required": ["doctype"],
+			}
+		),
 		"settings_toggle": "enable_read_documents",
 	},
 	{
@@ -87,20 +88,22 @@ BUILTIN_TOOLS = [
 			"confirmation_id. Present the preview to the user and call "
 			"confirm_write after they approve."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"doctype": {
-					"type": "string",
-					"description": "The DocType to create",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"doctype": {
+						"type": "string",
+						"description": "The DocType to create",
+					},
+					"values": {
+						"type": "object",
+						"description": "Field values for the new document",
+					},
 				},
-				"values": {
-					"type": "object",
-					"description": "Field values for the new document",
-				},
-			},
-			"required": ["doctype", "values"],
-		}),
+				"required": ["doctype", "values"],
+			}
+		),
 		"settings_toggle": "enable_create_documents",
 	},
 	{
@@ -113,24 +116,26 @@ BUILTIN_TOOLS = [
 			"current vs new values with a confirmation_id. Present the changes "
 			"to the user and call confirm_write after they approve."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"doctype": {
-					"type": "string",
-					"description": "The DocType of the document",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"doctype": {
+						"type": "string",
+						"description": "The DocType of the document",
+					},
+					"name": {
+						"type": "string",
+						"description": "The document name/ID",
+					},
+					"values": {
+						"type": "object",
+						"description": "Field values to update",
+					},
 				},
-				"name": {
-					"type": "string",
-					"description": "The document name/ID",
-				},
-				"values": {
-					"type": "object",
-					"description": "Field values to update",
-				},
-			},
-			"required": ["doctype", "name", "values"],
-		}),
+				"required": ["doctype", "name", "values"],
+			}
+		),
 		"settings_toggle": "enable_modify_documents",
 	},
 	{
@@ -142,16 +147,18 @@ BUILTIN_TOOLS = [
 			"confirmed. Requires the confirmation_id from the create_document "
 			"or update_document preview response."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"confirmation_id": {
-					"type": "string",
-					"description": "The confirmation_id from the preview response",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"confirmation_id": {
+						"type": "string",
+						"description": "The confirmation_id from the preview response",
+					},
 				},
-			},
-			"required": ["confirmation_id"],
-		}),
+				"required": ["confirmation_id"],
+			}
+		),
 		"settings_toggle": "enable_tool_calling",
 	},
 	{
@@ -162,24 +169,26 @@ BUILTIN_TOOLS = [
 			"Run a Frappe Report Builder or Script Report and return the results. "
 			"Provide the report name and optional filters."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"report_name": {
-					"type": "string",
-					"description": "Name of the report",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"report_name": {
+						"type": "string",
+						"description": "Name of the report",
+					},
+					"filters": {
+						"type": "object",
+						"description": "Report filters",
+					},
+					"limit": {
+						"type": "integer",
+						"description": "Max rows (default: 20, max: 100)",
+					},
 				},
-				"filters": {
-					"type": "object",
-					"description": "Report filters",
-				},
-				"limit": {
-					"type": "integer",
-					"description": "Max rows (default: 20, max: 100)",
-				},
-			},
-			"required": ["report_name"],
-		}),
+				"required": ["report_name"],
+			}
+		),
 		"settings_toggle": "enable_report_queries",
 	},
 	{
@@ -190,23 +199,25 @@ BUILTIN_TOOLS = [
 			"Generate a URL for the user to navigate to a Frappe page, "
 			"document form, or list view. The frontend will handle navigation."
 		),
-		"parameters_schema": json.dumps({
-			"type": "object",
-			"properties": {
-				"doctype": {
-					"type": "string",
-					"description": "DocType to navigate to",
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"doctype": {
+						"type": "string",
+						"description": "DocType to navigate to",
+					},
+					"name": {
+						"type": "string",
+						"description": "Document name (omit for list view)",
+					},
+					"url": {
+						"type": "string",
+						"description": "Direct URL path (alternative to doctype/name)",
+					},
 				},
-				"name": {
-					"type": "string",
-					"description": "Document name (omit for list view)",
-				},
-				"url": {
-					"type": "string",
-					"description": "Direct URL path (alternative to doctype/name)",
-				},
-			},
-		}),
+			}
+		),
 		"settings_toggle": "enable_navigate",
 	},
 ]

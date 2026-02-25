@@ -3,9 +3,8 @@
 
 import json
 
-import requests
-
 import frappe
+import requests
 from frappe import _
 
 from jana.services.llm.base import LLMProvider
@@ -62,18 +61,22 @@ class AnthropicProvider(LLMProvider):
 							parsed_input = json.loads(raw_input) if isinstance(raw_input, str) else raw_input
 						except json.JSONDecodeError:
 							parsed_input = {}
-						content_blocks.append({
-							"type": "tool_use",
-							"id": tc.get("id", ""),
-							"name": func.get("name", ""),
-							"input": parsed_input,
-						})
+						content_blocks.append(
+							{
+								"type": "tool_use",
+								"id": tc.get("id", ""),
+								"name": func.get("name", ""),
+								"input": parsed_input,
+							}
+						)
 					chat_messages.append({"role": "assistant", "content": content_blocks})
 				else:
-					chat_messages.append({
-						"role": "assistant",
-						"content": msg.get("content", ""),
-					})
+					chat_messages.append(
+						{
+							"role": "assistant",
+							"content": msg.get("content", ""),
+						}
+					)
 
 			elif role == "tool":
 				# Convert OpenAI tool result to Anthropic tool_result block.
@@ -95,16 +98,20 @@ class AnthropicProvider(LLMProvider):
 				):
 					chat_messages[-1]["content"].append(tool_result_block)
 				else:
-					chat_messages.append({
-						"role": "user",
-						"content": [tool_result_block],
-					})
+					chat_messages.append(
+						{
+							"role": "user",
+							"content": [tool_result_block],
+						}
+					)
 
 			elif role == "user":
-				chat_messages.append({
-					"role": "user",
-					"content": msg.get("content", ""),
-				})
+				chat_messages.append(
+					{
+						"role": "user",
+						"content": msg.get("content", ""),
+					}
+				)
 
 		payload = {
 			"model": model or "claude-sonnet-4-20250514",
@@ -128,11 +135,13 @@ class AnthropicProvider(LLMProvider):
 		for tool in tools:
 			if tool.get("type") == "function":
 				func = tool["function"]
-				anthropic_tools.append({
-					"name": func["name"],
-					"description": func.get("description", ""),
-					"input_schema": func.get("parameters", {"type": "object", "properties": {}}),
-				})
+				anthropic_tools.append(
+					{
+						"name": func["name"],
+						"description": func.get("description", ""),
+						"input_schema": func.get("parameters", {"type": "object", "properties": {}}),
+					}
+				)
 		return anthropic_tools
 
 	def complete(self, messages, model=None, temperature=0.7, max_tokens=None, tools=None):
@@ -161,20 +170,22 @@ class AnthropicProvider(LLMProvider):
 			if block_type == "text":
 				content += block.get("text", "")
 			elif block_type == "tool_use":
-				tool_calls.append({
-					"id": block["id"],
-					"type": "function",
-					"function": {
-						"name": block["name"],
-						"arguments": json.dumps(block.get("input", {})),
-					},
-				})
+				tool_calls.append(
+					{
+						"id": block["id"],
+						"type": "function",
+						"function": {
+							"name": block["name"],
+							"arguments": json.dumps(block.get("input", {})),
+						},
+					}
+				)
 
 		result = {
 			"content": content,
 			"model": data.get("model", model),
 			"tokens_used": data.get("usage", {}).get("input_tokens", 0)
-				+ data.get("usage", {}).get("output_tokens", 0),
+			+ data.get("usage", {}).get("output_tokens", 0),
 		}
 
 		if tool_calls:
@@ -187,9 +198,7 @@ class AnthropicProvider(LLMProvider):
 		payload = self._build_payload(messages, model, temperature, max_tokens, tools, stream=True)
 
 		try:
-			response = requests.post(
-				url, headers=self._get_headers(), json=payload, timeout=120, stream=True
-			)
+			response = requests.post(url, headers=self._get_headers(), json=payload, timeout=120, stream=True)
 			response.raise_for_status()
 		except requests.exceptions.HTTPError as e:
 			self._handle_http_error(e, response)

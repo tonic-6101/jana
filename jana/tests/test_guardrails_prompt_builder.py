@@ -68,7 +68,6 @@ class TestGuardrailRules(unittest.TestCase):
 		mock_translate.side_effect = lambda s: s  # No translation available
 		result = build_guardrail_prompt("xx")
 		# Should not have a "---" separator for bilingual
-		sections = result.split("\n\n---\n\n")
 		# Only one pair of rules (accuracy + security), no bilingual duplication
 		self.assertEqual(result.count("## ACCURACY RULES"), 1)
 

@@ -3,9 +3,8 @@
 
 import json
 
-import requests
-
 import frappe
+import requests
 from frappe import _
 
 from jana.services.llm.base import LLMProvider
@@ -82,9 +81,9 @@ class OpenAIProvider(LLMProvider):
 		choices = data.get("choices")
 		if not choices:
 			error_msg = data.get("error", {}).get("message", "")
-			frappe.throw(_("Unexpected response from AI provider: {0}").format(
-				error_msg or _("no choices returned")
-			))
+			frappe.throw(
+				_("Unexpected response from AI provider: {0}").format(error_msg or _("no choices returned"))
+			)
 
 		message = choices[0].get("message", {})
 
@@ -104,9 +103,7 @@ class OpenAIProvider(LLMProvider):
 		payload = self._build_payload(messages, model, temperature, max_tokens, tools, stream=True)
 
 		try:
-			response = requests.post(
-				url, headers=self._get_headers(), json=payload, timeout=120, stream=True
-			)
+			response = requests.post(url, headers=self._get_headers(), json=payload, timeout=120, stream=True)
 			response.raise_for_status()
 		except requests.exceptions.HTTPError as e:
 			self._handle_http_error(e, response)
