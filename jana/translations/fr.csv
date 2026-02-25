@@ -1,0 +1,191 @@
+AI responses may be less accurate in languages other than English.,Les réponses de l'IA peuvent être moins précises dans les langues autres que l'anglais.
+Dismiss,Fermer
+Open Jana AI Assistant,Ouvrir l'assistante Jana IA
+Chats,Discussions
+Select Agent,Sélectionner l'agent
+Chat History,Historique des discussions
+New Chat,Nouvelle discussion
+Settings,Paramètres
+Close,Fermer
+No conversations yet,Aucune conversation pour le moment
+Start a new chat to begin.,Commencez une nouvelle discussion.
+New conversation,Nouvelle conversation
+Welcome to Jana!,Bienvenue sur Jana !
+Connect your account to get started:,Connectez votre compte pour commencer :
+Connect with {0},Se connecter avec {0}
+or,ou
+To get started&#44; add your AI provider key.,"Pour commencer, ajoutez votre clé de fournisseur IA."
+Open Jana Settings,Ouvrir les paramètres Jana
+Copy,Copier
+Ask Jana...,Demandez à Jana...
+Stop generating,Arrêter la génération
+Copied to clipboard,Copié dans le presse-papiers
+just now,à l'instant
+Sorry&#44; something went wrong. Please try again.,"Désolé, une erreur est survenue. Veuillez réessayer."
+Start a conversation,Commencer une conversation
+Type a message below to begin.,Écrivez un message ci-dessous pour commencer.
+Type a message...,Écrivez un message...
+Press Enter to send&#44; Shift+Enter for new line,"Appuyez sur Entrée pour envoyer, Maj+Entrée pour un retour à la ligne"
+Untitled Chat,Discussion sans titre
+Rename,Renommer
+Archive,Archiver
+Delete,Supprimer
+Delete this conversation? This cannot be undone.,Supprimer cette conversation ? Cette action est irréversible.
+Chat,Discussion
+Save,Enregistrer
+General,Général
+AI Provider,Fournisseur IA
+Default Provider,Fournisseur par défaut
+Default Model,Modèle par défaut
+Max Context Tokens,Tokens de contexte maximum
+Maximum tokens for the LLM context window (512–128000),Nombre maximum de tokens pour la fenêtre de contexte du LLM (512–128000)
+Behavior,Comportement
+Enable Streaming,Activer le streaming
+Stream AI responses token-by-token for a real-time feel,Diffuser les réponses IA token par token pour un effet temps réel
+Enable Tool Calling,Activer l'appel d'outils
+Allow agents to call Frappe API tools during conversations,Permettre aux agents d'appeler les outils API Frappe pendant les conversations
+Providers,Fournisseurs
+Configured Providers,Fournisseurs configurés
+Click a provider to expand and edit all settings.,Cliquez sur un fournisseur pour le développer et modifier ses paramètres.
+Add Provider,Ajouter un fournisseur
+Cancel,Annuler
+New Provider,Nouveau fournisseur
+Provider Name,Nom du fournisseur
+Provider Type,Type de fournisseur
+Authentication,Authentification
+API Key,Clé API
+OAuth,OAuth
+Paste your API key,Collez votre clé API
+API Base URL,URL de base de l'API
+PII Masking,Masquage des données personnelles
+Global Default,Défaut global
+Always On,Toujours activé
+Always Off,Toujours désactivé
+Enabled,Activé
+Is Default,Par défaut
+Create Provider,Créer un fournisseur
+No providers configured.,Aucun fournisseur configuré.
+Capabilities,Capacités
+AI Capabilities,Capacités IA
+Control what Jana is allowed to do in conversations,Contrôlez ce que Jana est autorisée à faire dans les conversations
+Chat / Q&A,Discussion / Q&R
+Basic conversational AI,IA conversationnelle de base
+Read Documents,Lire les documents
+Allow AI to read Frappe documents for context,Autoriser l'IA à lire les documents Frappe pour le contexte
+Draft Content,Rédiger du contenu
+Generate emails&#44; descriptions&#44; and summaries,"Générer des e-mails, descriptions et résumés"
+Create Documents,Créer des documents
+Allow AI to create new records in the system,Autoriser l'IA à créer de nouveaux enregistrements dans le système
+Navigate to Pages,Naviguer vers les pages
+Allow AI to direct users to specific pages or reports,Autoriser l'IA à diriger les utilisateurs vers des pages ou rapports spécifiques
+Run Report Queries,Exécuter des requêtes de rapports
+Allow AI to query reports and return data,Autoriser l'IA à interroger les rapports et retourner des données
+Modify Documents,Modifier les documents
+Allow AI to change existing records — use with caution,Autoriser l'IA à modifier les enregistrements existants — à utiliser avec prudence
+Limits,Limites
+Rate Limits,Limites de débit
+Messages per User per Hour,Messages par utilisateur par heure
+Set to 0 for unlimited,Définir à 0 pour illimité
+Session Retention (days),Conservation des sessions (jours)
+Auto-archive sessions older than this. Set to 0 to keep forever.,Archiver automatiquement les sessions plus anciennes. Définir à 0 pour les conserver indéfiniment.
+Privacy,Confidentialité
+Auto-Mask PII,Masquage automatique des données personnelles
+Knowledge,Connaissances
+Business Context,Contexte métier
+Business Description,Description de l'entreprise
+Knowledge Token Budget,Budget de tokens de connaissances
+My Keys,Mes clés
+Your API Keys,Vos clés API
+Add a Key,Ajouter une clé
+Add Key,Ajouter une clé
+OAuth Connections,Connexions OAuth
+Connected,Connecté
+Not connected,Non connecté
+Disconnect,Déconnecter
+Connect,Connecter
+Settings saved,Paramètres enregistrés
+Failed to save settings,Échec de l'enregistrement des paramètres
+Connection successful,Connexion réussie
+Provider saved,Fournisseur enregistré
+Provider deleted,Fournisseur supprimé
+Provider created,Fournisseur créé
+API key added,Clé API ajoutée
+API key removed,Clé API supprimée
+Disconnected,Déconnecté
+Default,Par défaut
+Disabled,Désactivé
+Connection,Connexion
+Models,Modèles
+Available Models,Modèles disponibles
+Test Connection,Tester la connexion
+OK,OK
+Save Provider,Enregistrer le fournisseur
+Optional,Optionnel
+Back to Chat,Retour à la discussion
+Agents,Agents
+New Agent,Nouvel agent
+Retry,Réessayer
+No agents yet,Aucun agent pour le moment
+Create your first AI agent to get started.,Créez votre premier agent IA pour commencer.
+No description,Aucune description
+Basic Information,Informations de base
+Agent Name,Nom de l'agent
+Description,Description
+System Prompt,Prompt système
+Model Configuration,Configuration du modèle
+Provider,Fournisseur
+Model,Modèle
+Temperature,Température
+Precise,Précis
+Creative,Créatif
+Max Tokens,Tokens maximum
+Tools,Outils
+Remove,Supprimer
+Advanced,Avancé
+Mark as Template,Marquer comme modèle
+Agent saved,Agent enregistré
+Agent deleted,Agent supprimé
+Content Generation,Génération de contenu
+Draft Email,Rédiger un e-mail
+DocType,Type de document
+Document Name,Nom du document
+Email Type,Type d'e-mail
+Payment Reminder,Rappel de paiement
+Inquiry,Demande
+Follow Up,Suivi
+Thank You,Merci
+Complaint / Issue,Plainte / Problème
+Additional Instructions,Instructions supplémentaires
+Generate Description,Générer une description
+Style,Style
+Professional,Professionnel
+Technical,Technique
+Brief Summary,Résumé bref
+Generate,Générer
+Summarise Report,Résumer le rapport
+Report Name,Nom du rapport
+Summarise,Résumer
+Result,Résultat
+tokens,tokens
+Copied,Copié
+Subject,Objet
+Body,Corps
+Email Draft,Brouillon d'e-mail
+Report Summary,Résumé du rapport
+Content,Contenu
+Rate limit exceeded. You can send up to {0} messages per hour.,Limite de débit dépassée. Vous pouvez envoyer jusqu'à {0} messages par heure.
+Rate Limit Exceeded,Limite de débit dépassée
+An error occurred,Une erreur est survenue
+Streaming failed,Échec du streaming
+Session ID is required,L'identifiant de session est requis
+Message content is required,Le contenu du message est requis
+Title is required,Le titre est requis
+Provider name is required,Le nom du fournisseur est requis
+Provider {0} does not exist,Le fournisseur {0} n'existe pas
+Agent name is required,Le nom de l'agent est requis
+Agent {0} does not exist,L'agent {0} n'existe pas
+Article content cannot be empty,Le contenu de l'article ne peut pas être vide
+Feature Disabled,Fonctionnalité désactivée
+Permission denied,Permission refusée
+Document does not exist,Le document n'existe pas
+— Select —,— Sélectionner —

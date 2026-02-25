@@ -1,0 +1,112 @@
+AI responses may be less accurate in languages other than English.,KI-Antworten können in anderen Sprachen als Englisch weniger genau sein.
+Dismiss,Schließen
+Open Jana AI Assistant,Jana KI-Assistentin öffnen
+Chats,Chats
+Select Agent,Agent auswählen
+Chat History,Chat-Verlauf
+New Chat,Neuer Chat
+Settings,Einstellungen
+Close,Schließen
+No conversations yet,Noch keine Gespräche
+Start a new chat to begin.,Starten Sie einen neuen Chat.
+Welcome to Jana!,Willkommen bei Jana!
+Connect with {0},Verbinden mit {0}
+or,oder
+Open Jana Settings,Jana-Einstellungen öffnen
+Copy,Kopieren
+Ask Jana...,Jana fragen...
+Stop generating,Generierung stoppen
+Copied to clipboard,In die Zwischenablage kopiert
+just now,gerade eben
+Untitled Chat,Chat ohne Titel
+Rename,Umbenennen
+Archive,Archivieren
+Delete,Löschen
+Chat,Chat
+Save,Speichern
+General,Allgemein
+AI Provider,KI-Anbieter
+Default Provider,Standardanbieter
+Default Model,Standardmodell
+Behavior,Verhalten
+Enable Streaming,Streaming aktivieren
+Enable Tool Calling,Tool-Aufrufe aktivieren
+Providers,Anbieter
+Add Provider,Anbieter hinzufügen
+Cancel,Abbrechen
+Provider Name,Anbietername
+Provider Type,Anbietertyp
+Authentication,Authentifizierung
+API Key,API-Schlüssel
+PII Masking,PII-Maskierung
+Global Default,Globaler Standard
+Always On,Immer aktiv
+Always Off,Immer deaktiviert
+Enabled,Aktiviert
+Capabilities,Fähigkeiten
+AI Capabilities,KI-Fähigkeiten
+Read Documents,Dokumente lesen
+Draft Content,Inhalt entwerfen
+Create Documents,Dokumente erstellen
+Navigate to Pages,Zu Seiten navigieren
+Run Report Queries,Berichtsabfragen ausführen
+Modify Documents,Dokumente ändern
+Limits,Limits
+Rate Limits,Ratenbegrenzungen
+Privacy,Datenschutz
+Knowledge,Wissen
+Business Description,Geschäftsbeschreibung
+My Keys,Meine Schlüssel
+Connected,Verbunden
+Not connected,Nicht verbunden
+Disconnect,Trennen
+Connect,Verbinden
+Settings saved,Einstellungen gespeichert
+Connection successful,Verbindung erfolgreich
+Provider saved,Anbieter gespeichert
+Provider deleted,Anbieter gelöscht
+Provider created,Anbieter erstellt
+Default,Standard
+Disabled,Deaktiviert
+Models,Modelle
+Test Connection,Verbindung testen
+Save Provider,Anbieter speichern
+Optional,Optional
+Agents,Agenten
+New Agent,Neuer Agent
+Retry,Erneut versuchen
+No agents yet,Noch keine Agenten
+Agent Name,Agentenname
+Description,Beschreibung
+System Prompt,System-Prompt
+Provider,Anbieter
+Model,Modell
+Temperature,Temperatur
+Precise,Präzise
+Creative,Kreativ
+Tools,Werkzeuge
+Remove,Entfernen
+Advanced,Erweitert
+Agent saved,Agent gespeichert
+Agent deleted,Agent gelöscht
+Content Generation,Inhaltserstellung
+Draft Email,E-Mail entwerfen
+DocType,DocType
+Document Name,Dokumentname
+Email Type,E-Mail-Typ
+Payment Reminder,Zahlungserinnerung
+Inquiry,Anfrage
+Follow Up,Nachfassen
+Thank You,Danke
+Generate,Generieren
+Report Name,Berichtsname
+Result,Ergebnis
+tokens,Tokens
+Copied,Kopiert
+Subject,Betreff
+Body,Text
+Content,Inhalt
+An error occurred,Ein Fehler ist aufgetreten
+Permission denied,Zugriff verweigert
+Document does not exist,Dokument existiert nicht
+— Select —,— Auswählen —
