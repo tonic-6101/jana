@@ -1,0 +1,79 @@
+{
+ "actions": [],
+ "autoname": "format:JTERMS-{user}-{terms_version}",
+ "creation": "2026-02-25 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "terms_version",
+  "column_break_meta",
+  "accepted_at",
+  "ip_address"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "default": "__user"
+  },
+  {
+   "fieldname": "terms_version",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Terms Version",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_meta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "accepted_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Accepted At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ip_address",
+   "fieldtype": "Data",
+   "label": "IP Address",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-02-25 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Jana",
+ "name": "Jana Terms Acceptance",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Jana Admin"
+  },
+  {
+   "create": 1,
+   "if_owner": 1,
+   "read": 1,
+   "role": "Jana User"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

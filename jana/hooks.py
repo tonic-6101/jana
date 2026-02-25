@@ -65,12 +65,14 @@ has_permission = {
 	"Jana Chat Session": "jana.permissions.session_has_permission",
 	"Jana Chat Message": "jana.permissions.message_has_permission",
 	"Jana User Key": "jana.permissions.user_key_has_permission",
+	"Jana Terms Acceptance": "jana.permissions.terms_has_permission",
 }
 
 permission_query_conditions = {
 	"Jana Chat Session": "jana.permissions.session_permission_query_conditions",
 	"Jana Chat Message": "jana.permissions.message_permission_query_conditions",
 	"Jana User Key": "jana.permissions.user_key_permission_query_conditions",
+	"Jana Terms Acceptance": "jana.permissions.terms_permission_query_conditions",
 }
 
 # After Request

@@ -97,3 +97,24 @@ def user_key_permission_query_conditions(user=None):
 	if _is_jana_admin(user):
 		return None
 	return f"`tabJana User Key`.user = {frappe.db.escape(user)}"
+
+
+# -------------------------------------------------------------------
+# Jana Terms Acceptance
+# -------------------------------------------------------------------
+
+
+def terms_has_permission(doc, ptype="read", user=None):
+	"""Owner-scoped permission for Jana Terms Acceptance."""
+	user = user or frappe.session.user
+	if _is_jana_admin(user):
+		return True
+	return doc.user == user
+
+
+def terms_permission_query_conditions(user=None):
+	"""SQL condition for list views of Jana Terms Acceptance."""
+	user = user or frappe.session.user
+	if _is_jana_admin(user):
+		return None
+	return f"`tabJana Terms Acceptance`.user = {frappe.db.escape(user)}"

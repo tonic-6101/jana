@@ -12,6 +12,8 @@ def extend_bootinfo(bootinfo):
 		"default_agent": "General Assistant",
 		"streaming": True,
 		"oauth_providers": [],
+		"terms_accepted": False,
+		"terms_version": "1.0",
 		"capabilities": {
 			"chat": True,
 			"read_documents": True,
@@ -24,6 +26,11 @@ def extend_bootinfo(bootinfo):
 	}
 
 	try:
+		from jana.services.terms import CURRENT_TERMS_VERSION, has_accepted_terms
+
+		jana_config["terms_accepted"] = has_accepted_terms(frappe.session.user)
+		jana_config["terms_version"] = CURRENT_TERMS_VERSION
+
 		settings = frappe.get_single("Jana Settings")
 		if settings.default_provider:
 			provider = frappe.get_doc("Jana Provider", settings.default_provider)
@@ -107,6 +114,8 @@ def get_widget_config() -> dict:
 		"default_agent": "General Assistant",
 		"streaming": True,
 		"oauth_providers": [],
+		"terms_accepted": False,
+		"terms_version": "1.0",
 		"capabilities": {
 			"chat": True,
 			"read_documents": True,
@@ -119,6 +128,11 @@ def get_widget_config() -> dict:
 	}
 
 	try:
+		from jana.services.terms import CURRENT_TERMS_VERSION, has_accepted_terms
+
+		jana_config["terms_accepted"] = has_accepted_terms(frappe.session.user)
+		jana_config["terms_version"] = CURRENT_TERMS_VERSION
+
 		settings = frappe.get_single("Jana Settings")
 		if settings.default_provider:
 			provider = frappe.get_doc("Jana Provider", settings.default_provider)
