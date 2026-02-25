@@ -76,11 +76,14 @@ For detailed setup instructions, see the [Getting Started Guide](docs/getting-st
 
 | Document | Description |
 |----------|-------------|
+| [How Jana Works](docs/how-jana-works.md) | What Jana does (and doesn't do) — the orchestration layer explained |
 | [Getting Started](docs/getting-started.md) | Installation, first-time setup, and your first conversation |
 | [User Guide](docs/user-guide.md) | How to use Jana day-to-day (for all users) |
 | [Configuration](docs/configuration.md) | Jana Settings, capability toggles, and admin options |
 | [Providers](docs/providers.md) | Setting up OpenAI, Anthropic, Ollama, and other LLM providers |
 | [Agents](docs/agents.md) | Understanding and creating AI agents |
+| [LLM Guardrails](docs/llm-guardrails.md) | How Jana prevents hallucination and keeps AI grounded in real data |
+| [LLM Security](docs/llm-security.md) | How Jana protects your data and system from AI-related risks |
 | [Privacy & Data Handling](docs/privacy.md) | PII auto-masking, data flow, and GDPR compliance |
 | [Developer Guide](docs/developer-guide.md) | Architecture, extending Jana, and contributing |
 | [API Reference](docs/api-reference.md) | All REST API endpoints |
