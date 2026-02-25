@@ -88,6 +88,8 @@ export interface JanaBootConfig {
   enabled: boolean;
   default_agent: string;
   streaming: boolean;
+  terms_accepted: boolean;
+  terms_version: string;
   oauth_providers: JanaOAuthProvider[];
   capabilities: {
     chat: boolean;

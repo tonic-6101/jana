@@ -8,6 +8,8 @@ interface JanaBootConfig {
 	enabled: boolean;
 	default_agent: string;
 	streaming: boolean;
+	terms_accepted: boolean;
+	terms_version: string;
 	capabilities: Record<string, boolean>;
 	oauth_providers: Array<{
 		name: string;
@@ -94,6 +96,8 @@ class JanaWidget {
 			streaming: config.streaming,
 			capabilities: config.capabilities,
 			oauthProviders: config.oauth_providers || [],
+			termsAccepted: config.terms_accepted ?? false,
+			termsVersion: config.terms_version ?? "1.0",
 		});
 
 		this.app.mount(mountPoint);

@@ -3,7 +3,8 @@
   Copyright (C) 2026 Tonic
 -->
 <template>
-  <div class="flex h-screen bg-white">
+  <TermsAcceptanceModal v-if="!termsAccepted" @accepted="onTermsAccepted" />
+  <div v-else class="flex h-screen bg-white">
     <!-- Sidebar (desktop: always visible, mobile: overlay) -->
     <div
       :class="[
@@ -88,6 +89,15 @@ import ChatSidebar from "@/components/chat/ChatSidebar.vue"
 import ChatMessages from "@/components/chat/ChatMessages.vue"
 import ChatInput from "@/components/chat/ChatInput.vue"
 import DisclaimerBanner from "@/components/chat/DisclaimerBanner.vue"
+import TermsAcceptanceModal from "@/components/TermsAcceptanceModal.vue"
+
+const termsAccepted = ref(
+  (window as any).frappe?.boot?.jana?.terms_accepted ?? false,
+)
+
+function onTermsAccepted(): void {
+  termsAccepted.value = true
+}
 
 const chat = useChat()
 const { agents, fetchAgents } = useAgents()

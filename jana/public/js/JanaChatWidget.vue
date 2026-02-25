@@ -61,7 +61,7 @@
 				</svg>
 				<div class="jana-disclaimer-text">
 					<span v-if="showDisclaimer">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
-					<span v-if="showLangNotice" class="jana-lang-notice">{{ __('AI responses may be less accurate in languages other than English.') }}</span>
+					<span v-if="showLangNotice" class="jana-lang-notice">{{ __('Jana responds in your language. Complex technical content may vary in quality across languages.') }}</span>
 				</div>
 				<button class="jana-disclaimer-close" @click="dismissDisclaimer" :title="__('Dismiss')">
 					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -95,6 +95,34 @@
 								<span v-if="session.agent" class="jana-session-item-agent">{{ session.agent }}</span>
 							</div>
 						</div>
+					</button>
+				</div>
+			</div>
+
+			<!-- Terms acceptance view -->
+			<div v-else-if="currentView === 'terms'" class="jana-terms">
+				<div class="jana-terms-content">
+					<h3 class="jana-terms-title">{{ __('Terms of Use') }}</h3>
+					<p class="jana-terms-intro">{{ __('Before using Jana, please review and accept the following terms:') }}</p>
+					<ol class="jana-terms-list">
+						<li>{{ __('Jana is an AI assistant. AI-generated responses may be inaccurate, incomplete, or outdated. You are responsible for verifying all information before acting on it.') }}</li>
+						<li>{{ __('If you bring your own API keys (BYOK), you are responsible for all costs and usage with your LLM provider. Jana does not manage, limit, or monitor your provider billing.') }}</li>
+						<li>{{ __('Jana does not guarantee the accuracy, reliability, or suitability of AI responses for any particular purpose.') }}</li>
+						<li>{{ __('Your conversations are stored on this Frappe site. Data sent to cloud LLM providers is subject to their data handling policies.') }}</li>
+						<li>{{ __('Jana Community Edition is licensed under AGPL-3.0. See the full license for terms and conditions.') }}</li>
+					</ol>
+				</div>
+				<div class="jana-terms-footer">
+					<label class="jana-terms-checkbox">
+						<input type="checkbox" v-model="termsAgreed" />
+						<span>{{ __('I have read and agree to the Terms of Use') }}</span>
+					</label>
+					<button
+						class="jana-btn-primary jana-terms-accept"
+						:disabled="!termsAgreed || termsAccepting"
+						@click="acceptTerms"
+					>
+						{{ termsAccepting ? '...' : __('Accept and Continue') }}
 					</button>
 				</div>
 			</div>
@@ -272,6 +300,8 @@ const props = withDefaults(
 		streaming: boolean;
 		capabilities: Record<string, boolean>;
 		oauthProviders: OAuthProvider[];
+		termsAccepted: boolean;
+		termsVersion: string;
 	}>(),
 	{
 		enabled: false,
@@ -279,6 +309,8 @@ const props = withDefaults(
 		streaming: true,
 		capabilities: () => ({}),
 		oauthProviders: () => [],
+		termsAccepted: false,
+		termsVersion: "1.0",
 	},
 );
 
@@ -290,12 +322,15 @@ const userInput = ref("");
 const loading = ref(false);
 const sessionId = ref<string | null>(null);
 const currentAgent = ref(props.defaultAgent);
-const currentView = ref<"chat" | "sessions">("chat");
+const currentView = ref<"chat" | "sessions" | "terms">("chat");
 const sessions = ref<SessionInfo[]>([]);
 const sessionsLoading = ref(false);
 const agents = ref<Array<{ name: string; agent_name: string; description: string | null }>>([]);
 const agentsLoaded = ref(false);
 const disclaimerDismissed = ref(false);
+const termsLocallyAccepted = ref(props.termsAccepted);
+const termsAgreed = ref(false);
+const termsAccepting = ref(false);
 let abortController: AbortController | null = null;
 
 // --- Template refs ---
@@ -432,6 +467,10 @@ function autoResize(): void {
 
 function openPanel(): void {
 	isOpen.value = true;
+	if (!termsLocallyAccepted.value) {
+		currentView.value = "terms";
+		return;
+	}
 	fetchAgents();
 	if (sessionId.value) {
 		currentView.value = "chat";
@@ -444,6 +483,22 @@ function openPanel(): void {
 			inputField.value.focus();
 		}
 	});
+}
+
+async function acceptTerms(): Promise<void> {
+	if (!termsAgreed.value || termsAccepting.value) return;
+	termsAccepting.value = true;
+	try {
+		await apiCall("jana.api.terms.accept_terms");
+		termsLocallyAccepted.value = true;
+		currentView.value = "sessions";
+		fetchAgents();
+		fetchSessions();
+	} catch {
+		console.error("[Jana] Could not accept terms");
+	} finally {
+		termsAccepting.value = false;
+	}
 }
 
 function closePanel(): void {
