@@ -1,0 +1,256 @@
+AI responses may be less accurate in languages other than English.,قد تكون استجابات الذكاء الاصطناعي أقل دقة باللغات غير الإنجليزية.
+Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.,جنى هي مساعدة ذكاء اصطناعي. الردود مُولّدة وليست رسمية. تتطلب تغييرات المستندات تأكيدك قبل الحفظ.
+Dismiss,إخفاء
+Open Jana AI Assistant,افتح مساعدة جنى الذكية
+Chats,المحادثات
+Select Agent,اختر الوكيل
+Chat History,سجل المحادثات
+New Chat,محادثة جديدة
+Settings,الإعدادات
+Close,إغلاق
+No conversations yet,لا توجد محادثات بعد
+Start a new chat to begin.,ابدأ محادثة جديدة للبدء.
+New conversation,محادثة جديدة
+Welcome to Jana!,مرحبًا بك في جنى!
+Connect your account to get started:,اربط حسابك للبدء:
+Connect with {0},الاتصال بـ {0}
+or,أو
+To get started&#44; add your AI provider key.,للبدء، أضف مفتاح مزوّد الذكاء الاصطناعي.
+Open Jana Settings,افتح إعدادات جنى
+Copy,نسخ
+Ask Jana...,اسأل جنى...
+Stop generating,إيقاف التوليد
+Copied to clipboard,تم النسخ إلى الحافظة
+just now,الآن
+Sorry&#44; something went wrong. Please try again.,عذرًا، حدث خطأ. يرجى المحاولة مرة أخرى.
+Start a conversation,ابدأ محادثة
+Type a message below to begin.,اكتب رسالة أدناه للبدء.
+Type a message...,اكتب رسالة...
+Press Enter to send&#44; Shift+Enter for new line,اضغط Enter للإرسال، Shift+Enter لسطر جديد
+Untitled Chat,محادثة بدون عنوان
+Rename,إعادة تسمية
+Archive,أرشفة
+Delete,حذف
+Delete this conversation? This cannot be undone.,حذف هذه المحادثة؟ لا يمكن التراجع عن هذا.
+Chat,المحادثة
+Save,حفظ
+General,عام
+AI Provider,مزوّد الذكاء الاصطناعي
+Default Provider,المزوّد الافتراضي
+Default Model,النموذج الافتراضي
+Max Context Tokens,الحد الأقصى لرموز السياق
+Maximum tokens for the LLM context window (512–128000),الحد الأقصى لرموز نافذة سياق النموذج (512-128000)
+Behavior,السلوك
+Enable Streaming,تمكين البث المباشر
+Stream AI responses token-by-token for a real-time feel,بث استجابات الذكاء الاصطناعي رمزًا بعد رمز لتجربة فورية
+Enable Tool Calling,تمكين استدعاء الأدوات
+Allow agents to call Frappe API tools during conversations,السماح للوكلاء باستدعاء أدوات Frappe API أثناء المحادثات
+Providers,المزوّدون
+Configured Providers,المزوّدون المُعدّون
+Click a provider to expand and edit all settings.,انقر على مزوّد لتوسيعه وتعديل جميع الإعدادات.
+Add Provider,إضافة مزوّد
+Cancel,إلغاء
+New Provider,مزوّد جديد
+Provider Name,اسم المزوّد
+Provider Type,نوع المزوّد
+Authentication,المصادقة
+API Key,مفتاح API
+OAuth,OAuth
+Paste your API key,الصق مفتاح API الخاص بك
+API Base URL,عنوان URL الأساسي لـ API
+PII Masking,إخفاء البيانات الشخصية
+Global Default,الافتراضي العام
+Always On,مُفعّل دائمًا
+Always Off,مُعطّل دائمًا
+Enabled,مُفعّل
+Is Default,الافتراضي
+Create Provider,إنشاء مزوّد
+No providers configured.,لم يتم إعداد أي مزوّدين.
+Capabilities,القدرات
+AI Capabilities,قدرات الذكاء الاصطناعي
+Control what Jana is allowed to do in conversations,التحكم فيما يُسمح لجنى بفعله في المحادثات
+Chat / Q&A,المحادثة / الأسئلة والأجوبة
+Basic conversational AI,ذكاء اصطناعي محادثاتي أساسي
+Read Documents,قراءة المستندات
+Allow AI to read Frappe documents for context,السماح للذكاء الاصطناعي بقراءة مستندات Frappe للسياق
+Draft Content,صياغة المحتوى
+Generate emails&#44; descriptions&#44; and summaries,توليد رسائل البريد الإلكتروني والأوصاف والملخصات
+Create Documents,إنشاء المستندات
+Allow AI to create new records in the system,السماح للذكاء الاصطناعي بإنشاء سجلات جديدة في النظام
+Navigate to Pages,الانتقال إلى الصفحات
+Allow AI to direct users to specific pages or reports,السماح للذكاء الاصطناعي بتوجيه المستخدمين إلى صفحات أو تقارير محددة
+Run Report Queries,تشغيل استعلامات التقارير
+Allow AI to query reports and return data,السماح للذكاء الاصطناعي بالاستعلام عن التقارير وإرجاع البيانات
+Modify Documents,تعديل المستندات
+Allow AI to change existing records — use with caution,السماح للذكاء الاصطناعي بتغيير السجلات الحالية — استخدم بحذر
+Limits,الحدود
+Rate Limits,حدود المعدل
+Messages per User per Hour,الرسائل لكل مستخدم في الساعة
+Set to 0 for unlimited,اضبط على 0 للسماح بعدد غير محدود
+Session Retention (days),الاحتفاظ بالجلسات (أيام)
+Auto-archive sessions older than this. Set to 0 to keep forever.,أرشفة الجلسات الأقدم من هذا تلقائيًا. اضبط على 0 للاحتفاظ بها إلى الأبد.
+Privacy,الخصوصية
+Auto-Mask PII,إخفاء البيانات الشخصية تلقائيًا
+Automatically mask personal identifiable information (names&#44; emails&#44; phone numbers) before sending to cloud LLM providers. Recommended for GDPR compliance.,إخفاء معلومات التعريف الشخصية (الأسماء والبريد الإلكتروني وأرقام الهاتف) تلقائيًا قبل الإرسال إلى مزوّدي النماذج السحابية. يُوصى به للامتثال لـ GDPR.
+Knowledge,المعرفة
+Business Context,سياق العمل
+This description is included in every AI conversation to provide business context.,يُدرج هذا الوصف في كل محادثة ذكاء اصطناعي لتوفير سياق العمل.
+Business Description,وصف العمل
+Describe your business&#44; products&#44; and services...,صف أعمالك ومنتجاتك وخدماتك...
+Knowledge Token Budget,ميزانية رموز المعرفة
+Maximum tokens allocated for knowledge articles in the system prompt,الحد الأقصى للرموز المخصصة لمقالات المعرفة في موجه النظام
+Manage knowledge articles in Desk,إدارة مقالات المعرفة في Desk
+My Keys,مفاتيحي
+Your API Keys,مفاتيح API الخاصة بك
+Bring your own API key for any provider. Your keys are encrypted and only used for your sessions.,أحضر مفتاح API الخاص بك لأي مزوّد. مفاتيحك مُشفّرة وتُستخدم فقط لجلساتك.
+No API keys configured yet.,لم يتم إعداد أي مفاتيح API بعد.
+Add a Key,إضافة مفتاح
+Select provider,اختر المزوّد
+Paste API key,الصق مفتاح API
+Add Key,إضافة مفتاح
+OAuth Connections,اتصالات OAuth
+Connected,متصل
+Not connected,غير متصل
+Disconnect,قطع الاتصال
+Connect,اتصال
+Settings saved,تم حفظ الإعدادات
+Failed to save settings,فشل حفظ الإعدادات
+Connection successful,الاتصال ناجح
+Provider saved,تم حفظ المزوّد
+Failed to save provider,فشل حفظ المزوّد
+Delete this provider? This cannot be undone.,حذف هذا المزوّد؟ لا يمكن التراجع عن هذا.
+Provider deleted,تم حذف المزوّد
+Failed to delete provider,فشل حذف المزوّد
+Provider created,تم إنشاء المزوّد
+Failed to create provider,فشل إنشاء المزوّد
+API key added,تمت إضافة مفتاح API
+Failed to add API key,فشل إضافة مفتاح API
+API key removed,تمت إزالة مفتاح API
+Failed to remove API key,فشل إزالة مفتاح API
+Disconnected,تم قطع الاتصال
+Failed to disconnect,فشل قطع الاتصال
+Default,الافتراضي
+Disabled,مُعطّل
+Connection,الاتصال
+Models,النماذج
+Available Models,النماذج المتاحة
+Test Connection,اختبار الاتصال
+OK,حسنًا
+Save Provider,حفظ المزوّد
+Optional,اختياري
+Back to Chat,العودة إلى المحادثة
+Agents,الوكلاء
+New Agent,وكيل جديد
+Retry,إعادة المحاولة
+No agents yet,لا يوجد وكلاء بعد
+Create your first AI agent to get started.,أنشئ أول وكيل ذكاء اصطناعي للبدء.
+No description,بدون وصف
+Could not load agents. Please refresh the page.,تعذّر تحميل الوكلاء. يرجى تحديث الصفحة.
+Basic Information,المعلومات الأساسية
+Agent Name,اسم الوكيل
+Agent name cannot be changed after creation.,لا يمكن تغيير اسم الوكيل بعد الإنشاء.
+Description,الوصف
+Brief description of what this agent does,وصف مختصر لما يفعله هذا الوكيل
+System Prompt,موجه النظام
+Instructions that define the agent's behavior&#44; personality&#44; and capabilities.,تعليمات تحدد سلوك الوكيل وشخصيته وقدراته.
+Model Configuration,إعداد النموذج
+Provider,المزوّد
+Default (from settings),الافتراضي (من الإعدادات)
+Model,النموذج
+Temperature,درجة الحرارة
+Precise,دقيق
+Creative,إبداعي
+Max Tokens,الحد الأقصى للرموز
+Tools,الأدوات
+Functions this agent can call.,الوظائف التي يمكن لهذا الوكيل استدعاؤها.
+Remove,إزالة
+No tools configured. Create tools in Desk first.,لم يتم إعداد أدوات. أنشئ الأدوات في Desk أولاً.
+Articles injected into the agent's context.,مقالات تُحقن في سياق الوكيل.
+No knowledge articles configured. Create articles in Desk first.,لم يتم إعداد مقالات معرفية. أنشئ المقالات في Desk أولاً.
+Advanced,متقدم
+Mark as Template,تعيين كقالب
+Templates are blueprints that can be shared and installed by other users.,القوالب هي مخططات يمكن مشاركتها وتثبيتها من قبل مستخدمين آخرين.
+Agent saved,تم حفظ الوكيل
+Failed to save agent,فشل حفظ الوكيل
+Delete this agent? This cannot be undone.,حذف هذا الوكيل؟ لا يمكن التراجع عن هذا.
+Agent deleted,تم حذف الوكيل
+Failed to delete agent,فشل حذف الوكيل
+Content Generation,توليد المحتوى
+Draft Email,صياغة بريد إلكتروني
+DocType,نوع المستند
+Document Name,اسم المستند
+Email Type,نوع البريد الإلكتروني
+Payment Reminder,تذكير بالدفع
+Inquiry,استفسار
+Follow Up,متابعة
+Thank You,شكرًا لك
+Complaint / Issue,شكوى / مشكلة
+Additional Instructions,تعليمات إضافية
+Generate Description,توليد وصف
+Style,الأسلوب
+Professional,احترافي
+Marketing / Catalogue,تسويقي / كتالوج
+Technical,تقني
+Brief Summary,ملخص مختصر
+Generate,توليد
+Summarise Report,تلخيص التقرير
+Report Name,اسم التقرير
+Summarise,تلخيص
+Result,النتيجة
+tokens,رموز
+Copied,تم النسخ
+Subject,الموضوع
+Body,المحتوى
+Email Draft,مسودة البريد الإلكتروني
+Report Summary,ملخص التقرير
+Content,المحتوى
+Rate limit exceeded. You can send up to {0} messages per hour.,تم تجاوز حد المعدل. يمكنك إرسال حتى {0} رسالة في الساعة.
+Rate Limit Exceeded,تم تجاوز حد المعدل
+Rate limit exceeded. Please wait before sending more messages.,تم تجاوز حد المعدل. يرجى الانتظار قبل إرسال المزيد من الرسائل.
+An error occurred,حدث خطأ
+No model configured. Set a model on the agent or in Jana Settings.,لم يتم إعداد نموذج. عيّن نموذجًا على الوكيل أو في إعدادات جنى.
+An error occurred during streaming,حدث خطأ أثناء البث
+Streaming failed,فشل البث
+You do not have access to this session,ليس لديك صلاحية الوصول إلى هذه الجلسة
+Session ID is required,معرّف الجلسة مطلوب
+Message content is required,محتوى الرسالة مطلوب
+You do not have permission to archive this session,ليس لديك صلاحية أرشفة هذه الجلسة
+Session is already archived,الجلسة مؤرشفة بالفعل
+You do not have permission to delete this session,ليس لديك صلاحية حذف هذه الجلسة
+Title is required,العنوان مطلوب
+You do not have permission to rename this session,ليس لديك صلاحية إعادة تسمية هذه الجلسة
+Only administrators can test provider connections,فقط المسؤولون يمكنهم اختبار اتصالات المزوّدين
+Provider name is required,اسم المزوّد مطلوب
+Provider {0} does not exist,المزوّد {0} غير موجود
+Only administrators can manage providers,فقط المسؤولون يمكنهم إدارة المزوّدين
+Only administrators can view provider details,فقط المسؤولون يمكنهم عرض تفاصيل المزوّدين
+Only administrators can create providers,فقط المسؤولون يمكنهم إنشاء المزوّدين
+Only administrators can update providers,فقط المسؤولون يمكنهم تحديث المزوّدين
+Only administrators can delete providers,فقط المسؤولون يمكنهم حذف المزوّدين
+API Base URL is required for {0} providers,عنوان URL الأساسي لـ API مطلوب لمزوّدي {0}
+Connected App is required for Google OAuth,تطبيق متصل مطلوب لـ Google OAuth
+OAuth is only supported for OpenRouter and Google providers,OAuth مدعوم فقط لمزوّدي OpenRouter و Google
+Cannot delete provider {0}: referenced by agent(s): {1},لا يمكن حذف المزوّد {0}: مُشار إليه بواسطة الوكيل (الوكلاء): {1}
+No AI provider configured. Please set up a provider in Jana Settings.,لم يتم إعداد مزوّد ذكاء اصطناعي. يرجى إعداد مزوّد في إعدادات جنى.
+Provider {0} is disabled. Please enable it or choose a different provider.,المزوّد {0} مُعطّل. يرجى تمكينه أو اختيار مزوّد آخر.
+Unsupported provider type: {0},نوع مزوّد غير مدعوم: {0}
+Agent name is required,اسم الوكيل مطلوب
+Agent {0} does not exist,الوكيل {0} غير موجود
+Only administrators can create agents,فقط المسؤولون يمكنهم إنشاء الوكلاء
+An agent named '{0}' already exists,يوجد وكيل باسم '{0}' بالفعل
+Only administrators can update agents,فقط المسؤولون يمكنهم تحديث الوكلاء
+Only administrators can delete agents,فقط المسؤولون يمكنهم حذف الوكلاء
+Temperature must be between 0.0 and 2.0,يجب أن تكون درجة الحرارة بين 0.0 و 2.0
+Cannot delete agent {0}: {1} active session(s) still reference it.,لا يمكن حذف الوكيل {0}: لا تزال {1} جلسة (جلسات) نشطة تشير إليه.
+Article content cannot be empty,لا يمكن أن يكون محتوى المقالة فارغًا
+Content generation is disabled. Enable 'Draft Content' in Jana Settings.,توليد المحتوى مُعطّل. فعّل 'صياغة المحتوى' في إعدادات جنى.
+Feature Disabled,الميزة مُعطّلة
+No default model configured. Set a model in Jana Settings.,لم يتم إعداد نموذج افتراضي. عيّن نموذجًا في إعدادات جنى.
+Permission denied,تم رفض الصلاحية
+Document does not exist,المستند غير موجود
+An error occurred while executing the tool,حدث خطأ أثناء تنفيذ الأداة
+Confirmation expired or not found. Please try the action again.,انتهت صلاحية التأكيد أو لم يُعثر عليه. يرجى المحاولة مرة أخرى.
+Parameters Schema must be valid JSON,يجب أن يكون مخطط المعلمات JSON صالحًا
+Default AI assistant with general Frappe knowledge and context awareness,مساعد ذكاء اصطناعي افتراضي مع معرفة عامة بـ Frappe ووعي بالسياق
+A key for {0} already exists for user {1},يوجد مفتاح لـ {0} بالفعل للمستخدم {1}
+— Select —,— اختر —
