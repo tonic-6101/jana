@@ -534,6 +534,13 @@
 	color: #78350f;
 }
 
+.jana-lang-notice {
+	display: block;
+	margin-top: 2px;
+	font-style: italic;
+	opacity: 0.85;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
 	.jana-panel {

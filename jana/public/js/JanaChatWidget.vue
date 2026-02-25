@@ -52,14 +52,17 @@
 				</div>
 			</div>
 
-			<!-- Legal disclaimer -->
-			<div v-if="showDisclaimer && currentView === 'chat'" class="jana-disclaimer">
+			<!-- Legal disclaimer + language notice -->
+			<div v-if="(showDisclaimer || showLangNotice) && currentView === 'chat'" class="jana-disclaimer">
 				<svg class="jana-disclaimer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="12" cy="12" r="10"></circle>
 					<line x1="12" y1="8" x2="12" y2="12"></line>
 					<line x1="12" y1="16" x2="12.01" y2="16"></line>
 				</svg>
-				<span class="jana-disclaimer-text">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
+				<div class="jana-disclaimer-text">
+					<span v-if="showDisclaimer">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
+					<span v-if="showLangNotice" class="jana-lang-notice">{{ __('AI responses may be less accurate in languages other than English.') }}</span>
+				</div>
 				<button class="jana-disclaimer-close" @click="dismissDisclaimer" :title="__('Dismiss')">
 					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
 				</button>
@@ -340,6 +343,15 @@ const isStreamingMsg = computed(() => {
 const showDisclaimer = computed(() =>
 	(props.capabilities.create_documents || props.capabilities.modify_documents)
 	&& !disclaimerDismissed.value,
+);
+
+const isNonEnglish = computed(() => {
+	const lang = typeof frappe !== "undefined" && frappe.boot?.lang;
+	return lang && !String(lang).startsWith("en");
+});
+
+const showLangNotice = computed(() =>
+	isNonEnglish.value && !disclaimerDismissed.value,
 );
 
 // --- Methods ---

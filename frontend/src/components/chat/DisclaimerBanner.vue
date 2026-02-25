@@ -22,7 +22,10 @@
       <line x1="12" y1="8" x2="12" y2="12" />
       <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
-    <span class="flex-1">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
+    <div class="flex-1">
+      <span v-if="showWriteDisclaimer">{{ __('Jana is an AI assistant. Responses are generated, not authoritative. Document changes require your confirmation before saving.') }}</span>
+      <span v-if="isNonEnglish" class="block mt-0.5 italic opacity-85">{{ __('AI responses may be less accurate in languages other than English.') }}</span>
+    </div>
     <button
       class="flex-shrink-0 rounded p-0.5 hover:bg-amber-100 text-amber-700"
       :title="__('Dismiss')"
@@ -47,8 +50,17 @@ const capabilities = computed(() => {
   return boot?.capabilities || {}
 })
 
+const isNonEnglish = computed(() => {
+  const lang = (window as any).frappe?.boot?.lang
+  return lang && !String(lang).startsWith("en")
+})
+
+const showWriteDisclaimer = computed(() =>
+  capabilities.value.create_documents || capabilities.value.modify_documents,
+)
+
 const visible = computed(() =>
-  (capabilities.value.create_documents || capabilities.value.modify_documents)
+  (showWriteDisclaimer.value || isNonEnglish.value)
   && !dismissed.value,
 )
 
