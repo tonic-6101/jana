@@ -6,9 +6,9 @@ This guide walks you through installing Jana, configuring your first AI provider
 
 Before installing Jana, ensure you have:
 
-- A working **Frappe v15+** site (bench setup complete)
-- **Python 3.10** or later
-- **Node.js 18+** (for building the frontend)
+- A working **Frappe v16+** site (bench setup complete)
+- **Python 3.14** or later
+- **Node.js 24+** (for building the frontend)
 - An API key from at least one LLM provider (OpenAI, Anthropic, etc.), **or** a local Ollama installation
 
 ## Step 1: Install the App

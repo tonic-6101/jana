@@ -123,11 +123,11 @@ Jana provides tools to help with GDPR compliance (PII masking, local model suppo
 
 ### Which Frappe version is required?
 
-Frappe v15.0 or later.
+Frappe v16.0 or later.
 
 ### Which Python version is required?
 
-Python 3.10 or later.
+Python 3.14 or later.
 
 ### Can I add support for a new LLM provider?
 

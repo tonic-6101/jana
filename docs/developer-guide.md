@@ -368,7 +368,7 @@ bench run-tests --app jana --module jana.tests.test_chat
 
 - **Linter:** Ruff (configured in `pyproject.toml`)
 - **Line length:** 110 characters
-- **Target:** Python 3.10+
+- **Target:** Python 3.14+
 - **License header** on every file:
 
 ```python

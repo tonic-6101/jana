@@ -6,8 +6,8 @@
 <p align="center">
   <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL%20v3-blue.svg" alt="License: AGPL v3"></a>
   <img src="https://img.shields.io/badge/version-0.1.0-green" alt="Version">
-  <img src="https://img.shields.io/badge/Frappe-v15+-purple" alt="Frappe v15+">
-  <img src="https://img.shields.io/badge/Python-3.10+-yellow" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/Frappe-v16+-purple" alt="Frappe v16+">
+  <img src="https://img.shields.io/badge/Python-3.10+-yellow" alt="Python 3.14+">
 </p>
 
 ---
@@ -104,7 +104,7 @@ For detailed setup instructions, see the [Getting Started Guide](docs/getting-st
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Frappe v15+, Python 3.10+ |
+| Backend | Frappe v16+, Python 3.14+ |
 | Frontend | Vue 3, TypeScript, Tailwind CSS, FrappeUI |
 | Database | MariaDB (via Frappe ORM) |
 | AI Providers | OpenAI, Anthropic, Google Gemini, OpenRouter, Ollama, vLLM |
