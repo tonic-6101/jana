@@ -10,9 +10,7 @@
   <img src=".github/jana-icon.svg" alt="Jana" width="128">
 </p>
 
-Jana (Arabic: جنى — "harvest" / "garden of paradise") is an AI-powered assistant that integrates directly into Frappe Desk. It provides context-aware chat, document understanding, and natural language interaction across any Frappe-based application — ERPNext, HRMS, CRM, or any custom Frappe app.
-
-Jana is a **Frappe-level application**. It does not depend on ERPNext and works with any Frappe site.
+Jana is an AI-powered assistant built on the [Frappe Framework](https://frappeframework.com). Designed for teams who want context-aware AI without leaving their Frappe ecosystem, Jana provides chat, document understanding, and natural language interaction across any Frappe-based application — with support for multiple LLM providers and GDPR-compliant privacy.
 
 ---
 
