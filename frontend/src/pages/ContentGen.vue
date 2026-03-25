@@ -3,7 +3,7 @@
   Copyright (C) 2026 Tonic
 -->
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-full bg-gray-50 dark:bg-gray-900">
     <!-- Header -->
     <header class="border-b border-gray-200 bg-white">
       <div class="mx-auto max-w-3xl px-6 py-4 flex items-center gap-3">
@@ -29,7 +29,7 @@
           :key="m.value"
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           :class="mode === m.value
-            ? 'bg-blue-600 text-white'
+            ? 'bg-accent-600 text-white'
             : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'"
           @click="mode = m.value; result = null; error = ''"
         >
@@ -50,7 +50,7 @@
               :placeholder="__('e.g. Sales Invoice')"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                      placeholder:text-gray-300
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
           </div>
           <div>
@@ -61,7 +61,7 @@
               :placeholder="__('e.g. SI-00042')"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                      placeholder:text-gray-300
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
           </div>
         </div>
@@ -71,7 +71,7 @@
           <select
             v-model="emailIntent"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
           >
             <option value="general">{{ __('General') }}</option>
             <option value="payment_reminder">{{ __('Payment Reminder') }}</option>
@@ -90,13 +90,13 @@
             :placeholder="__('Optional: specific tone, details to include, etc.')"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                    placeholder:text-gray-300
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400 resize-y"
           />
         </div>
 
         <button
-          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white
-                 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          class="rounded-lg bg-accent-600 px-4 py-2 text-sm font-medium text-white
+                 hover:bg-accent-700 transition-colors disabled:opacity-50"
           :disabled="generating || !doctype || !docname"
           @click="handleDraftEmail"
         >
@@ -117,7 +117,7 @@
               :placeholder="__('e.g. Item')"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                      placeholder:text-gray-300
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
           </div>
           <div>
@@ -128,7 +128,7 @@
               :placeholder="__('e.g. ITEM-00001')"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                      placeholder:text-gray-300
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
           </div>
         </div>
@@ -138,7 +138,7 @@
           <select
             v-model="descStyle"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
           >
             <option value="professional">{{ __('Professional') }}</option>
             <option value="marketing">{{ __('Marketing / Catalogue') }}</option>
@@ -155,13 +155,13 @@
             :placeholder="__('Optional: target audience, keywords, etc.')"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                    placeholder:text-gray-300
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400 resize-y"
           />
         </div>
 
         <button
-          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white
-                 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          class="rounded-lg bg-accent-600 px-4 py-2 text-sm font-medium text-white
+                 hover:bg-accent-700 transition-colors disabled:opacity-50"
           :disabled="generating || !doctype || !docname"
           @click="handleGenerateDescription"
         >
@@ -181,7 +181,7 @@
             :placeholder="__('e.g. Accounts Receivable')"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                    placeholder:text-gray-300
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
           />
         </div>
 
@@ -193,13 +193,13 @@
             :placeholder="__('Optional: {&quot;company&quot;: &quot;My Company&quot;}')"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-mono
                    placeholder:text-gray-300
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400 resize-y"
           />
         </div>
 
         <button
-          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white
-                 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          class="rounded-lg bg-accent-600 px-4 py-2 text-sm font-medium text-white
+                 hover:bg-accent-700 transition-colors disabled:opacity-50"
           :disabled="generating || !reportName"
           @click="handleSummarizeReport"
         >

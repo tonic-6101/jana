@@ -31,7 +31,7 @@
             {{ form.deleting.value ? __('Deleting…') : __('Delete') }}
           </button>
           <button
-            class="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            class="rounded-lg bg-accent-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-700 transition-colors disabled:opacity-50"
             :disabled="form.saving.value || !canSave"
             @click="handleSave"
           >
@@ -43,7 +43,7 @@
 
     <!-- Loading -->
     <div v-if="form.loading.value" class="flex items-center justify-center py-16">
-      <div class="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+      <div class="h-6 w-6 animate-spin rounded-full border-2 border-accent-600 border-t-transparent" />
     </div>
 
     <!-- Form -->
@@ -60,7 +60,7 @@
               :disabled="!form.isNew.value"
               :placeholder="__('e.g. Accounting Assistant')"
               class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900
-                     placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400
+                     placeholder:text-gray-400 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400
                      disabled:bg-gray-50 disabled:text-gray-500"
             />
             <p v-if="!form.isNew.value" class="mt-1 text-xs text-gray-400">
@@ -75,7 +75,7 @@
               type="text"
               :placeholder="__('Brief description of what this agent does')"
               class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900
-                     placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     placeholder:text-gray-400 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
           </div>
         </div>
@@ -92,7 +92,7 @@
           rows="10"
           :placeholder="__('You are a helpful assistant that...')"
           class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 font-mono
-                 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400
+                 placeholder:text-gray-400 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400
                  resize-y"
         />
       </section>
@@ -106,7 +106,7 @@
             <select
               :value="form.provider.value ?? ''"
               class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
               @change="handleProviderChange"
             >
               <option value="">{{ __('Default (from settings)') }}</option>
@@ -126,7 +126,7 @@
               v-if="form.availableModels.value.length"
               :value="form.model.value ?? ''"
               class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
               @change="form.model.value = ($event.target as HTMLSelectElement).value || null"
             >
               <option value="">{{ __('Default (from settings)') }}</option>
@@ -138,7 +138,7 @@
               type="text"
               :placeholder="form.provider.value ? __('Loading models…') : __('Select a provider first, or type a model name')"
               class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900
-                     placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     placeholder:text-gray-400 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
               @input="form.model.value = modelInput || null"
             />
           </div>
@@ -154,7 +154,7 @@
               min="0"
               max="2"
               step="0.1"
-              class="w-full accent-blue-600"
+              class="w-full accent-accent-600"
             />
             <div class="flex justify-between text-xs text-gray-400 mt-0.5">
               <span>{{ __('Precise') }}</span>
@@ -171,7 +171,7 @@
               step="256"
               :placeholder="__('0 = use model default')"
               class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900
-                     placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     placeholder:text-gray-400 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
           </div>
         </div>
@@ -214,7 +214,7 @@
         <div v-if="unselectedTools.length">
           <select
             class="w-full rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm
-                   text-gray-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   text-gray-500 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             @change="handleAddTool"
           >
             <option value="">{{ __('+ Add a tool…') }}</option>
@@ -266,7 +266,7 @@
         <div v-if="unselectedKnowledge.length">
           <select
             class="w-full rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm
-                   text-gray-500 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   text-gray-500 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             @change="handleAddKnowledge"
           >
             <option value="">{{ __('+ Add a knowledge article…') }}</option>
@@ -288,7 +288,7 @@
           <input
             v-model="form.isTemplate.value"
             type="checkbox"
-            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="h-4 w-4 rounded border-gray-300 text-accent-600 focus:ring-accent-500"
           />
           <div>
             <span class="text-sm text-gray-700">{{ __('Mark as Template') }}</span>

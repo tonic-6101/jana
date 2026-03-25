@@ -1,3 +1,5 @@
+@import './app-tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,7 +41,7 @@
 .chat-markdown ul { @apply list-disc pl-5 mb-2; }
 .chat-markdown ol { @apply list-decimal pl-5 mb-2; }
 .chat-markdown li { @apply mb-1; }
-.chat-markdown a { @apply text-blue-600 hover:underline; }
+.chat-markdown a { @apply text-accent-600 hover:underline; }
 .chat-markdown blockquote { @apply border-l-4 border-gray-300 pl-3 italic text-gray-600 my-2; }
 .chat-markdown table { @apply border-collapse w-full my-2; }
 .chat-markdown th, .chat-markdown td { @apply border border-gray-300 px-3 py-1.5 text-left text-sm; }

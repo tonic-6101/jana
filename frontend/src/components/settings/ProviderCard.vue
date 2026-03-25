@@ -27,7 +27,7 @@
             </span>
             <span
               v-if="provider.is_default"
-              class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600"
+              class="inline-flex items-center rounded-full bg-accent-50 px-2 py-0.5 text-xs font-medium text-accent-600"
             >
               {{ __('Default') }}
             </span>
@@ -63,7 +63,7 @@
           <select
             :value="local.provider_type"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             @change="local.provider_type = ($event.target as HTMLSelectElement).value as any"
           >
             <option v-for="t in providerTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
@@ -74,7 +74,7 @@
             <input
               v-model="local.enabled"
               type="checkbox"
-              class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              class="h-4 w-4 rounded border-gray-300 text-accent-600 focus:ring-accent-500"
             />
             <span class="text-sm text-gray-700">{{ __('Enabled') }}</span>
           </label>
@@ -82,7 +82,7 @@
             <input
               v-model="local.is_default"
               type="checkbox"
-              class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              class="h-4 w-4 rounded border-gray-300 text-accent-600 focus:ring-accent-500"
             />
             <span class="text-sm text-gray-700">{{ __('Is Default') }}</span>
           </label>
@@ -98,7 +98,7 @@
             <select
               :value="local.auth_method"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
               @change="local.auth_method = ($event.target as HTMLSelectElement).value as any"
             >
               <option value="API Key">{{ __('API Key') }}</option>
@@ -113,7 +113,7 @@
               :placeholder="basePlaceholder"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                      placeholder:text-gray-300
-                     focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                     focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             />
             <p class="text-xs text-gray-400 mt-0.5">
               {{ __('Required for Ollama, vLLM, or custom endpoints.') }}
@@ -132,7 +132,7 @@
             :placeholder="provider.has_api_key ? __('••••••••  (key set, enter new to replace)') : __('Paste your API key')"
             class="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                    placeholder:text-gray-300
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
           />
         </div>
       </div>
@@ -147,7 +147,7 @@
           :placeholder="__('Comma-separated list of available model names')"
           class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                  placeholder:text-gray-300
-                 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+                 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400 resize-y"
         />
       </div>
 
@@ -159,7 +159,7 @@
           <select
             :value="local.mask_pii_override"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                   focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                   focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
             @change="local.mask_pii_override = ($event.target as HTMLSelectElement).value as any"
           >
             <option value="Global Default">{{ __('Global Default') }}</option>
@@ -199,7 +199,7 @@
             {{ __('Delete') }}
           </button>
           <button
-            class="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            class="rounded-lg bg-accent-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-accent-700 transition-colors disabled:opacity-50"
             :disabled="savingLocal || !localDirty"
             @click.stop="handleSave"
           >
@@ -287,7 +287,7 @@ const basePlaceholder = computed(() => {
 })
 
 const TYPE_COLORS: Record<string, string> = {
-  openai: "bg-blue-50 text-blue-700",
+  openai: "bg-sky-50 text-sky-700",
   anthropic: "bg-orange-50 text-orange-700",
   google: "bg-green-50 text-green-700",
   openrouter: "bg-purple-50 text-purple-700",

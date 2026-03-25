@@ -23,16 +23,18 @@ function getCsrfToken(): string {
   return (window as unknown as Record<string, unknown>).csrf_token as string ?? ""
 }
 
-export function useChat() {
-  const sessions = ref<ChatSessionSummary[]>([])
-  const sessionsLoading = ref(false)
-  const currentSessionId = ref<string | null>(null)
-  const currentAgent = ref(getBootConfig()?.default_agent ?? "General Assistant")
-  const messages = ref<ChatMessageUI[]>([])
-  const sending = ref(false)
-  const streaming = ref(false)
+// Module-level singleton state — shared across all consumers
+const sessions = ref<ChatSessionSummary[]>([])
+const sessionsLoading = ref(false)
+const currentSessionId = ref<string | null>(null)
+const currentAgent = ref(getBootConfig()?.default_agent ?? "General Assistant")
+const messages = ref<ChatMessageUI[]>([])
+const sending = ref(false)
+const streaming = ref(false)
 
-  let abortController: AbortController | null = null
+let abortController: AbortController | null = null
+
+export function useChat() {
 
   async function apiCall(method: string, args: Record<string, unknown> = {}): Promise<unknown> {
     const { call } = await import("frappe-ui")

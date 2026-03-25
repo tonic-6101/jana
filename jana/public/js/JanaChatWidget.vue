@@ -4,23 +4,31 @@
 -->
 
 <template>
-	<div class="jana-widget">
-		<!-- Floating bubble -->
+	<div class="jana-widget" :class="{ 'jana-widget-embedded': embedded }">
+		<!-- Floating bubble (hidden in embedded/dock mode) -->
 		<button
-			v-if="!isOpen"
+			v-if="!embedded && !isOpen"
 			class="jana-bubble"
 			@click="openPanel"
 			:title="__('Open Jana AI Assistant')"
 		>
-			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-				<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+			<svg viewBox="0 0 52 52" width="52" height="52" class="jana-bubble-icon">
+				<rect width="52" height="52" rx="14" fill="#7c3aed" />
+				<g transform="translate(14 14)" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M12 6V2H8" />
+					<path d="m8 18-4 4V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z" />
+					<path d="M2 12h2" />
+					<path d="M9 11v2" />
+					<path d="M15 11v2" />
+					<path d="M20 12h2" />
+				</g>
 			</svg>
 		</button>
 
-		<!-- Chat panel (drawer) -->
-		<div v-if="isOpen" class="jana-panel">
-			<!-- Header -->
-			<div class="jana-panel-header">
+		<!-- Chat panel — in embedded mode, renders content only (DockPanelShell provides chrome) -->
+		<div v-if="isOpen || embedded" :class="embedded ? 'jana-panel-embedded' : 'jana-panel'">
+			<!-- Header: full chrome in standalone, action toolbar only in embedded -->
+			<div v-if="!embedded" class="jana-panel-header">
 				<div class="jana-panel-title">
 					<strong>Jana</strong>
 					<span v-if="currentView === 'sessions'" class="jana-header-label">{{ __('Chats') }}</span>
@@ -48,6 +56,34 @@
 					</button>
 					<button class="jana-btn-icon" @click="closePanel" :title="__('Close')">
 						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+					</button>
+				</div>
+			</div>
+			<!-- Embedded toolbar: agent selector + action buttons (no title/close — DockPanelShell provides those) -->
+			<div v-else class="jana-embedded-toolbar">
+				<div class="jana-panel-title">
+					<span v-if="currentView === 'sessions'" class="jana-header-label">{{ __('Chats') }}</span>
+					<select
+						v-else-if="agents.length > 1 && !sessionId"
+						v-model="currentAgent"
+						class="jana-agent-select"
+						:title="__('Select Agent')"
+					>
+						<option v-for="a in agents" :key="a.name" :value="a.agent_name">
+							{{ a.agent_name }}
+						</option>
+					</select>
+					<span v-else class="jana-agent-name">{{ currentAgent }}</span>
+				</div>
+				<div class="jana-panel-actions">
+					<button v-if="currentView === 'chat'" class="jana-btn-icon" @click="showSessionList" :title="__('Chat History')">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+					</button>
+					<button class="jana-btn-icon" @click="startNewChat" :title="__('New Chat')">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+					</button>
+					<button class="jana-btn-icon" @click="openSettings" :title="__('Settings')">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
 					</button>
 				</div>
 			</div>
@@ -302,6 +338,7 @@ const props = withDefaults(
 		oauthProviders: OAuthProvider[];
 		termsAccepted: boolean;
 		termsVersion: string;
+		embedded: boolean;
 	}>(),
 	{
 		enabled: false,
@@ -311,6 +348,7 @@ const props = withDefaults(
 		oauthProviders: () => [],
 		termsAccepted: false,
 		termsVersion: "1.0",
+		embedded: false,
 	},
 );
 
@@ -808,6 +846,10 @@ onMounted(() => {
 		disclaimerDismissed.value = sessionStorage.getItem("jana_disclaimer_dismissed") === "1";
 	} catch {
 		// sessionStorage unavailable
+	}
+	// Auto-open in embedded mode (mounted inside DockPanelShell)
+	if (props.embedded) {
+		openPanel();
 	}
 });
 

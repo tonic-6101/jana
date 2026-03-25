@@ -1,17 +1,18 @@
 {
   "name": "jana-ui",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/assets/jana/frontend/ && cp ../jana/public/frontend/index.html ../jana/www/jana.html",
+    "build": "vite build --base=/assets/jana/frontend/",
     "build:ci": "vite build --base=/assets/jana/frontend/",
     "serve": "vite preview",
     "type-check": "vue-tsc --noEmit 2>&1 | grep -v node_modules/ | grep 'error TS' && exit 1 || exit 0"
   },
   "dependencies": {
     "frappe-ui": "^0.1.261",
+    "lucide-vue-next": "^0.577.0",
     "markdown-it": "^14.0.0",
     "socket.io-client": "^4.7.2",
     "vue": "^3.5.13",

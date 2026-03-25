@@ -3,7 +3,7 @@
   Copyright (C) 2026 Tonic
 -->
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-full bg-gray-50 dark:bg-gray-900">
     <!-- Header -->
     <header class="border-b border-gray-200 bg-white">
       <div class="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
@@ -22,7 +22,7 @@
         <router-link
           v-if="isAdmin"
           to="/jana/agents/new"
-          class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+          class="inline-flex items-center gap-2 rounded-lg bg-accent-600 px-4 py-2 text-sm font-medium text-white hover:bg-accent-700 transition-colors"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19" />
@@ -37,7 +37,7 @@
     <div class="mx-auto max-w-5xl px-6 py-6">
       <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-16">
-        <div class="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div class="h-6 w-6 animate-spin rounded-full border-2 border-accent-600 border-t-transparent" />
       </div>
 
       <!-- Error state -->
@@ -78,17 +78,17 @@
           v-for="agent in agents"
           :key="agent.name"
           :to="`/jana/agents/${encodeURIComponent(agent.name)}`"
-          class="group block rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-blue-300 hover:shadow-md"
+          class="group block rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-accent-300 hover:shadow-md"
         >
           <div class="flex items-start justify-between gap-2 mb-3">
             <div class="flex items-center gap-2.5">
-              <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-50 text-accent-600">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 </svg>
               </div>
-              <h3 class="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+              <h3 class="text-sm font-semibold text-gray-900 group-hover:text-accent-600 transition-colors">
                 {{ agent.agent_name }}
               </h3>
             </div>
@@ -113,7 +113,7 @@
             </span>
             <span
               v-if="agent.model"
-              class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600"
+              class="inline-flex items-center rounded-full bg-accent-50 px-2 py-0.5 text-xs text-accent-600"
             >
               {{ agent.model }}
             </span>

@@ -6,7 +6,7 @@
 	line-height: 1.5;
 }
 
-/* Floating bubble button */
+/* Floating bubble button — squircle with bot-message-square icon */
 .jana-bubble {
 	position: fixed;
 	bottom: 24px;
@@ -14,16 +14,23 @@
 	z-index: 1060;
 	width: 52px;
 	height: 52px;
-	border-radius: 50%;
-	background: var(--primary, #2490ef);
-	color: white;
+	border-radius: 14px;
+	background: none;
 	border: none;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	padding: 0;
+	overflow: hidden;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.jana-bubble-icon {
+	display: block;
+	width: 100%;
+	height: 100%;
 }
 
 .jana-bubble:hover {
@@ -609,6 +616,31 @@
 .jana-terms-accept:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;
+}
+
+/* Embedded mode — inside DockPanelShell (no fixed positioning, fills container) */
+.jana-panel-embedded {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	background: var(--fg-color, #fff);
+	font-family: var(--font-stack, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.jana-embedded-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 6px 12px;
+	border-bottom: 1px solid var(--border-color, #e2e8f0);
+	background: var(--fg-color, #fff);
+	flex-shrink: 0;
+}
+
+.jana-widget-embedded .jana-bubble {
+	display: none;
 }
 
 /* Responsive */

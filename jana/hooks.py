@@ -24,6 +24,34 @@ add_to_apps_screen = [
 
 export_python_type_annotations = True
 
+# Dock integration
+# ------------------
+dock_app_registry = {
+	"label": "Jana",
+	"icon": "/assets/jana/images/jana-icon.svg",
+	"color": "#7c3aed",
+	"route": "/jana",
+}
+
+dock_settings_sections = [
+	{
+		"label": "Jana",
+		"icon": "/assets/jana/images/jana-icon.svg",
+		"icon_url": "/assets/jana/images/jana-icon.svg",
+		"route": "jana",
+		"component": "JanaSettings",
+		"bundle": "/assets/jana/js/jana-settings.esm.js",
+		"sections": [
+			{"label": "General", "key": "general"},
+			{"label": "Providers", "key": "providers"},
+			{"label": "Capabilities", "key": "capabilities"},
+			{"label": "Limits", "key": "limits"},
+			{"label": "Knowledge", "key": "knowledge"},
+			{"label": "My Keys", "key": "my-keys"},
+		],
+	}
+]
+
 # Includes in <head>
 # ------------------
 

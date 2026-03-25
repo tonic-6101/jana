@@ -6,8 +6,18 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
     <div class="w-full max-w-lg rounded-xl bg-white shadow-2xl">
       <!-- Header -->
-      <div class="border-b border-gray-200 px-6 py-4">
+      <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
         <h2 class="text-lg font-semibold text-gray-900">{{ __('Terms of Use') }}</h2>
+        <button
+          class="rounded-lg p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          :aria-label="__('Close')"
+          @click="emit('declined')"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
       <!-- Body -->
@@ -37,7 +47,7 @@
         <a
           href="/docs/terms-of-use"
           target="_blank"
-          class="inline-block text-sm text-blue-600 hover:text-blue-800 underline"
+          class="inline-block text-sm text-accent-600 hover:text-accent-800 underline"
         >
           {{ __('View Full Terms of Use') }}
         </a>
@@ -49,20 +59,27 @@
           <input
             v-model="agreed"
             type="checkbox"
-            class="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            class="mt-0.5 rounded border-gray-300 text-accent-600 focus:ring-accent-500"
           />
           <span class="text-sm text-gray-700">{{ __('I have read and agree to the Terms of Use') }}</span>
         </label>
 
         <button
           :disabled="!agreed || accepting"
-          class="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          class="w-full rounded-lg bg-accent-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           @click="handleAccept"
         >
           {{ accepting ? '...' : __('Accept and Continue') }}
         </button>
 
         <p v-if="error" class="text-xs text-red-600">{{ error }}</p>
+
+        <button
+          class="w-full text-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          @click="emit('declined')"
+        >
+          {{ __('Decline and go back') }}
+        </button>
       </div>
     </div>
   </div>
@@ -74,6 +91,7 @@ import { __ } from "@/composables/useTranslate"
 
 const emit = defineEmits<{
   accepted: []
+  declined: []
 }>()
 
 const agreed = ref(false)

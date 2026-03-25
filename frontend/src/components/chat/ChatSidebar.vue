@@ -7,8 +7,8 @@
     <!-- Header -->
     <div class="flex-shrink-0 px-4 py-3 border-b border-gray-200">
       <button
-        class="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2
-               text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+        class="w-full flex items-center justify-center gap-2 rounded-lg bg-accent-600 px-4 py-2
+               text-sm font-medium text-white hover:bg-accent-700 transition-colors"
         @click="$emit('new-chat')"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -23,7 +23,7 @@
         <select
           :value="currentAgent"
           class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                 text-gray-700 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                 text-gray-700 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
           @change="$emit('select-agent', ($event.target as HTMLSelectElement).value)"
         >
           <option v-for="agent in agents" :key="agent.name" :value="agent.agent_name">
@@ -37,7 +37,7 @@
     <div class="flex-1 overflow-y-auto">
       <!-- Loading -->
       <div v-if="sessionsLoading" class="flex items-center justify-center py-8">
-        <div class="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div class="h-5 w-5 animate-spin rounded-full border-2 border-accent-600 border-t-transparent" />
       </div>
 
       <!-- Empty -->
@@ -59,7 +59,7 @@
           :class="[
             'group relative mx-2 my-0.5 rounded-lg px-3 py-2.5 cursor-pointer transition-colors',
             session.name === currentSessionId
-              ? 'bg-blue-50 text-blue-900'
+              ? 'bg-accent-50 text-accent-900'
               : 'hover:bg-gray-100 text-gray-700',
           ]"
           @click="$emit('select-session', session.name)"
@@ -71,8 +71,8 @@
                 v-if="renamingId === session.name"
                 ref="renameInputRef"
                 v-model="renameValue"
-                class="w-full rounded border border-blue-400 bg-white px-1.5 py-0.5 text-sm
-                       font-medium text-gray-900 outline-none ring-1 ring-blue-400"
+                class="w-full rounded border border-accent-400 bg-white px-1.5 py-0.5 text-sm
+                       font-medium text-gray-900 outline-none ring-1 ring-accent-400"
                 @keydown.enter="submitRename"
                 @keydown.escape="cancelRename"
                 @blur="submitRename"
@@ -155,49 +155,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <div class="flex-shrink-0 border-t border-gray-200 px-4 py-3 space-y-1.5">
-      <router-link
-        to="/jana/agents"
-        class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        </svg>
-        {{ __('Agents') }}
-      </router-link>
-      <router-link
-        to="/jana/content"
-        class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-        {{ __('Content') }}
-      </router-link>
-      <router-link
-        to="/jana/settings"
-        class="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65
-                   1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65
-                   0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65
-                   1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0
-                   0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65
-                   1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0
-                   0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65
-                   1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0
-                   0 0-1.51 1z" />
-        </svg>
-        {{ __('Settings') }}
-      </router-link>
-    </div>
   </aside>
 </template>
 

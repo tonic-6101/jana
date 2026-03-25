@@ -3,7 +3,7 @@
   Copyright (C) 2026 Tonic
 -->
 <template>
-  <div class="flex h-screen flex-col bg-white">
+  <div class="flex h-full flex-col bg-white dark:bg-gray-900">
     <!-- Header -->
     <header class="flex items-center gap-4 border-b border-gray-200 px-6 py-3 flex-shrink-0">
       <router-link
@@ -28,7 +28,7 @@
 
     <!-- Loading -->
     <div v-if="!st.roleLoaded.value || st.loading.value" class="flex flex-1 items-center justify-center">
-      <div class="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+      <div class="h-6 w-6 animate-spin rounded-full border-2 border-accent-600 border-t-transparent" />
     </div>
 
     <!-- Admin: tabbed layout -->
@@ -83,7 +83,7 @@
             <div class="flex items-center justify-between">
               <SectionTitle :title="__('Configured Providers')" :description="__('Click a provider to expand and edit all settings.')" />
               <button
-                class="text-sm font-medium text-blue-600 hover:text-blue-700"
+                class="text-sm font-medium text-accent-600 hover:text-accent-700"
                 @click="showNewProvider = !showNewProvider"
               >
                 {{ showNewProvider ? __('Cancel') : '+ ' + __('Add Provider') }}
@@ -91,7 +91,7 @@
             </div>
 
             <!-- New Provider form -->
-            <div v-if="showNewProvider" class="rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/30 p-4 space-y-4">
+            <div v-if="showNewProvider" class="rounded-xl border-2 border-dashed border-accent-200 bg-accent-50/30 p-4 space-y-4">
               <h3 class="text-sm font-semibold text-gray-900">{{ __('New Provider') }}</h3>
               <div class="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -101,7 +101,7 @@
                     type="text"
                     :placeholder="__('e.g. My OpenAI')"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
                   />
                 </div>
                 <div>
@@ -109,7 +109,7 @@
                   <select
                     v-model="newProvider.provider_type"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
                   >
                     <option value="openai">OpenAI</option>
                     <option value="anthropic">Anthropic</option>
@@ -125,7 +125,7 @@
                   <select
                     v-model="newProvider.auth_method"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
                   >
                     <option value="API Key">{{ __('API Key') }}</option>
                     <option value="OAuth">{{ __('OAuth') }}</option>
@@ -139,7 +139,7 @@
                     :placeholder="__('Paste your API key')"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                            placeholder:text-gray-300
-                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
                   />
                 </div>
                 <div>
@@ -150,7 +150,7 @@
                     :placeholder="__('Optional — for Ollama, vLLM, custom')"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                            placeholder:text-gray-300
-                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
                   />
                 </div>
                 <div>
@@ -158,7 +158,7 @@
                   <select
                     v-model="newProvider.mask_pii_override"
                     class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
                   >
                     <option value="Global Default">{{ __('Global Default') }}</option>
                     <option value="Always On">{{ __('Always On') }}</option>
@@ -168,16 +168,16 @@
               </div>
               <div class="flex items-center gap-4">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input v-model="newProvider.enabled" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                  <input v-model="newProvider.enabled" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-accent-600" />
                   <span class="text-sm text-gray-700">{{ __('Enabled') }}</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input v-model="newProvider.is_default" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-blue-600" />
+                  <input v-model="newProvider.is_default" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-accent-600" />
                   <span class="text-sm text-gray-700">{{ __('Is Default') }}</span>
                 </label>
               </div>
               <button
-                class="rounded-lg bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700
+                class="rounded-lg bg-accent-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-700
                        disabled:opacity-50 transition-colors"
                 :disabled="!newProvider.provider_name.trim() || creatingProvider"
                 @click="handleCreateProvider"
@@ -294,7 +294,7 @@
                 v-model="st.settings.value.business_description"
                 rows="6"
                 class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm
-                       focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-400"
+                       focus:border-accent-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent-400"
                 :placeholder="__('Describe your business, products, and services...')"
               />
             </div>

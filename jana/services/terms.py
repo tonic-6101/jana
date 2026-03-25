@@ -11,7 +11,22 @@ forces re-acceptance for all users.
 import frappe
 from frappe import _
 
-CURRENT_TERMS_VERSION = "1.0"
+
+def _get_app_version() -> str:
+	"""Read the app version from the VERSION file (major.minor only)."""
+	import os
+
+	version_file = os.path.join(os.path.dirname(__file__), "..", "..", "VERSION")
+	try:
+		full = open(version_file).read().strip()
+		# Use major.minor so patch releases don't force re-acceptance
+		parts = full.split(".")
+		return f"{parts[0]}.{parts[1]}" if len(parts) >= 2 else full
+	except Exception:
+		return "1.0"
+
+
+CURRENT_TERMS_VERSION = _get_app_version()
 
 
 def has_accepted_terms(user: str | None = None) -> bool:

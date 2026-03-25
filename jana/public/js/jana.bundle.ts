@@ -73,9 +73,31 @@ async function getConfig(): Promise<JanaBootConfig | null> {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const frappe: any;
 
+/**
+ * Check if Dock is installed (top bar provides the Jana button).
+ */
+function isDockInstalled(): boolean {
+	if (
+		typeof frappe !== "undefined" &&
+		(frappe as Record<string, unknown>).boot
+	) {
+		const boot = (frappe as Record<string, unknown>).boot as Record<string, unknown>;
+		const dock = boot.dock as Record<string, unknown> | undefined;
+		return dock?.installed === true;
+	}
+	// Also check dockBoot on window (used by domain app SPAs)
+	const win = window as Record<string, unknown>;
+	if (win.dockBoot) {
+		return (win.dockBoot as Record<string, unknown>).installed === true;
+	}
+	return false;
+}
+
 class JanaWidget {
 	private app: App | null = null;
+	private embeddedApp: App | null = null;
 	private mounted = false;
+	private config: JanaBootConfig | null = null;
 
 	async init(): Promise<void> {
 		if (this.mounted) return;
@@ -83,25 +105,74 @@ class JanaWidget {
 		// Skip on Jana's own SPA — it has its own chat UI
 		if (window.location.pathname.startsWith("/jana")) return;
 
-		const config = await getConfig();
-		if (!config) return;
+		this.config = await getConfig();
+		if (!this.config) return;
 
+		// When Dock is installed, the top bar button opens Jana in DockPanelShell.
+		// We skip mounting the floating bubble and instead listen for panel events.
+		if (isDockInstalled()) {
+			this.listenForDockPanel();
+			this.mounted = true;
+			return;
+		}
+
+		// Standalone mode: mount the floating bubble + panel
 		const mountPoint = document.createElement("div");
 		mountPoint.id = "jana-chat-widget";
 		document.body.appendChild(mountPoint);
 
 		this.app = createApp(JanaChatWidget, {
-			enabled: config.enabled,
-			defaultAgent: config.default_agent,
-			streaming: config.streaming,
-			capabilities: config.capabilities,
-			oauthProviders: config.oauth_providers || [],
-			termsAccepted: config.terms_accepted ?? false,
-			termsVersion: config.terms_version ?? "1.0",
+			enabled: this.config.enabled,
+			defaultAgent: this.config.default_agent,
+			streaming: this.config.streaming,
+			capabilities: this.config.capabilities,
+			oauthProviders: this.config.oauth_providers || [],
+			termsAccepted: this.config.terms_accepted ?? false,
+			termsVersion: this.config.terms_version ?? "1.0",
+			embedded: false,
 		});
 
 		this.app.mount(mountPoint);
 		this.mounted = true;
+	}
+
+	/**
+	 * Listen for Dock panel mount/unmount events.
+	 * When the DockJanaPanel opens, it dispatches `dock:jana-panel-mount` with
+	 * the container element. We create an embedded widget instance inside it.
+	 */
+	private listenForDockPanel(): void {
+		document.addEventListener("dock:jana-panel-mount", ((e: CustomEvent) => {
+			const container = e.detail?.container as HTMLElement;
+			if (!container || !this.config) return;
+
+			// Clean up any previous embedded instance
+			this.destroyEmbedded();
+
+			this.embeddedApp = createApp(JanaChatWidget, {
+				enabled: this.config.enabled,
+				defaultAgent: this.config.default_agent,
+				streaming: this.config.streaming,
+				capabilities: this.config.capabilities,
+				oauthProviders: this.config.oauth_providers || [],
+				termsAccepted: this.config.terms_accepted ?? false,
+				termsVersion: this.config.terms_version ?? "1.0",
+				embedded: true,
+			});
+
+			this.embeddedApp.mount(container);
+		}) as EventListener);
+
+		document.addEventListener("dock:jana-panel-unmount", () => {
+			this.destroyEmbedded();
+		});
+	}
+
+	private destroyEmbedded(): void {
+		if (this.embeddedApp) {
+			this.embeddedApp.unmount();
+			this.embeddedApp = null;
+		}
 	}
 
 	toggle(): void {
