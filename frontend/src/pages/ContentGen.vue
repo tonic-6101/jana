@@ -265,7 +265,7 @@
 import { ref } from "vue"
 import { __ } from "@/composables/useTranslate"
 import { useContentGen } from "@/composables/useContentGen"
-import type { EmailIntent, DescriptionStyle } from "@/composables/useContentGen"
+import type { EmailIntent, DescriptionStyle, EmailResult, DescriptionResult, ReportSummaryResult } from "@/composables/useContentGen"
 
 const { generating, error, draftEmail, generateDescription, summarizeReport } = useContentGen()
 
@@ -292,8 +292,7 @@ const descStyle = ref<DescriptionStyle>("professional")
 const reportName = ref("")
 const reportFilters = ref("")
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const result = ref<Record<string, any> | null>(null)
+const result = ref<EmailResult | DescriptionResult | ReportSummaryResult | null>(null)
 const copied = ref(false)
 
 async function handleDraftEmail() {

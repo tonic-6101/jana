@@ -240,3 +240,94 @@ export interface KnowledgeArticleSummary {
   article_title: string;
   category: string;
 }
+
+// --- Composable return types ---
+
+import type { Ref, ComputedRef, DeepReadonly } from "vue";
+
+export interface UseChatReturn {
+  sessions: Ref<ChatSessionSummary[]>;
+  sessionsLoading: Ref<boolean>;
+  currentSessionId: Ref<string | null>;
+  currentAgent: Ref<string>;
+  messages: Ref<ChatMessageUI[]>;
+  sending: Ref<boolean>;
+  streaming: Ref<boolean>;
+  fetchSessions: () => Promise<void>;
+  createSession: (agentName?: string) => Promise<string>;
+  loadSession: (sessionId: string) => Promise<void>;
+  archiveSession: (sessionId: string) => Promise<void>;
+  deleteSession: (sessionId: string) => Promise<void>;
+  renameSession: (sessionId: string, title: string) => Promise<void>;
+  startNewChat: (agentName?: string) => void;
+  sendMessage: (content: string) => Promise<void>;
+  abortStream: () => void;
+}
+
+export interface UseSettingsReturn {
+  isAdmin: Ref<boolean>;
+  roleLoaded: Ref<boolean>;
+  settings: Ref<JanaSettings | null>;
+  providers: Ref<JanaProvider[]>;
+  availableModels: Ref<string[]>;
+  userKeys: Ref<JanaUserKey[]>;
+  oauthStatus: Ref<Record<string, OAuthProviderStatus>>;
+  loading: Ref<boolean>;
+  saving: Ref<boolean>;
+  dirty: ComputedRef<boolean>;
+  testingProvider: Ref<string | null>;
+  testResults: Ref<Record<string, ConnectionTestResult>>;
+  detectRole: () => Promise<void>;
+  loadSettings: () => Promise<void>;
+  saveSettings: () => Promise<void>;
+  loadProviders: () => Promise<void>;
+  loadModelsFor: (providerName: string) => Promise<void>;
+  testConnection: (providerName: string) => Promise<ConnectionTestResult>;
+  saveProvider: (providerName: string, data: Record<string, unknown>) => Promise<JanaProvider>;
+  createProvider: (data: Record<string, unknown>) => Promise<JanaProvider>;
+  deleteProvider: (providerName: string) => Promise<void>;
+  loadUserKeys: () => Promise<void>;
+  addUserKey: (provider: string, apiKey: string) => Promise<void>;
+  deleteUserKey: (keyName: string) => Promise<void>;
+  loadOAuthStatus: () => Promise<void>;
+  connectOAuth: (providerName: string, providerType: string) => Promise<void>;
+  disconnectOAuth: (providerName: string) => Promise<void>;
+}
+
+export interface UseAgentFormReturn {
+  isNew: Ref<boolean>;
+  loading: Ref<boolean>;
+  saving: Ref<boolean>;
+  deleting: Ref<boolean>;
+  dirty: ComputedRef<boolean>;
+  agentName: Ref<string>;
+  description: Ref<string>;
+  systemPrompt: Ref<string>;
+  provider: Ref<string | null>;
+  model: Ref<string | null>;
+  temperature: Ref<number>;
+  maxTokens: Ref<number>;
+  isTemplate: Ref<boolean>;
+  tools: Ref<AgentToolRow[]>;
+  knowledge: Ref<AgentKnowledgeRow[]>;
+  availableTools: Ref<ToolSummary[]>;
+  availableKnowledge: Ref<KnowledgeArticleSummary[]>;
+  providers: Ref<JanaProvider[]>;
+  availableModels: Ref<string[]>;
+  loadReferenceData: () => Promise<void>;
+  loadModelsFor: (providerName: string) => Promise<void>;
+  loadAgent: (name: string) => Promise<void>;
+  saveAgent: () => Promise<string>;
+  deleteAgent: () => Promise<void>;
+  addTool: (toolName: string) => void;
+  removeTool: (toolName: string) => void;
+  addKnowledge: (articleName: string) => void;
+  removeKnowledge: (articleName: string) => void;
+  resetForm: () => void;
+}
+
+export interface UseAgentsReturn {
+  agents: DeepReadonly<Ref<AgentSummary[]>>;
+  loading: DeepReadonly<Ref<boolean>>;
+  fetchAgents: () => Promise<void>;
+}

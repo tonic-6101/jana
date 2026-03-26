@@ -46,12 +46,12 @@ import { __ } from "@/composables/useTranslate"
 const dismissed = ref(false)
 
 const capabilities = computed(() => {
-  const boot = (window as any).frappe?.boot?.jana
+  const boot = window.frappe?.boot?.jana
   return boot?.capabilities || {}
 })
 
 const isNonEnglish = computed(() => {
-  const lang = (window as any).frappe?.boot?.lang
+  const lang = window.frappe?.boot?.lang
   return lang && !String(lang).startsWith("en")
 })
 

@@ -1,69 +1,74 @@
 <!--
   SPDX-License-Identifier: AGPL-3.0-or-later
   Copyright (C) 2026 Tonic
+
+  Jana Settings — rendered inside Dock's unified settings host.
+  Dock provides the page title ("Jana Settings") and layout chrome.
 -->
 <template>
-  <div class="flex h-full flex-col bg-white dark:bg-gray-900">
-    <!-- Header -->
-    <header class="flex items-center gap-4 border-b border-gray-200 px-6 py-3 flex-shrink-0">
-      <router-link
-        to="/jana/chat"
-        class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
+  <!-- Loading -->
+  <div v-if="!st.roleLoaded.value || st.loading.value" class="flex items-center justify-center py-20">
+    <div class="h-6 w-6 animate-spin rounded-full border-2 border-accent-600 border-t-transparent" />
+  </div>
+
+  <!-- Admin: tabbed layout -->
+  <template v-else-if="st.isAdmin.value && st.settings.value">
+    <!-- Tab bar -->
+    <nav class="flex gap-1 border-b border-gray-200 dark:border-gray-700 mb-6">
+      <button
+        v-for="(tab, i) in adminTabs"
+        :key="tab.label"
+        class="relative px-3 py-2 text-sm font-medium transition-colors"
+        :class="activeTab === i
+          ? 'text-gray-900 dark:text-white'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
+        @click="activeTab = i"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-        {{ __('Chat') }}
-      </router-link>
-      <h1 class="flex-1 text-lg font-semibold text-gray-900">{{ __('Settings') }}</h1>
-      <Button
-        v-if="st.isAdmin.value && st.settings.value"
-        :label="__('Save')"
-        variant="solid"
-        :disabled="!st.dirty.value"
-        :loading="st.saving.value"
-        @click="handleSave"
-      />
-    </header>
+        {{ tab.label }}
+        <span
+          v-if="activeTab === i"
+          class="absolute bottom-0 left-0 right-0 h-0.5 bg-accent-600 dark:bg-accent-400 rounded-full"
+        />
+      </button>
+    </nav>
 
-    <!-- Loading -->
-    <div v-if="!st.roleLoaded.value || st.loading.value" class="flex flex-1 items-center justify-center">
-      <div class="h-6 w-6 animate-spin rounded-full border-2 border-accent-600 border-t-transparent" />
-    </div>
-
-    <!-- Admin: tabbed layout -->
-    <template v-else-if="st.isAdmin.value && st.settings.value">
-      <Tabs :tabs="adminTabs" v-model="activeTab">
-        <template #tab-panel="{ tab }">
-          <!-- General -->
-          <div v-if="tab.label === __('General')" class="max-w-3xl mx-auto px-6 py-6 space-y-6">
-            <SectionTitle :title="__('AI Provider')" />
-
-            <div class="grid gap-4 sm:grid-cols-2">
+    <!-- Tab panels -->
+    <div>
+        <!-- General -->
+        <div v-if="adminTabs[activeTab]?.label === __('General')" class="max-w-2xl space-y-6">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('AI Provider') }}
+            </h2>
+            <div class="space-y-5">
+              <div class="grid gap-4 sm:grid-cols-2">
+                <FormControl
+                  type="select"
+                  :label="__('Default Provider')"
+                  :options="providerOptions"
+                  v-model="st.settings.value.default_provider"
+                  @change="onProviderChange"
+                />
+                <FormControl
+                  type="select"
+                  :label="__('Default Model')"
+                  :options="modelOptions"
+                  v-model="st.settings.value.default_model"
+                />
+              </div>
               <FormControl
-                type="select"
-                :label="__('Default Provider')"
-                :options="providerOptions"
-                v-model="st.settings.value.default_provider"
-                @change="onProviderChange"
-              />
-              <FormControl
-                type="select"
-                :label="__('Default Model')"
-                :options="modelOptions"
-                v-model="st.settings.value.default_model"
+                type="number"
+                :label="__('Max Context Tokens')"
+                :description="__('Maximum tokens for the LLM context window (512–128000)')"
+                v-model.number="st.settings.value.max_context_tokens"
               />
             </div>
+          </div>
 
-            <FormControl
-              type="number"
-              :label="__('Max Context Tokens')"
-              :description="__('Maximum tokens for the LLM context window (512–128000)')"
-              v-model.number="st.settings.value.max_context_tokens"
-            />
-
-            <SectionTitle :title="__('Behavior')" />
-
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('Behavior') }}
+            </h2>
             <div class="space-y-4">
               <Switch
                 v-model="st.settings.value.enable_streaming"
@@ -77,142 +82,147 @@
               />
             </div>
           </div>
+        </div>
 
-          <!-- Providers -->
-          <div v-else-if="tab.label === __('Providers')" class="max-w-3xl mx-auto px-6 py-6 space-y-4">
-            <div class="flex items-center justify-between">
-              <SectionTitle :title="__('Configured Providers')" :description="__('Click a provider to expand and edit all settings.')" />
-              <button
-                class="text-sm font-medium text-accent-600 hover:text-accent-700"
-                @click="showNewProvider = !showNewProvider"
-              >
-                {{ showNewProvider ? __('Cancel') : '+ ' + __('Add Provider') }}
-              </button>
-            </div>
-
-            <!-- New Provider form -->
-            <div v-if="showNewProvider" class="rounded-xl border-2 border-dashed border-accent-200 bg-accent-50/30 p-4 space-y-4">
-              <h3 class="text-sm font-semibold text-gray-900">{{ __('New Provider') }}</h3>
-              <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Provider Name') }} *</label>
-                  <input
-                    v-model="newProvider.provider_name"
-                    type="text"
-                    :placeholder="__('e.g. My OpenAI')"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Provider Type') }} *</label>
-                  <select
-                    v-model="newProvider.provider_type"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-                  >
-                    <option value="openai">OpenAI</option>
-                    <option value="anthropic">Anthropic</option>
-                    <option value="google">Google</option>
-                    <option value="openrouter">OpenRouter</option>
-                    <option value="ollama">Ollama</option>
-                    <option value="vllm">vLLM</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Authentication') }}</label>
-                  <select
-                    v-model="newProvider.auth_method"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-                  >
-                    <option value="API Key">{{ __('API Key') }}</option>
-                    <option value="OAuth">{{ __('OAuth') }}</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('API Key') }}</label>
-                  <input
-                    v-model="newProvider.api_key"
-                    type="password"
-                    :placeholder="__('Paste your API key')"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           placeholder:text-gray-300
-                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('API Base URL') }}</label>
-                  <input
-                    v-model="newProvider.api_base_url"
-                    type="text"
-                    :placeholder="__('Optional — for Ollama, vLLM, custom')"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           placeholder:text-gray-300
-                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-                  />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('PII Masking') }}</label>
-                  <select
-                    v-model="newProvider.mask_pii_override"
-                    class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
-                           focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-                  >
-                    <option value="Global Default">{{ __('Global Default') }}</option>
-                    <option value="Always On">{{ __('Always On') }}</option>
-                    <option value="Always Off">{{ __('Always Off') }}</option>
-                  </select>
-                </div>
-              </div>
-              <div class="flex items-center gap-4">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input v-model="newProvider.enabled" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-accent-600" />
-                  <span class="text-sm text-gray-700">{{ __('Enabled') }}</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input v-model="newProvider.is_default" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-accent-600" />
-                  <span class="text-sm text-gray-700">{{ __('Is Default') }}</span>
-                </label>
-              </div>
-              <button
-                class="rounded-lg bg-accent-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-accent-700
-                       disabled:opacity-50 transition-colors"
-                :disabled="!newProvider.provider_name.trim() || creatingProvider"
-                @click="handleCreateProvider"
-              >
-                {{ creatingProvider ? __('Creating…') : __('Create Provider') }}
-              </button>
-            </div>
-
-            <!-- Empty state -->
-            <div v-if="!st.providers.value.length && !showNewProvider" class="py-8 text-center text-sm text-gray-400">
-              {{ __('No providers configured.') }}
-            </div>
-
-            <!-- Provider cards -->
-            <div v-if="st.providers.value.length" class="space-y-3">
-              <ProviderCard
-                v-for="p in st.providers.value"
-                :key="p.name"
-                :provider="p"
-                :test-result="st.testResults.value[p.name]"
-                :testing="st.testingProvider.value === p.name"
-                @test="handleTestConnection"
-                @save="handleSaveProvider"
-                @delete="handleDeleteProvider"
-              />
-            </div>
+        <!-- Providers -->
+        <div v-else-if="adminTabs[activeTab]?.label === __('Providers')" class="max-w-2xl space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('Configured Providers') }}
+            </h2>
+            <button
+              class="text-sm font-medium text-accent-600 hover:text-accent-700"
+              @click="showNewProvider = !showNewProvider"
+            >
+              {{ showNewProvider ? __('Cancel') : '+ ' + __('Add Provider') }}
+            </button>
           </div>
 
-          <!-- Capabilities -->
-          <div v-else-if="tab.label === __('Capabilities')" class="max-w-3xl mx-auto px-6 py-6 space-y-4">
-            <SectionTitle
-              :title="__('AI Capabilities')"
-              :description="__('Control what Jana is allowed to do in conversations')"
-            />
+          <!-- New Provider form -->
+          <div v-if="showNewProvider" class="rounded-lg border-2 border-dashed border-accent-200 dark:border-accent-700 bg-accent-50/30 dark:bg-accent-900/10 p-5 space-y-5">
+            <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ __('New Provider') }}</h3>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('Provider Name') }} *</label>
+                <input
+                  v-model="newProvider.provider_name"
+                  type="text"
+                  :placeholder="__('e.g. My OpenAI')"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('Provider Type') }} *</label>
+                <select
+                  v-model="newProvider.provider_type"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                >
+                  <option value="openai">OpenAI</option>
+                  <option value="anthropic">Anthropic</option>
+                  <option value="google">Google</option>
+                  <option value="openrouter">OpenRouter</option>
+                  <option value="ollama">Ollama</option>
+                  <option value="vllm">vLLM</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('Authentication') }}</label>
+                <select
+                  v-model="newProvider.auth_method"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                >
+                  <option value="API Key">{{ __('API Key') }}</option>
+                  <option value="OAuth">{{ __('OAuth') }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('API Key') }}</label>
+                <input
+                  v-model="newProvider.api_key"
+                  type="password"
+                  :placeholder="__('Paste your API key')"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         placeholder:text-gray-300 dark:placeholder:text-gray-600
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('API Base URL') }}</label>
+                <input
+                  v-model="newProvider.api_base_url"
+                  type="text"
+                  :placeholder="__('Optional — for Ollama, vLLM, custom')"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         placeholder:text-gray-300 dark:placeholder:text-gray-600
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{{ __('PII Masking') }}</label>
+                <select
+                  v-model="newProvider.mask_pii_override"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                >
+                  <option value="Global Default">{{ __('Global Default') }}</option>
+                  <option value="Always On">{{ __('Always On') }}</option>
+                  <option value="Always Off">{{ __('Always Off') }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input v-model="newProvider.enabled" type="checkbox" class="h-4 w-4 rounded accent-accent-600 dark:accent-accent-400" />
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Enabled') }}</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input v-model="newProvider.is_default" type="checkbox" class="h-4 w-4 rounded accent-accent-600 dark:accent-accent-400" />
+                <span class="text-sm text-gray-700 dark:text-gray-300">{{ __('Is Default') }}</span>
+              </label>
+            </div>
+            <button
+              class="rounded-lg bg-accent-600 dark:bg-accent-400 px-4 py-2 text-sm font-medium text-white dark:text-gray-900
+                     hover:bg-accent-700 dark:hover:bg-accent-300 disabled:opacity-50 transition-colors"
+              :disabled="!newProvider.provider_name.trim() || creatingProvider"
+              @click="handleCreateProvider"
+            >
+              {{ creatingProvider ? __('Creating…') : __('Create Provider') }}
+            </button>
+          </div>
 
+          <!-- Empty state -->
+          <div v-if="!st.providers.value.length && !showNewProvider" class="py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+            {{ __('No providers configured.') }}
+          </div>
+
+          <!-- Provider cards -->
+          <div v-if="st.providers.value.length" class="space-y-3">
+            <ProviderCard
+              v-for="p in st.providers.value"
+              :key="p.name"
+              :provider="p"
+              :test-result="st.testResults.value[p.name]"
+              :testing="st.testingProvider.value === p.name"
+              @test="handleTestConnection"
+              @save="handleSaveProvider"
+              @delete="handleDeleteProvider"
+            />
+          </div>
+        </div>
+
+        <!-- Capabilities -->
+        <div v-else-if="adminTabs[activeTab]?.label === __('Capabilities')" class="max-w-2xl space-y-6">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('AI Capabilities') }}
+            </h2>
+            <p class="mb-4 text-xs text-gray-400 dark:text-gray-500">
+              {{ __('Control what Jana is allowed to do in conversations') }}
+            </p>
             <div class="space-y-4">
               <Switch
                 v-model="st.settings.value.enable_chat"
@@ -251,111 +261,132 @@
               />
             </div>
           </div>
+        </div>
 
-          <!-- Limits & Privacy -->
-          <div v-else-if="tab.label === __('Limits')" class="max-w-3xl mx-auto px-6 py-6 space-y-6">
-            <SectionTitle :title="__('Rate Limits')" />
+        <!-- Limits & Privacy -->
+        <div v-else-if="adminTabs[activeTab]?.label === __('Limits')" class="max-w-2xl space-y-6">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('Rate Limits') }}
+            </h2>
+            <div class="space-y-5">
+              <FormControl
+                type="number"
+                :label="__('Messages per User per Hour')"
+                :description="__('Set to 0 for unlimited')"
+                v-model.number="st.settings.value.rate_limit_per_hour"
+              />
+              <FormControl
+                type="number"
+                :label="__('Session Retention (days)')"
+                :description="__('Auto-archive sessions older than this. Set to 0 to keep forever.')"
+                v-model.number="st.settings.value.session_retention_days"
+              />
+            </div>
+          </div>
 
-            <FormControl
-              type="number"
-              :label="__('Messages per User per Hour')"
-              :description="__('Set to 0 for unlimited')"
-              v-model.number="st.settings.value.rate_limit_per_hour"
-            />
-
-            <FormControl
-              type="number"
-              :label="__('Session Retention (days)')"
-              :description="__('Auto-archive sessions older than this. Set to 0 to keep forever.')"
-              v-model.number="st.settings.value.session_retention_days"
-            />
-
-            <SectionTitle :title="__('Privacy')" />
-
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('Privacy') }}
+            </h2>
             <Switch
               v-model="st.settings.value.mask_pii"
               :label="__('Auto-Mask PII')"
               :description="__('Automatically mask personal identifiable information (names, emails, phone numbers) before sending to cloud LLM providers. Recommended for GDPR compliance.')"
             />
           </div>
+        </div>
 
-          <!-- Knowledge -->
-          <div v-else-if="tab.label === __('Knowledge')" class="max-w-3xl mx-auto px-6 py-6 space-y-6">
-            <SectionTitle
-              :title="__('Business Context')"
-              :description="__('This description is included in every AI conversation to provide business context.')"
-            />
-
-            <div>
-              <label class="mb-1.5 block text-sm font-medium text-gray-700">
-                {{ __('Business Description') }}
-              </label>
-              <textarea
-                v-model="st.settings.value.business_description"
-                rows="6"
-                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm
-                       focus:border-accent-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent-400"
-                :placeholder="__('Describe your business, products, and services...')"
+        <!-- Knowledge -->
+        <div v-else-if="adminTabs[activeTab]?.label === __('Knowledge')" class="max-w-2xl space-y-6">
+          <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h2 class="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {{ __('Business Context') }}
+            </h2>
+            <p class="mb-4 text-xs text-gray-400 dark:text-gray-500">
+              {{ __('This description is included in every AI conversation to provide business context.') }}
+            </p>
+            <div class="space-y-5">
+              <div>
+                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ __('Business Description') }}
+                </label>
+                <textarea
+                  v-model="st.settings.value.business_description"
+                  rows="6"
+                  class="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white
+                         focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400"
+                  :placeholder="__('Describe your business, products, and services...')"
+                />
+              </div>
+              <FormControl
+                type="number"
+                :label="__('Knowledge Token Budget')"
+                :description="__('Maximum tokens allocated for knowledge articles in the system prompt')"
+                v-model.number="st.settings.value.knowledge_token_budget"
               />
             </div>
-
-            <FormControl
-              type="number"
-              :label="__('Knowledge Token Budget')"
-              :description="__('Maximum tokens allocated for knowledge articles in the system prompt')"
-              v-model.number="st.settings.value.knowledge_token_budget"
-            />
-
-            <p class="text-xs text-gray-400">
-              <a href="/app/jana-knowledge-article" target="_blank" class="hover:underline">
-                {{ __('Manage knowledge articles in Desk') }} &rarr;
-              </a>
-            </p>
           </div>
 
-          <!-- My Keys -->
-          <div v-else-if="tab.label === __('My Keys')" class="max-w-3xl mx-auto px-6 py-6">
-            <MyKeysSection
-              :user-keys="st.userKeys.value"
-              :providers="st.providers.value"
-              :oauth-status="st.oauthStatus.value"
-              @add-key="handleAddKey"
-              @delete-key="handleDeleteKey"
-              @connect-oauth="handleConnectOAuth"
-              @disconnect-oauth="handleDisconnectOAuth"
-            />
-          </div>
-        </template>
-      </Tabs>
-    </template>
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            <a href="/app/jana-knowledge-article" target="_blank" class="hover:underline">
+              {{ __('Manage knowledge articles in Desk') }} &rarr;
+            </a>
+          </p>
+        </div>
 
-    <!-- Non-admin: just My Keys -->
-    <div v-else class="flex-1 overflow-y-auto">
-      <div class="max-w-3xl mx-auto px-6 py-6">
-        <MyKeysSection
-          :user-keys="st.userKeys.value"
-          :providers="st.providers.value"
-          :oauth-status="st.oauthStatus.value"
-          @add-key="handleAddKey"
-          @delete-key="handleDeleteKey"
-          @connect-oauth="handleConnectOAuth"
-          @disconnect-oauth="handleDisconnectOAuth"
-        />
-      </div>
+        <!-- My Keys -->
+        <div v-else-if="adminTabs[activeTab]?.label === __('My Keys')" class="max-w-2xl">
+          <MyKeysSection
+            :user-keys="st.userKeys.value"
+            :providers="st.providers.value"
+            :oauth-status="st.oauthStatus.value"
+            @add-key="handleAddKey"
+            @delete-key="handleDeleteKey"
+            @connect-oauth="handleConnectOAuth"
+            @disconnect-oauth="handleDisconnectOAuth"
+          />
+        </div>
     </div>
+
+    <!-- Save button -->
+    <div class="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 px-1 py-4">
+      <Button
+        :label="st.saving.value ? __('Saving…') : __('Save')"
+        variant="solid"
+        :disabled="!st.dirty.value"
+        :loading="st.saving.value"
+        @click="handleSave"
+      />
+      <span v-if="justSaved" class="text-xs text-green-600 dark:text-green-400">{{ __('Saved') }}</span>
+    </div>
+  </template>
+
+  <!-- Non-admin: just My Keys -->
+  <div v-else class="max-w-2xl py-6">
+    <MyKeysSection
+      :user-keys="st.userKeys.value"
+      :providers="st.providers.value"
+      :oauth-status="st.oauthStatus.value"
+      @add-key="handleAddKey"
+      @delete-key="handleDeleteKey"
+      @connect-oauth="handleConnectOAuth"
+      @disconnect-oauth="handleDisconnectOAuth"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, defineComponent, h } from "vue"
-import { Tabs, Button, FormControl, Switch, Badge, toast } from "frappe-ui"
+import { Button, FormControl, Switch, Badge, toast } from "frappe-ui"
 import { __ } from "@/composables/useTranslate"
 import { useSettings } from "@/composables/useSettings"
 import ProviderCard from "@/components/settings/ProviderCard.vue"
-import type { OAuthProviderStatus } from "@/types/jana"
+import type { JanaProvider, JanaUserKey, OAuthProviderStatus } from "@/types/jana"
 
 const st = useSettings()
 const activeTab = ref(0)
+const justSaved = ref(false)
 
 // --- New Provider form state ---
 const showNewProvider = ref(false)
@@ -415,7 +446,8 @@ watch(
 async function handleSave() {
   try {
     await st.saveSettings()
-    toast.success(__("Settings saved"))
+    justSaved.value = true
+    setTimeout(() => (justSaved.value = false), 2500)
   } catch {
     toast.error(__("Failed to save settings"))
   }
@@ -466,7 +498,6 @@ async function handleCreateProvider() {
     })
     toast.success(__("Provider created"))
     showNewProvider.value = false
-    // Reset form
     newProvider.provider_name = ""
     newProvider.provider_type = "openai"
     newProvider.auth_method = "API Key"
@@ -526,30 +557,21 @@ onMounted(async () => {
 
 // --- Inline sub-components ---
 
-const SectionTitle = defineComponent({
-  props: {
-    title: { type: String, required: true },
-    description: { type: String, default: "" },
-  },
-  setup(props) {
-    return () =>
-      h("div", { class: "mb-1" }, [
-        h("h2", { class: "text-sm font-semibold text-gray-900" }, props.title),
-        props.description
-          ? h("p", { class: "mt-0.5 text-xs text-gray-500" }, props.description)
-          : null,
-      ])
-  },
-})
+interface MyKeysSectionProps {
+  userKeys: JanaUserKey[]
+  providers: JanaProvider[]
+  oauthStatus: Record<string, OAuthProviderStatus>
+}
 
-const MyKeysSection = defineComponent({
-  props: {
-    userKeys: { type: Array, default: () => [] },
-    providers: { type: Array, default: () => [] },
-    oauthStatus: { type: Object, default: () => ({}) },
-  },
-  emits: ["add-key", "delete-key", "connect-oauth", "disconnect-oauth"],
-  setup(props, { emit }) {
+interface MyKeysSectionEmits {
+  (e: "add-key", provider: string, apiKey: string): void
+  (e: "delete-key", keyName: string): void
+  (e: "connect-oauth", providerName: string, providerType: string): void
+  (e: "disconnect-oauth", providerName: string): void
+}
+
+const MyKeysSection = defineComponent(
+  (props: MyKeysSectionProps, { emit }: { emit: MyKeysSectionEmits }) => {
     const newKeyProvider = ref("")
     const newKeyValue = ref("")
     const adding = ref(false)
@@ -567,140 +589,141 @@ const MyKeysSection = defineComponent({
     }
 
     const oauthProviders = computed(() => {
-      return Object.entries(props.oauthStatus as Record<string, OAuthProviderStatus>)
+      return Object.entries(props.oauthStatus)
         .map(([key, val]) => ({ key, ...val }))
     })
 
     return () =>
       h("div", { class: "space-y-6" }, [
-        // Section header
-        h("div", {}, [
-          h("h2", { class: "text-sm font-semibold text-gray-900" }, __("Your API Keys")),
+        // Your API Keys card
+        h("div", { class: "rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5" }, [
+          h("h2", { class: "mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400" }, __("Your API Keys")),
           h(
             "p",
-            { class: "mt-0.5 text-xs text-gray-500" },
+            { class: "mb-4 text-xs text-gray-400 dark:text-gray-500" },
             __("Bring your own API key for any provider. Your keys are encrypted and only used for your sessions."),
           ),
-        ]),
 
-        // Existing keys
-        (props.userKeys as any[]).length
-          ? h(
-              "div",
-              { class: "space-y-2" },
-              (props.userKeys as any[]).map((key: any) =>
-                h(
-                  "div",
-                  {
-                    key: key.name,
-                    class:
-                      "flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3",
-                  },
-                  [
-                    h("div", {}, [
-                      h("p", { class: "text-sm font-medium text-gray-900" }, key.provider),
-                      h(
-                        "p",
-                        { class: "text-xs text-gray-500" },
-                        key.auth_type === "api_key"
-                          ? __("API Key") + " •••••"
-                          : key.auth_type,
-                      ),
-                    ]),
-                    h(Button, {
-                      label: __("Remove"),
-                      variant: "subtle",
-                      theme: "red",
-                      size: "sm",
-                      onClick: () => emit("delete-key", key.name),
-                    }),
-                  ],
+          // Existing keys
+          props.userKeys.length
+            ? h(
+                "div",
+                { class: "space-y-2 mb-4" },
+                props.userKeys.map((key) =>
+                  h(
+                    "div",
+                    {
+                      key: key.name,
+                      class: "flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3",
+                    },
+                    [
+                      h("div", {}, [
+                        h("p", { class: "text-sm font-medium text-gray-900 dark:text-white" }, key.provider),
+                        h(
+                          "p",
+                          { class: "text-xs text-gray-500 dark:text-gray-400" },
+                          key.auth_type === "api_key"
+                            ? __("API Key") + " •••••"
+                            : key.auth_type,
+                        ),
+                      ]),
+                      h(Button, {
+                        label: __("Remove"),
+                        variant: "subtle",
+                        theme: "red",
+                        size: "sm",
+                        onClick: () => emit("delete-key", key.name),
+                      }),
+                    ],
+                  ),
                 ),
+              )
+            : h(
+                "p",
+                { class: "py-4 text-center text-sm text-gray-400 dark:text-gray-500" },
+                __("No API keys configured yet."),
               ),
-            )
-          : h(
-              "p",
-              { class: "py-4 text-center text-sm text-gray-400" },
-              __("No API keys configured yet."),
-            ),
 
-        // Add key form
-        h("div", { class: "rounded-lg border border-gray-200 p-4 space-y-3" }, [
-          h("h3", { class: "text-sm font-medium text-gray-700" }, __("Add a Key")),
-          h("div", { class: "grid gap-3 sm:grid-cols-2" }, [
-            h(FormControl, {
-              type: "select",
-              placeholder: __("Select provider"),
-              options: (props.providers as any[])
-                .filter((p: any) => p.enabled)
-                .map((p: any) => ({ label: p.provider_name, value: p.name })),
-              modelValue: newKeyProvider.value,
-              "onUpdate:modelValue": (v: string) => {
-                newKeyProvider.value = v
-              },
-            }),
-            h(FormControl, {
-              type: "text",
-              placeholder: __("Paste API key"),
-              modelValue: newKeyValue.value,
-              "onUpdate:modelValue": (v: string) => {
-                newKeyValue.value = v
-              },
+          // Add key form
+          h("div", { class: "rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 space-y-3" }, [
+            h("h3", { class: "text-sm font-medium text-gray-700 dark:text-gray-300" }, __("Add a Key")),
+            h("div", { class: "grid gap-3 sm:grid-cols-2" }, [
+              h(FormControl, {
+                type: "select",
+                placeholder: __("Select provider"),
+                options: props.providers
+                  .filter((p) => p.enabled)
+                  .map((p) => ({ label: p.provider_name, value: p.name })),
+                modelValue: newKeyProvider.value,
+                "onUpdate:modelValue": (v: string) => {
+                  newKeyProvider.value = v
+                },
+              }),
+              h(FormControl, {
+                type: "text",
+                placeholder: __("Paste API key"),
+                modelValue: newKeyValue.value,
+                "onUpdate:modelValue": (v: string) => {
+                  newKeyValue.value = v
+                },
+              }),
+            ]),
+            h(Button, {
+              label: __("Add Key"),
+              variant: "solid",
+              size: "sm",
+              disabled: !newKeyProvider.value || !newKeyValue.value,
+              loading: adding.value,
+              onClick: submitKey,
             }),
           ]),
-          h(Button, {
-            label: __("Add Key"),
-            variant: "solid",
-            size: "sm",
-            disabled: !newKeyProvider.value || !newKeyValue.value,
-            loading: adding.value,
-            onClick: submitKey,
-          }),
         ]),
 
         // OAuth section
         oauthProviders.value.length
-          ? h("div", { class: "space-y-3" }, [
-              h("h3", { class: "text-sm font-semibold text-gray-900" }, __("OAuth Connections")),
-              ...oauthProviders.value.map((op) =>
-                h(
-                  "div",
-                  {
-                    key: op.key,
-                    class:
-                      "flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3",
-                  },
-                  [
-                    h("div", { class: "flex items-center gap-2" }, [
-                      h("span", { class: "text-sm font-medium text-gray-900" }, op.provider_name),
-                      h(Badge, {
-                        label: op.connected ? __("Connected") : __("Not connected"),
-                        theme: op.connected ? "green" : "gray",
-                        variant: "subtle",
-                        size: "sm",
-                      }),
-                    ]),
-                    op.connected
-                      ? h(Button, {
-                          label: __("Disconnect"),
+          ? h("div", { class: "rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5" }, [
+              h("h2", { class: "mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400" }, __("OAuth Connections")),
+              h("div", { class: "space-y-2" },
+                oauthProviders.value.map((op) =>
+                  h(
+                    "div",
+                    {
+                      key: op.key,
+                      class: "flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-3",
+                    },
+                    [
+                      h("div", { class: "flex items-center gap-2" }, [
+                        h("span", { class: "text-sm font-medium text-gray-900 dark:text-white" }, op.provider_name),
+                        h(Badge, {
+                          label: op.connected ? __("Connected") : __("Not connected"),
+                          theme: op.connected ? "green" : "gray",
                           variant: "subtle",
-                          theme: "red",
                           size: "sm",
-                          onClick: () => emit("disconnect-oauth", op.key),
-                        })
-                      : h(Button, {
-                          label: __("Connect"),
-                          variant: "solid",
-                          size: "sm",
-                          onClick: () =>
-                            emit("connect-oauth", op.key, op.provider_type),
                         }),
-                  ],
+                      ]),
+                      op.connected
+                        ? h(Button, {
+                            label: __("Disconnect"),
+                            variant: "subtle",
+                            theme: "red",
+                            size: "sm",
+                            onClick: () => emit("disconnect-oauth", op.key),
+                          })
+                        : h(Button, {
+                            label: __("Connect"),
+                            variant: "solid",
+                            size: "sm",
+                            onClick: () =>
+                              emit("connect-oauth", op.key, op.provider_type),
+                          }),
+                    ],
+                  ),
                 ),
               ),
             ])
           : null,
       ])
   },
-})
+  { props: ["userKeys", "providers", "oauthStatus"], emits: ["add-key", "delete-key", "connect-oauth", "disconnect-oauth"] },
+)
 </script>

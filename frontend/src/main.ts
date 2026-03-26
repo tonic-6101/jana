@@ -17,7 +17,7 @@ if (import.meta.env.DEV) {
   const { call } = await import("frappe-ui");
   const values = await call("jana.www.jana.get_context_for_dev");
   for (const key in values) {
-    (window as any)[key] = values[key];
+    window[key] = values[key];
   }
 }
 

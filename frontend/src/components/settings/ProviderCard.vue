@@ -64,7 +64,7 @@
             :value="local.provider_type"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                    focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-            @change="local.provider_type = ($event.target as HTMLSelectElement).value as any"
+            @change="local.provider_type = ($event.target as HTMLSelectElement).value as ProviderType"
           >
             <option v-for="t in providerTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
           </select>
@@ -99,7 +99,7 @@
               :value="local.auth_method"
               class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                      focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-              @change="local.auth_method = ($event.target as HTMLSelectElement).value as any"
+              @change="local.auth_method = ($event.target as HTMLSelectElement).value as AuthMethod"
             >
               <option value="API Key">{{ __('API Key') }}</option>
               <option value="OAuth">{{ __('OAuth') }}</option>
@@ -137,6 +137,22 @@
         </div>
       </div>
 
+      <!-- Connected App (Google OAuth) -->
+      <div v-if="local.auth_method === 'OAuth' && local.provider_type === 'google'">
+        <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('Connected App') }}</label>
+        <input
+          v-model="local.connected_app"
+          type="text"
+          :placeholder="__('Name of the Frappe Connected App for Google OAuth')"
+          class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
+                 placeholder:text-gray-300
+                 focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
+        />
+        <p class="text-xs text-gray-400 mt-0.5">
+          {{ __('Create a Connected App in Setup → Integrations → Connected App, then enter its name here.') }}
+        </p>
+      </div>
+
       <!-- Models -->
       <div>
         <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{{ __('Models') }}</h4>
@@ -160,7 +176,7 @@
             :value="local.mask_pii_override"
             class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm
                    focus:border-accent-400 focus:outline-none focus:ring-1 focus:ring-accent-400"
-            @change="local.mask_pii_override = ($event.target as HTMLSelectElement).value as any"
+            @change="local.mask_pii_override = ($event.target as HTMLSelectElement).value as PiiOverride"
           >
             <option value="Global Default">{{ __('Global Default') }}</option>
             <option value="Always On">{{ __('Always On') }}</option>
@@ -251,6 +267,7 @@ const local = reactive({
   api_key: "",
   available_models: props.provider.available_models || "",
   mask_pii_override: (props.provider.mask_pii_override || "Global Default") as PiiOverride,
+  connected_app: props.provider.connected_app || "",
 })
 
 // Sync local state when provider prop changes externally
@@ -263,6 +280,7 @@ watch(() => props.provider, (p) => {
   local.api_key = ""
   local.available_models = p.available_models || ""
   local.mask_pii_override = (p.mask_pii_override || "Global Default") as PiiOverride
+  local.connected_app = p.connected_app || ""
 }, { deep: true })
 
 const localDirty = computed(() => {
@@ -275,7 +293,8 @@ const localDirty = computed(() => {
     local.api_base_url !== (p.api_base_url || "") ||
     local.api_key !== "" ||
     local.available_models !== (p.available_models || "") ||
-    local.mask_pii_override !== (p.mask_pii_override || "Global Default")
+    local.mask_pii_override !== (p.mask_pii_override || "Global Default") ||
+    local.connected_app !== (p.connected_app || "")
   )
 })
 
@@ -310,6 +329,9 @@ function handleSave() {
   }
   if (local.api_key) {
     data.api_key = local.api_key
+  }
+  if (local.auth_method === "OAuth" && local.provider_type === "google") {
+    data.connected_app = local.connected_app || null
   }
   emit("save", props.provider.name, data)
 }

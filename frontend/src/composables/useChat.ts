@@ -7,20 +7,17 @@ import type {
   ChatSessionSummary,
   ChatSessionDetail,
   JanaBootConfig,
+  UseChatReturn,
 } from "@/types/jana"
+import { apiCall } from "@/utils/apiCall"
 import { __ } from "@/composables/useTranslate"
 
 function getBootConfig(): JanaBootConfig | null {
-  const w = window as unknown as Record<string, unknown>
-  if (w.frappe && typeof w.frappe === "object") {
-    const boot = (w.frappe as Record<string, unknown>).boot as Record<string, unknown> | undefined
-    return boot?.jana as JanaBootConfig ?? null
-  }
-  return null
+  return window.frappe?.boot?.jana ?? null
 }
 
 function getCsrfToken(): string {
-  return (window as unknown as Record<string, unknown>).csrf_token as string ?? ""
+  return window.csrf_token ?? ""
 }
 
 // Module-level singleton state — shared across all consumers
@@ -34,23 +31,17 @@ const streaming = ref(false)
 
 let abortController: AbortController | null = null
 
-export function useChat() {
-
-  async function apiCall(method: string, args: Record<string, unknown> = {}): Promise<unknown> {
-    const { call } = await import("frappe-ui")
-    return call(method, args)
-  }
+export function useChat(): UseChatReturn {
 
   // --- Session Management ---
 
   async function fetchSessions(): Promise<void> {
     sessionsLoading.value = true
     try {
-      const result = await apiCall("jana.api.chat.get_sessions", {
+      sessions.value = await apiCall<ChatSessionSummary[]>("jana.api.chat.get_sessions", {
         limit: 20,
         status: "active",
       })
-      sessions.value = result as ChatSessionSummary[]
     } catch {
       sessions.value = []
     } finally {
@@ -60,7 +51,7 @@ export function useChat() {
 
   async function createSession(agentName?: string): Promise<string> {
     const agent = agentName ?? currentAgent.value
-    const result = await apiCall("jana.api.chat.create_session", { agent }) as Record<string, string>
+    const result = await apiCall<{ session_id: string }>("jana.api.chat.create_session", { agent })
     currentSessionId.value = result.session_id
     return result.session_id
   }
@@ -68,9 +59,9 @@ export function useChat() {
   async function loadSession(sessionId: string): Promise<void> {
     sessionsLoading.value = true
     try {
-      const result = await apiCall("jana.api.chat.get_session", {
+      const result = await apiCall<ChatSessionDetail>("jana.api.chat.get_session", {
         session_id: sessionId,
-      }) as ChatSessionDetail
+      })
 
       currentSessionId.value = result.session.name
       currentAgent.value = result.session.agent ?? getBootConfig()?.default_agent ?? "General Assistant"
@@ -191,7 +182,10 @@ export function useChat() {
     const msgIdx = messages.value.length - 1
     streaming.value = true
 
-    const reader = response.body!.getReader()
+    if (!response.body) {
+      throw new Error("Response body is null — streaming not supported")
+    }
+    const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ""
 
@@ -234,18 +228,24 @@ export function useChat() {
     }
   }
 
+  interface SendMessageResponse {
+    content: string
+    model?: string
+    tokens_used?: number
+  }
+
   async function sendNonStreaming(content: string): Promise<void> {
-    const result = await apiCall("jana.api.chat.send_message", {
+    const result = await apiCall<SendMessageResponse>("jana.api.chat.send_message", {
       session_id: currentSessionId.value,
       content,
-    }) as Record<string, unknown>
+    })
 
     messages.value.push({
       localId: `resp-${Date.now()}`,
       role: "assistant",
-      content: result.content as string,
-      model: result.model as string | undefined,
-      tokens_used: result.tokens_used as number | undefined,
+      content: result.content,
+      model: result.model,
+      tokens_used: result.tokens_used,
     })
   }
 

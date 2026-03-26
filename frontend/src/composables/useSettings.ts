@@ -8,7 +8,9 @@ import type {
   JanaUserKey,
   ConnectionTestResult,
   OAuthProviderStatus,
+  UseSettingsReturn,
 } from "@/types/jana"
+import { apiCall } from "@/utils/apiCall"
 
 const SETTINGS_FIELDS: (keyof JanaSettings)[] = [
   "default_provider",
@@ -30,12 +32,7 @@ const SETTINGS_FIELDS: (keyof JanaSettings)[] = [
   "mask_pii",
 ]
 
-async function apiCall(method: string, args: Record<string, unknown> = {}): Promise<unknown> {
-  const { call } = await import("frappe-ui")
-  return call(method, args)
-}
-
-export function useSettings() {
+export function useSettings(): UseSettingsReturn {
   const isAdmin = ref(false)
   const roleLoaded = ref(false)
   const settings = ref<JanaSettings | null>(null)
@@ -59,7 +56,7 @@ export function useSettings() {
 
   async function detectRole(): Promise<void> {
     try {
-      const result = (await apiCall("jana.api.agents.check_admin")) as { is_admin: boolean }
+      const result = await apiCall<{ is_admin: boolean }>("jana.api.agents.check_admin")
       isAdmin.value = result.is_admin
     } catch {
       isAdmin.value = false
@@ -72,10 +69,10 @@ export function useSettings() {
   async function loadSettings(): Promise<void> {
     loading.value = true
     try {
-      const doc = (await apiCall("frappe.client.get", {
+      const doc = await apiCall<Record<string, unknown>>("frappe.client.get", {
         doctype: "Jana Settings",
         name: "Jana Settings",
-      })) as Record<string, unknown>
+      })
 
       const s: Record<string, unknown> = {}
       for (const key of SETTINGS_FIELDS) {
@@ -87,7 +84,7 @@ export function useSettings() {
           s[key] = val ?? null
         }
       }
-      settings.value = s as unknown as JanaSettings
+      settings.value = s as JanaSettings
       originalSnapshot.value = JSON.stringify(settings.value)
     } finally {
       loading.value = false
@@ -101,7 +98,7 @@ export function useSettings() {
       // Convert booleans back to 0/1 for Frappe
       const payload: Record<string, unknown> = {}
       for (const key of SETTINGS_FIELDS) {
-        const val = (settings.value as Record<string, unknown>)[key]
+        const val = settings.value[key as keyof JanaSettings]
         payload[key] = typeof val === "boolean" ? (val ? 1 : 0) : val
       }
       await apiCall("frappe.client.set_value", {
@@ -120,12 +117,11 @@ export function useSettings() {
   async function loadProviders(): Promise<void> {
     try {
       // Admin gets full detail via dedicated API
-      const result = await apiCall("jana.api.providers.list_providers")
-      providers.value = result as JanaProvider[]
+      providers.value = await apiCall<JanaProvider[]>("jana.api.providers.list_providers")
     } catch {
       // Fallback for non-admin (limited fields)
       try {
-        const result = await apiCall("frappe.client.get_list", {
+        providers.value = await apiCall<JanaProvider[]>("frappe.client.get_list", {
           doctype: "Jana Provider",
           fields: [
             "name", "provider_name", "provider_type",
@@ -134,7 +130,6 @@ export function useSettings() {
           limit_page_length: 0,
           order_by: "provider_name asc",
         })
-        providers.value = result as JanaProvider[]
       } catch {
         providers.value = []
       }
@@ -147,10 +142,9 @@ export function useSettings() {
       return
     }
     try {
-      const result = await apiCall("jana.api.providers.get_models_for_provider", {
+      availableModels.value = await apiCall<string[]>("jana.api.providers.get_models_for_provider", {
         provider_name: providerName,
       })
-      availableModels.value = result as string[]
     } catch {
       availableModels.value = []
     }
@@ -159,9 +153,9 @@ export function useSettings() {
   async function testConnection(providerName: string): Promise<ConnectionTestResult> {
     testingProvider.value = providerName
     try {
-      const result = (await apiCall("jana.api.providers.test_connection", {
+      const result = await apiCall<ConnectionTestResult>("jana.api.providers.test_connection", {
         provider_name: providerName,
-      })) as ConnectionTestResult
+      })
       testResults.value[providerName] = result
       return result
     } catch (err) {
@@ -182,10 +176,10 @@ export function useSettings() {
     providerName: string,
     data: Record<string, unknown>,
   ): Promise<JanaProvider> {
-    const result = (await apiCall("jana.api.providers.save_provider", {
+    const result = await apiCall<JanaProvider>("jana.api.providers.save_provider", {
       provider_name: providerName,
       data: JSON.stringify(data),
-    })) as JanaProvider
+    })
     const idx = providers.value.findIndex((p) => p.name === providerName)
     if (idx >= 0) {
       providers.value[idx] = result
@@ -194,9 +188,9 @@ export function useSettings() {
   }
 
   async function createProvider(data: Record<string, unknown>): Promise<JanaProvider> {
-    const result = (await apiCall("jana.api.providers.create_provider", {
+    const result = await apiCall<JanaProvider>("jana.api.providers.create_provider", {
       data: JSON.stringify(data),
-    })) as JanaProvider
+    })
     providers.value.push(result)
     return result
   }
@@ -212,13 +206,12 @@ export function useSettings() {
 
   async function loadUserKeys(): Promise<void> {
     try {
-      const result = await apiCall("frappe.client.get_list", {
+      userKeys.value = await apiCall<JanaUserKey[]>("frappe.client.get_list", {
         doctype: "Jana User Key",
         fields: ["name", "user", "provider", "auth_type", "enabled", "connected_at"],
         limit_page_length: 0,
         order_by: "creation desc",
       })
-      userKeys.value = result as JanaUserKey[]
     } catch {
       userKeys.value = []
     }
@@ -249,11 +242,9 @@ export function useSettings() {
 
   async function loadOAuthStatus(): Promise<void> {
     try {
-      const result = (await apiCall("jana.api.oauth.get_oauth_status")) as Record<
-        string,
-        OAuthProviderStatus
-      >
-      oauthStatus.value = result
+      oauthStatus.value = await apiCall<Record<string, OAuthProviderStatus>>(
+        "jana.api.oauth.get_oauth_status",
+      )
     } catch {
       oauthStatus.value = {}
     }
@@ -264,9 +255,7 @@ export function useSettings() {
       providerType === "google"
         ? "jana.api.oauth.initiate_google_oauth"
         : "jana.api.oauth.initiate_openrouter_oauth"
-    const result = (await apiCall(method, { provider_name: providerName })) as {
-      auth_url: string
-    }
+    const result = await apiCall<{ auth_url: string }>(method, { provider_name: providerName })
     window.location.href = result.auth_url
   }
 

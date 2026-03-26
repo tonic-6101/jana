@@ -9,14 +9,11 @@ import type {
   ToolSummary,
   KnowledgeArticleSummary,
   JanaProvider,
+  UseAgentFormReturn,
 } from "@/types/jana"
+import { apiCall } from "@/utils/apiCall"
 
-async function apiCall(method: string, args: Record<string, unknown> = {}): Promise<unknown> {
-  const { call } = await import("frappe-ui")
-  return call(method, args)
-}
-
-export function useAgentForm() {
+export function useAgentForm(): UseAgentFormReturn {
   // --- Form state ---
   const isNew = ref(true)
   const loading = ref(false)
@@ -79,9 +76,9 @@ export function useAgentForm() {
 
   async function loadReferenceData(): Promise<void> {
     const [toolsResult, knowledgeResult, providersResult] = await Promise.all([
-      apiCall("jana.api.agents.list_tools"),
-      apiCall("jana.api.agents.list_knowledge_articles"),
-      apiCall("frappe.client.get_list", {
+      apiCall<ToolSummary[]>("jana.api.agents.list_tools"),
+      apiCall<KnowledgeArticleSummary[]>("jana.api.agents.list_knowledge_articles"),
+      apiCall<JanaProvider[]>("frappe.client.get_list", {
         doctype: "Jana Provider",
         fields: ["name", "provider_name", "provider_type", "enabled", "is_default"],
         filters: { enabled: 1 },
@@ -89,9 +86,9 @@ export function useAgentForm() {
         limit_page_length: 0,
       }),
     ])
-    availableTools.value = toolsResult as ToolSummary[]
-    availableKnowledge.value = knowledgeResult as KnowledgeArticleSummary[]
-    providers.value = providersResult as JanaProvider[]
+    availableTools.value = toolsResult
+    availableKnowledge.value = knowledgeResult
+    providers.value = providersResult
   }
 
   async function loadModelsFor(providerName: string): Promise<void> {
@@ -100,10 +97,9 @@ export function useAgentForm() {
       return
     }
     try {
-      const result = await apiCall("jana.api.providers.get_models_for_provider", {
+      availableModels.value = await apiCall<string[]>("jana.api.providers.get_models_for_provider", {
         provider_name: providerName,
       })
-      availableModels.value = result as string[]
     } catch {
       availableModels.value = []
     }
@@ -114,9 +110,9 @@ export function useAgentForm() {
   async function loadAgent(name: string): Promise<void> {
     loading.value = true
     try {
-      const result = (await apiCall("jana.api.agents.get_agent", {
+      const result = await apiCall<AgentDetail>("jana.api.agents.get_agent", {
         agent_name: name,
-      })) as AgentDetail
+      })
 
       isNew.value = false
       agentName.value = result.agent_name
@@ -170,14 +166,14 @@ export function useAgentForm() {
       let result: Record<string, string>
 
       if (isNew.value) {
-        result = (await apiCall("jana.api.agents.create_agent", {
+        result = await apiCall<Record<string, string>>("jana.api.agents.create_agent", {
           data: JSON.stringify(payload),
-        })) as Record<string, string>
+        })
       } else {
-        result = (await apiCall("jana.api.agents.update_agent", {
+        result = await apiCall<Record<string, string>>("jana.api.agents.update_agent", {
           agent_name: agentName.value,
           data: JSON.stringify(payload),
-        })) as Record<string, string>
+        })
       }
 
       isNew.value = false

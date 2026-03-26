@@ -3,7 +3,7 @@
   Copyright (C) 2026 Tonic
 -->
 <script setup lang="ts">
-// @ts-ignore — served by Dock's built assets
+// @ts-expect-error — runtime ESM served by Dock's built assets
 import { DockLayout } from '/assets/dock/js/dock-navbar.esm.js'
 import JanaSidebar from '@/components/JanaSidebar.vue'
 </script>

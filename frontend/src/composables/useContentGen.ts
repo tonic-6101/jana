@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2026 Tonic
 
-import { ref } from "vue"
+import { ref, type Ref } from "vue"
+import { apiCall } from "@/utils/apiCall"
 
 export type EmailIntent =
   | "general"
@@ -36,15 +37,15 @@ export interface ReportSummaryResult extends ContentResult {
   row_count: number
 }
 
-async function apiCall(
-  method: string,
-  args: Record<string, unknown> = {},
-): Promise<unknown> {
-  const { call } = await import("frappe-ui")
-  return call(method, args)
+export interface UseContentGenReturn {
+  generating: Ref<boolean>
+  error: Ref<string>
+  draftEmail: (doctype: string, docname: string, intent?: EmailIntent, instructions?: string) => Promise<EmailResult | null>
+  generateDescription: (doctype: string, docname: string, style?: DescriptionStyle, instructions?: string) => Promise<DescriptionResult | null>
+  summarizeReport: (reportName: string, filters?: Record<string, unknown>, limit?: number) => Promise<ReportSummaryResult | null>
 }
 
-export function useContentGen() {
+export function useContentGen(): UseContentGenReturn {
   const generating = ref(false)
   const error = ref("")
 
@@ -59,8 +60,7 @@ export function useContentGen() {
     try {
       const args: Record<string, unknown> = { doctype, docname, intent }
       if (instructions) args.instructions = instructions
-      const result = await apiCall("jana.api.content.draft_email", args)
-      return result as EmailResult
+      return await apiCall<EmailResult>("jana.api.content.draft_email", args)
     } catch (err) {
       error.value = String(err)
       return null
@@ -80,8 +80,7 @@ export function useContentGen() {
     try {
       const args: Record<string, unknown> = { doctype, docname, style }
       if (instructions) args.instructions = instructions
-      const result = await apiCall("jana.api.content.generate_description", args)
-      return result as DescriptionResult
+      return await apiCall<DescriptionResult>("jana.api.content.generate_description", args)
     } catch (err) {
       error.value = String(err)
       return null
@@ -101,8 +100,7 @@ export function useContentGen() {
       const args: Record<string, unknown> = { report_name: reportName }
       if (filters) args.filters = JSON.stringify(filters)
       if (limit) args.limit = limit
-      const result = await apiCall("jana.api.content.summarize_report", args)
-      return result as ReportSummaryResult
+      return await apiCall<ReportSummaryResult>("jana.api.content.summarize_report", args)
     } catch (err) {
       error.value = String(err)
       return null

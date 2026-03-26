@@ -66,7 +66,7 @@ import DisclaimerBanner from "@/components/chat/DisclaimerBanner.vue"
 import TermsAcceptanceModal from "@/components/TermsAcceptanceModal.vue"
 
 const termsAccepted = ref(
-  (window as any).frappe?.boot?.jana?.terms_accepted ?? false,
+  window.frappe?.boot?.jana?.terms_accepted ?? false,
 )
 const showTermsModal = ref(!termsAccepted.value)
 

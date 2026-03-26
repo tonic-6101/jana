@@ -6,67 +6,79 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router"
 // Dock shared pages — calendar, people, notifications, bookmarks rendered inside Jana's layout.
 // Each route lazily loads its component from Dock's ESM bundle at navigation time.
 const dockEsm = '/assets/dock/js/dock-navbar.esm.js'
-const dockInstalled = !!(window as any).frappe?.boot?.dock?.installed
+const dockInstalled = !!window.frappe?.boot?.dock?.installed
+
+/** Resolve a Dock shared route's component by name. */
+function dockRouteComponent(routeName: string) {
+  return () =>
+    import(/* @vite-ignore */ dockEsm).then((m) => {
+      const route = m.dockSharedRoutes('/jana').find((r) => r.name === routeName)
+      if (!route?.component) {
+        throw new Error(`Dock shared route "${routeName}" not found`)
+      }
+      return route.component
+    })
+}
 
 const dockSharedRoutes: RouteRecordRaw[] = dockInstalled ? [
   {
     path: '/jana/account',
     name: 'dock-account',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-account').component()),
+    component: dockRouteComponent('dock-account'),
     meta: { dockShared: true, title: 'My Account' },
   },
   {
     path: '/jana/calendar',
     name: 'dock-calendar',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-calendar').component()),
+    component: dockRouteComponent('dock-calendar'),
     meta: { dockShared: true, title: 'Calendar' },
   },
   {
     path: '/jana/people',
     name: 'dock-people',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-people').component()),
+    component: dockRouteComponent('dock-people'),
     meta: { dockShared: true, title: 'People' },
   },
   {
     path: '/jana/people/:name',
     name: 'dock-person',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-person').component()),
+    component: dockRouteComponent('dock-person'),
     meta: { dockShared: true, title: 'Contact' },
   },
   {
     path: '/jana/notifications',
     name: 'dock-notifications',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-notifications').component()),
+    component: dockRouteComponent('dock-notifications'),
     meta: { dockShared: true, title: 'Notifications' },
   },
   {
     path: '/jana/bookmarks',
     name: 'dock-bookmarks',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-bookmarks').component()),
+    component: dockRouteComponent('dock-bookmarks'),
     meta: { dockShared: true, title: 'Bookmarks' },
   },
   {
     path: '/jana/notes',
     name: 'dock-notes',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-notes').component()),
+    component: dockRouteComponent('dock-notes'),
     meta: { dockShared: true, title: 'Notes' },
   },
   {
     path: '/jana/activity',
     name: 'dock-activity',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-activity').component()),
+    component: dockRouteComponent('dock-activity'),
     meta: { dockShared: true, title: 'Activity' },
   },
   {
     path: '/jana/discussions',
     name: 'dock-discussions',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-discussions').component()),
+    component: dockRouteComponent('dock-discussions'),
     meta: { dockShared: true, title: 'Discussions' },
   },
   {
     path: '/jana/discussions/:name',
     name: 'dock-discussion-detail',
-    component: () => import(/* @vite-ignore */ dockEsm).then(m => m.dockSharedRoutes('/jana').find((r: any) => r.name === 'dock-discussion-detail').component()),
+    component: dockRouteComponent('dock-discussion-detail'),
     meta: { dockShared: true, title: 'Discussion' },
   },
 ] : []

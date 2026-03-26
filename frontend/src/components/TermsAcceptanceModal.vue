@@ -126,11 +126,10 @@ async function handleAccept(): Promise<void> {
 
 function getCsrfToken(): string {
   if (typeof window !== "undefined") {
-    const w = window as unknown as Record<string, unknown>
-    if (w.frappe && (w.frappe as Record<string, unknown>).csrf_token) {
-      return (w.frappe as Record<string, unknown>).csrf_token as string
+    if (window.frappe?.csrf_token) {
+      return window.frappe.csrf_token
     }
-    if (w.csrf_token) return w.csrf_token as string
+    if (window.csrf_token) return window.csrf_token
   }
   const match = document.cookie.match(/csrf_token=([^;]+)/)
   return match ? decodeURIComponent(match[1]) : ""

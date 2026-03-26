@@ -5,9 +5,9 @@
  * Translation wrapper for the Vue SPA frontend.
  * Uses Frappe's translation function when available.
  */
-export function __(text: string, ...args: any[]): string {
-  if (typeof window !== "undefined" && (window as any).__ ) {
-    return (window as any).__(text, ...args);
+export function __(text: string, ...args: unknown[]): string {
+  if (typeof window !== "undefined" && window.__) {
+    return window.__(text, ...args);
   }
   return text;
 }

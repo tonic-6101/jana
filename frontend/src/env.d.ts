@@ -3,10 +3,34 @@
 
 /// <reference types="vite/client" />
 
+import type { JanaBootConfig } from './types/jana'
+
 declare module '*.vue' {
 	import type { DefineComponent } from 'vue'
 	const component: DefineComponent<{}, {}, any>
 	export default component
+}
+
+/** Frappe globals injected at runtime */
+interface FrappeGlobal {
+	boot: {
+		jana?: JanaBootConfig
+		dock?: { installed: boolean }
+		lang?: string
+		[key: string]: unknown
+	}
+	csrf_token: string
+	call: (opts: { method: string; args?: Record<string, unknown> }) => Promise<unknown>
+	[key: string]: unknown
+}
+
+declare global {
+	interface Window {
+		frappe: FrappeGlobal
+		csrf_token: string
+		__: (text: string, ...args: unknown[]) => string
+		[key: string]: unknown
+	}
 }
 
 declare module 'frappe-ui' {
