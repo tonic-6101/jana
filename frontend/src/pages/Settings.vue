@@ -350,14 +350,15 @@
     </div>
 
     <!-- Save button -->
-    <div class="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 px-1 py-4">
-      <Button
-        :label="st.saving.value ? __('Saving…') : __('Save')"
-        variant="solid"
-        :disabled="!st.dirty.value"
-        :loading="st.saving.value"
+    <div class="flex items-center gap-3 border-t border-gray-200 dark:border-gray-700 py-4 mt-6">
+      <button
+        class="rounded-lg bg-accent-600 dark:bg-accent-400 px-4 py-2 text-sm font-medium text-white dark:text-gray-900
+               hover:bg-accent-700 dark:hover:bg-accent-300 transition-colors disabled:opacity-50"
+        :disabled="!st.dirty.value || st.saving.value"
         @click="handleSave"
-      />
+      >
+        {{ st.saving.value ? __('Saving…') : __('Save') }}
+      </button>
       <span v-if="justSaved" class="text-xs text-green-600 dark:text-green-400">{{ __('Saved') }}</span>
     </div>
   </template>

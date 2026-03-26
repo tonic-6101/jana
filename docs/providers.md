@@ -73,12 +73,69 @@ Google's multimodal LLM family.
 
 ### Setup (OAuth)
 
-1. Configure a Frappe **Connected App** for Google OAuth
-2. Create a Jana Provider:
+With OAuth, each user authenticates individually with their own Google account. No shared API key is needed.
+
+#### Step 1: Google Cloud Console
+
+1. Go to [console.cloud.google.com](https://console.cloud.google.com/) and create or select a project
+2. Navigate to **APIs & Services → Library** and enable the **Generative Language API** (`generativelanguage.googleapis.com`)
+3. Navigate to **APIs & Services → OAuth consent screen**:
+   - Set the app name (e.g., "Jana AI Assistant")
+   - Add your support email
+   - Add the scope `https://www.googleapis.com/auth/generative-language.retriever`
+   - While in "Testing" status, add yourself and any test users under **Test users**
+4. Navigate to **APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID**:
+   - Application type: **Web application**
+   - Name: "Jana" (or any name)
+   - Under **Authorized redirect URIs**, add:
+     ```
+     https://your-site.example.com/api/method/frappe.integrations.doctype.connected_app.connected_app.callback/YOUR_CONNECTED_APP_NAME
+     ```
+     (Replace with your actual site URL; the Connected App name comes from step 2 below)
+   - Save and copy the **Client ID** and **Client Secret**
+
+#### Step 2: Frappe Connected App
+
+1. In Frappe Desk, go to **Connected App → New**:
+   - **Provider Name**: `Google Gemini` (this becomes the document name — use it in the redirect URI above)
+   - **Authorization URI**: `https://accounts.google.com/o/oauth2/v2/auth`
+   - **Token URI**: `https://oauth2.googleapis.com/token`
+   - **Client ID**: paste from Google Cloud Console
+   - **Client Secret**: paste from Google Cloud Console
+2. In the **Scopes** table, add:
+   - `https://www.googleapis.com/auth/generative-language.retriever`
+3. In the **Query Parameters** table, add:
+   - Key: `access_type`, Value: `offline`
+   - Key: `prompt`, Value: `consent`
+4. Save the Connected App
+
+The **Redirect URI** field auto-populates after saving. If you haven't set it in Google Cloud Console yet, copy it now and add it to your OAuth Client's authorized redirect URIs.
+
+#### Step 3: Jana Provider
+
+1. Create a Jana Provider:
    - **Provider Type**: `google`
    - **Auth Method**: `OAuth`
-   - **Connected App**: Link to your Connected App
-3. Users authenticate individually via the OAuth flow
+   - **Connected App**: Link to the Connected App you created above
+2. Save and enable the provider
+
+#### Step 4: User Connection
+
+Each user connects their Google account individually:
+
+1. Go to **Jana Settings → My Keys**
+2. Find the Google provider and click **Connect**
+3. Complete the Google consent flow
+4. The token is stored automatically and refreshes when needed
+
+#### Troubleshooting OAuth
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| "Google OAuth token is invalid or expired" | Token revoked or refresh failed | Click **Disconnect** then **Connect** again |
+| "Generative Language API is not enabled" | API not turned on in Google Cloud | Enable it in APIs & Services → Library |
+| "Google API access denied" | Wrong OAuth scopes | Check the Connected App's scopes table |
+| "Google account not connected" | User hasn't completed OAuth flow | Click **Connect** in My Keys |
 
 ## OpenRouter
 

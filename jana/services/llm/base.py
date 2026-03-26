@@ -64,16 +64,37 @@ class LLMProvider(ABC):
 		return get_decrypted_password("Jana User Key", key_name, "api_key", raise_exception=False) or ""
 
 	def _get_oauth_token(self) -> str:
-		"""Fetch an OAuth token from Frappe's Token Cache (for Google OAuth)."""
+		"""Fetch an OAuth token from Frappe's Token Cache (for Google OAuth).
+
+		Uses get_active_token() which auto-refreshes expired tokens.
+		Raises actionable errors instead of silently returning empty string.
+		"""
 		connected_app = getattr(self.provider_doc, "connected_app", None)
 		if not connected_app:
 			return ""
 		try:
 			app_doc = frappe.get_doc("Connected App", connected_app)
-			token = app_doc.get_user_token(self.user)
-			return token.get_password("access_token") if token else ""
-		except Exception:
-			return ""
+			token_cache = app_doc.get_active_token(self.user)
+			if not token_cache:
+				frappe.throw(
+					_(
+						"Google account not connected. "
+						"Connect your Google account in Jana Settings → My Keys."
+					),
+					title=_("Google OAuth Required"),
+				)
+			return token_cache.get_password("access_token")
+		except frappe.ValidationError:
+			raise
+		except Exception as e:
+			frappe.log_error(f"Google OAuth token retrieval failed: {e}")
+			frappe.throw(
+				_(
+					"Your Google token has expired or been revoked. "
+					"Please reconnect in Jana Settings → My Keys."
+				),
+				title=_("Google Reconnection Required"),
+			)
 
 	@abstractmethod
 	def complete(

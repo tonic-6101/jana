@@ -126,6 +126,25 @@ def test_connection(provider_name: str) -> dict:
 				"model": None,
 			}
 
+	# For Google OAuth providers, verify the user has connected before attempting
+	if provider_doc.auth_method == "OAuth" and provider_doc.provider_type == "google":
+		if not provider_doc.connected_app:
+			return {
+				"success": False,
+				"message": _("No Connected App configured for this provider."),
+				"latency_ms": 0,
+				"model": test_model,
+			}
+		app_doc = frappe.get_doc("Connected App", provider_doc.connected_app)
+		token_cache = app_doc.get_token_cache(frappe.session.user)
+		if not token_cache:
+			return {
+				"success": False,
+				"message": _("Google account not connected. Connect in My Keys first."),
+				"latency_ms": 0,
+				"model": test_model,
+			}
+
 	try:
 		from jana.services.llm.factory import get_provider
 

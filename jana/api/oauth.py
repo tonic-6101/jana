@@ -117,7 +117,6 @@ def initiate_google_oauth(provider_name: str) -> dict:
 
 	connected_app = frappe.get_doc("Connected App", provider.connected_app)
 	auth_url = connected_app.initiate_web_application_flow(
-		scopes="https://www.googleapis.com/auth/generative-language",
 		success_uri="/app",
 	)
 
@@ -150,13 +149,12 @@ def get_oauth_status() -> dict:
 			)
 		elif p.provider_type == "google":
 			# Check Frappe's Token Cache for an existing token
-			connected = bool(
-				frappe.db.get_value(
-					"Token Cache",
-					{"user": frappe.session.user, "connected_app": p.name},
-					"name",
+			# Token Cache names are "{connected_app}-{user}" per Frappe's get_token_cache()
+			connected_app = frappe.db.get_value("Jana Provider", p.name, "connected_app")
+			if connected_app:
+				connected = frappe.db.exists(
+					"Token Cache", connected_app + "-" + frappe.session.user
 				)
-			)
 
 		result[p.name] = {
 			"connected": connected,
@@ -183,13 +181,11 @@ def disconnect_oauth(provider_name: str) -> dict:
 			frappe.db.commit()
 
 	elif provider.provider_type == "google":
-		token_name = frappe.db.get_value(
-			"Token Cache",
-			{"user": frappe.session.user, "connected_app": provider.connected_app},
-			"name",
-		)
-		if token_name:
-			frappe.delete_doc("Token Cache", token_name, ignore_permissions=True)
-			frappe.db.commit()
+		# Token Cache names are "{connected_app}-{user}" per Frappe's get_token_cache()
+		if provider.connected_app:
+			token_name = provider.connected_app + "-" + frappe.session.user
+			if frappe.db.exists("Token Cache", token_name):
+				frappe.delete_doc("Token Cache", token_name, ignore_permissions=True)
+				frappe.db.commit()
 
 	return {"success": True}

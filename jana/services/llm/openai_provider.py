@@ -19,6 +19,8 @@ class OpenAIProvider(LLMProvider):
 	"""
 
 	def _get_base_url(self) -> str:
+		if self.provider_type == "google":
+			return (self.api_base_url or "https://generativelanguage.googleapis.com/v1beta/openai").rstrip("/")
 		if self.provider_type == "openrouter":
 			return (self.api_base_url or "https://openrouter.ai/api/v1").rstrip("/")
 		return (self.api_base_url or DEFAULT_BASE_URL).rstrip("/")
@@ -140,6 +142,35 @@ class OpenAIProvider(LLMProvider):
 
 	def _handle_http_error(self, error, response):
 		status = response.status_code
+
+		# Google-specific error messages
+		if self.provider_type == "google":
+			try:
+				body = response.json()
+				msg = body.get("error", {}).get("message", "")
+			except (ValueError, AttributeError):
+				msg = ""
+
+			if status == 401:
+				frappe.throw(
+					_("Google OAuth token is invalid or expired. Reconnect in Jana Settings → My Keys.")
+				)
+			if status == 403:
+				if "not enabled" in msg.lower() or "api_disabled" in msg.lower():
+					frappe.throw(
+						_(
+							"The Generative Language API is not enabled in your Google Cloud project. "
+							"Enable it at console.cloud.google.com."
+						)
+					)
+				frappe.throw(
+					_(
+						"Google API access denied. "
+						"Check OAuth scopes and API permissions in your Google Cloud project."
+					)
+				)
+			if status == 429:
+				frappe.throw(_("Google Gemini rate limit exceeded. Please wait and try again."))
 
 		if status == 401:
 			frappe.throw(_("Invalid API key. Please check your OpenAI API key in Jana Settings."))
