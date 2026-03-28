@@ -225,3 +225,45 @@ def list_knowledge_articles() -> list:
 		fields=["name", "article_title", "category"],
 		order_by="article_title asc",
 	)
+
+
+@frappe.whitelist()
+def suggest_agent(context_doctype: str = None) -> dict:
+	"""Suggest the best agent for the current page context.
+
+	Matches agents based on their knowledge articles' ``doctype_scope`` field.
+	Falls back to the default agent if no match is found.
+	"""
+	if not context_doctype:
+		return {"agent_name": None}
+
+	# Find agents that have knowledge articles scoped to this DocType
+	matched = frappe.db.sql(
+		"""
+		SELECT DISTINCT a.agent_name
+		FROM `tabJana Agent` a
+		INNER JOIN `tabJana Agent Knowledge` ak ON ak.parent = a.name AND ak.enabled = 1
+		INNER JOIN `tabJana Knowledge Article` ka ON ka.name = ak.knowledge_article
+			AND ka.enabled = 1 AND ka.doctype_scope = %s
+		LIMIT 1
+		""",
+		(context_doctype,),
+		as_dict=True,
+	)
+
+	if matched:
+		return {"agent_name": matched[0].agent_name}
+
+	# Check agent descriptions for DocType keyword match
+	keyword = context_doctype.lower().replace(" ", "")
+	agents = frappe.get_all(
+		"Jana Agent",
+		fields=["agent_name", "description"],
+		order_by="agent_name asc",
+	)
+	for agent in agents:
+		desc = (agent.description or "").lower().replace(" ", "")
+		if keyword in desc:
+			return {"agent_name": agent.agent_name}
+
+	return {"agent_name": None}

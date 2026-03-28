@@ -31,6 +31,10 @@ def check_rate_limit(user: str = None) -> None:
 	current_count = cint(frappe.cache().get_value(cache_key) or 0)
 
 	if current_count >= limit:
+		# Bell notification (only on first hit — check if one was sent recently)
+		from jana.integrations.dock_notification import on_rate_limit_exceeded
+		on_rate_limit_exceeded(user, limit)
+
 		frappe.throw(
 			_(
 				"Rate limit exceeded. You can send up to {0} messages per hour. "

@@ -36,6 +36,19 @@
         </h1>
         <p class="text-xs text-gray-400 dark:text-gray-500">{{ chat.currentAgent.value }}</p>
       </div>
+      <!-- Export -->
+      <button
+        v-if="chat.messages.value.length"
+        class="rounded-lg border border-gray-200 dark:border-gray-700 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        :title="__('Export conversation as JSON')"
+        @click="handleExport"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      </button>
     </header>
 
     <DisclaimerBanner />
@@ -45,6 +58,8 @@
       :messages="chat.messages.value"
       :sending="chat.sending.value"
       :streaming="chat.streaming.value"
+      :connection-error="chat.connectionError.value"
+      @retry="chat.retryMessage($event)"
     />
 
     <!-- Input -->
@@ -57,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted, onUnmounted } from "vue"
 import { __ } from "@/composables/useTranslate"
 import { useChat } from "@/composables/useChat"
 import ChatMessages from "@/components/chat/ChatMessages.vue"
@@ -90,8 +105,37 @@ const sessionTitle = computed(() => {
   return session?.session_title || __("Untitled Chat")
 })
 
+function handleExport(): void {
+  const data = chat.exportSession()
+  if (!data) return
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `jana-chat-${data.session_id || "new"}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function handleKeydown(e: KeyboardEvent): void {
+  // Esc — stop streaming if active
+  if (e.key === "Escape" && chat.streaming.value) {
+    chat.abortStream()
+  }
+  // Ctrl+/ or Cmd+/ — focus chat input
+  if (e.key === "/" && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault()
+    chatInputRef.value?.focus()
+  }
+}
+
 onMounted(() => {
   chatInputRef.value?.focus()
+  document.addEventListener("keydown", handleKeydown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeydown)
 })
 
 async function handleSend(content: string) {

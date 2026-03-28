@@ -90,11 +90,35 @@
     <!-- Divider -->
     <div v-if="!collapsed" class="mx-3 my-2" style="border-top: 1px solid rgba(255,255,255,0.2)" />
 
-    <!-- Recents label -->
+    <!-- Recents label + search -->
     <div v-if="!collapsed" class="px-4 pb-1">
-      <span class="text-xs font-medium uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">
-        {{ __('Recents') }}
-      </span>
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium uppercase tracking-wider" style="color: rgba(255,255,255,0.5)">
+          {{ __('Recents') }}
+        </span>
+        <button
+          class="rounded p-0.5 transition-colors"
+          style="color: rgba(255,255,255,0.5)"
+          :title="__('Search conversations')"
+          @mouseenter="($event.currentTarget as HTMLElement).style.color = 'white'"
+          @mouseleave="($event.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.5)'"
+          @click="searchOpen = !searchOpen"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+      </div>
+      <input
+        v-if="searchOpen"
+        v-model="searchQuery"
+        type="text"
+        :placeholder="__('Filter conversations…')"
+        class="mt-1.5 w-full rounded-lg px-2.5 py-1 text-sm outline-none"
+        style="border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white"
+        @keydown.escape="searchOpen = false; searchQuery = ''"
+      />
     </div>
 
     <!-- Session list -->
@@ -105,15 +129,15 @@
       </div>
 
       <!-- Empty -->
-      <div v-else-if="!sessions.length" class="flex flex-col items-center py-6" style="color: rgba(255,255,255,0.5)">
+      <div v-else-if="!filteredSessions.length" class="flex flex-col items-center py-6" style="color: rgba(255,255,255,0.5)">
         <MessageSquare :size="20" class="mb-1.5" />
-        <p class="text-xs">{{ __('No conversations yet') }}</p>
+        <p class="text-xs">{{ searchQuery ? __('No matches') : __('No conversations yet') }}</p>
       </div>
 
       <!-- Sessions -->
       <div v-else class="space-y-0.5">
         <div
-          v-for="session in sessions"
+          v-for="session in filteredSessions"
           :key="session.name"
           class="group relative rounded-lg px-3 py-2 cursor-pointer transition-colors"
           :style="{
@@ -214,7 +238,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUnmounted } from "vue"
+import { ref, computed, nextTick, onMounted, onUnmounted } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import {
   Plus, MessageSquare, Bot, FileText,
@@ -242,6 +266,18 @@ const currentAgent = chat.currentAgent
 // Sidebar toggle state — mirrors DockSidebarShell behavior
 const collapsed = ref<boolean>(localStorage.getItem(STORAGE_KEY) === "true")
 const mobileOpen = ref<boolean>(false)
+
+// Session search/filter
+const searchOpen = ref(false)
+const searchQuery = ref("")
+const filteredSessions = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return sessions.value
+  return sessions.value.filter((s) =>
+    (s.session_title || "").toLowerCase().includes(q) ||
+    (s.agent || "").toLowerCase().includes(q)
+  )
+})
 
 function toggleSidebar() {
   if (window.innerWidth <= 576) {

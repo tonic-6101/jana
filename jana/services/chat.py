@@ -119,13 +119,25 @@ class ChatService:
 			else:
 				turn_temperature = base_temperature
 
-			result = provider.complete(
-				messages=messages,
-				model=model,
-				temperature=turn_temperature,
-				max_tokens=max_tokens,
-				tools=tools_spec,
-			)
+			try:
+				result = provider.complete(
+					messages=messages,
+					model=model,
+					temperature=turn_temperature,
+					max_tokens=max_tokens,
+					tools=tools_spec,
+				)
+			except Exception as provider_exc:
+				# Bell notification for provider error
+				from jana.integrations.dock_notification import on_provider_error
+				on_provider_error(
+					user=frappe.session.user,
+					provider_name=provider_name or "default",
+					error_type=type(provider_exc).__name__,
+					error_message=str(provider_exc),
+					session_name=session_id,
+				)
+				raise
 
 			tool_calls = result.get("tool_calls")
 			if not tool_calls:

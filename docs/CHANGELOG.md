@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.1.3] - 2026-03-27
+
+### Added
+
+- Chat sidebar search/filter — filter conversations by title or agent name
+- Message retry on failure — retry button on error messages re-sends the original content
+- Connection error banner — shown in chat when provider is unreachable
+- Conversation export — download chat history as JSON from the header bar
+- Token usage display — per-message token count and model shown below assistant messages
+- Auto-suggest agent — automatically selects the best agent based on current page DocType
+  - Matches via knowledge article `doctype_scope` or agent description keywords
+  - New `suggest_agent` API endpoint
+- Dark mode support — full dark theme for widget CSS (prefers-color-scheme + Frappe `data-theme="dark"`)
+- Widget keyboard shortcuts — Ctrl+J / Cmd+J to toggle widget, Esc to close or abort stream
+- SPA keyboard shortcuts — Esc to abort streaming, Ctrl+/ to focus chat input
+- Widget unread indicator — pulsing badge on bubble when new assistant messages arrive while minimized
+
+### Fixed
+
+- CONTEXT.md DocType count updated from 11 to 12 (was missing Jana Terms Acceptance)
+
+## [0.1.2] - 2026-03-20
+
+### Added
+
+- Provider tier-based guardrail levels
+- Tool chain monitoring for safety and loops
+- Tool capability metadata and argument validation
+
+## [0.1.1] - 2026-03-15
+
+### Added
+
+- Guardrails prompt builder with security rules injection
+- SSRF prevention for provider URLs
+- Input validation (message length, doc access)
+
 ## [0.1.0] - 2026-02-25
 
 ### Added (Month 2 — Interface & Agents)

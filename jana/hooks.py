@@ -33,6 +33,12 @@ dock_app_registry = {
 	"route": "/jana",
 }
 
+dock_notification_types = [
+	{"type": "jana_write_confirmation_needed", "label": "Write Confirmation Needed", "icon": "shield-alert"},
+	{"type": "jana_rate_limit_exceeded", "label": "Rate Limit Reached", "icon": "timer-off"},
+	{"type": "jana_provider_error", "label": "AI Provider Error", "icon": "alert-triangle"},
+]
+
 dock_settings_sections = [
 	{
 		"label": "Jana",

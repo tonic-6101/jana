@@ -114,6 +114,9 @@ export interface ChatMessageUI {
   tokens_used?: number;
   creation?: string;
   streaming?: boolean;
+  error?: boolean;
+  /** Original content for retry (stored on user messages when their response fails) */
+  retryContent?: string;
 }
 
 /** Session summary from get_sessions API */
@@ -253,6 +256,7 @@ export interface UseChatReturn {
   messages: Ref<ChatMessageUI[]>;
   sending: Ref<boolean>;
   streaming: Ref<boolean>;
+  connectionError: Ref<boolean>;
   fetchSessions: () => Promise<void>;
   createSession: (agentName?: string) => Promise<string>;
   loadSession: (sessionId: string) => Promise<void>;
@@ -261,6 +265,8 @@ export interface UseChatReturn {
   renameSession: (sessionId: string, title: string) => Promise<void>;
   startNewChat: (agentName?: string) => void;
   sendMessage: (content: string) => Promise<void>;
+  retryMessage: (localId: string) => Promise<void>;
+  exportSession: () => Record<string, unknown> | null;
   abortStream: () => void;
 }
 

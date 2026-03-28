@@ -28,6 +28,7 @@ const currentAgent = ref(getBootConfig()?.default_agent ?? "General Assistant")
 const messages = ref<ChatMessageUI[]>([])
 const sending = ref(false)
 const streaming = ref(false)
+const connectionError = ref(false)
 
 let abortController: AbortController | null = null
 
@@ -50,10 +51,34 @@ export function useChat(): UseChatReturn {
   }
 
   async function createSession(agentName?: string): Promise<string> {
+    // Auto-suggest agent based on current page context if none specified
+    if (!agentName) {
+      const suggested = await suggestAgentForContext()
+      if (suggested) {
+        currentAgent.value = suggested
+      }
+    }
     const agent = agentName ?? currentAgent.value
     const result = await apiCall<{ session_id: string }>("jana.api.chat.create_session", { agent })
     currentSessionId.value = result.session_id
     return result.session_id
+  }
+
+  async function suggestAgentForContext(): Promise<string | null> {
+    // Detect current DocType from the Frappe Desk route
+    const doctype = window.frappe?.boot?.doctype
+      ?? window.cur_frm?.doctype
+      ?? null
+    if (!doctype) return null
+    try {
+      const result = await apiCall<{ agent_name: string | null }>(
+        "jana.api.agents.suggest_agent",
+        { context_doctype: doctype },
+      )
+      return result.agent_name
+    } catch {
+      return null
+    }
   }
 
   async function loadSession(sessionId: string): Promise<void> {
@@ -131,16 +156,20 @@ export function useChat(): UseChatReturn {
     const useStreaming = boot?.streaming ?? true
 
     try {
+      connectionError.value = false
       if (useStreaming) {
         await sendStreaming(trimmed)
       } else {
         await sendNonStreaming(trimmed)
       }
     } catch {
+      connectionError.value = true
       messages.value.push({
         localId: `error-${Date.now()}`,
         role: "assistant",
         content: __("Sorry, something went wrong. Please try again."),
+        error: true,
+        retryContent: trimmed,
       })
     } finally {
       sending.value = false
@@ -254,6 +283,39 @@ export function useChat(): UseChatReturn {
     abortController = null
   }
 
+  async function retryMessage(localId: string): Promise<void> {
+    const errorMsg = messages.value.find((m) => m.localId === localId)
+    if (!errorMsg?.retryContent) return
+
+    const content = errorMsg.retryContent
+    // Remove the error message
+    messages.value = messages.value.filter((m) => m.localId !== localId)
+
+    // Re-send
+    await sendMessage(content)
+  }
+
+  function exportSession(): Record<string, unknown> | null {
+    if (!messages.value.length) return null
+
+    const session = sessions.value.find((s) => s.name === currentSessionId.value)
+    return {
+      session_id: currentSessionId.value,
+      title: session?.session_title ?? "Untitled Chat",
+      agent: currentAgent.value,
+      exported_at: new Date().toISOString(),
+      messages: messages.value
+        .filter((m) => !m.error)
+        .map((m) => ({
+          role: m.role,
+          content: m.content,
+          model: m.model,
+          tokens_used: m.tokens_used,
+          creation: m.creation,
+        })),
+    }
+  }
+
   return {
     sessions,
     sessionsLoading,
@@ -262,6 +324,7 @@ export function useChat(): UseChatReturn {
     messages,
     sending,
     streaming,
+    connectionError,
     fetchSessions,
     createSession,
     loadSession,
@@ -270,6 +333,8 @@ export function useChat(): UseChatReturn {
     renameSession,
     startNewChat,
     sendMessage,
+    retryMessage,
+    exportSession,
     abortStream,
   }
 }

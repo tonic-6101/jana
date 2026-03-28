@@ -38,6 +38,24 @@
 	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Unread indicator badge on bubble */
+.jana-bubble-badge {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	width: 10px;
+	height: 10px;
+	background: #ef4444;
+	border-radius: 50%;
+	border: 2px solid white;
+	animation: jana-pulse 2s ease-in-out infinite;
+}
+
+@keyframes jana-pulse {
+	0%, 100% { transform: scale(1); opacity: 1; }
+	50% { transform: scale(1.15); opacity: 0.8; }
+}
+
 /* Chat panel (drawer) */
 .jana-panel {
 	position: fixed;
@@ -641,6 +659,123 @@
 
 .jana-widget-embedded .jana-bubble {
 	display: none;
+}
+
+/* ===================== Dark Mode ===================== */
+
+@media (prefers-color-scheme: dark) {
+	.jana-bubble {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	}
+
+	.jana-panel {
+		background: var(--fg-color, #1a202c);
+		border-left-color: var(--border-color, #2d3748);
+		box-shadow: -4px 0 24px rgba(0, 0, 0, 0.3);
+	}
+
+	.jana-panel-header {
+		background: var(--fg-color, #1a202c);
+		border-bottom-color: var(--border-color, #2d3748);
+	}
+
+	.jana-panel-title strong {
+		color: var(--text-color, #e2e8f0);
+	}
+
+	.jana-message-user .jana-message-content {
+		background: var(--primary, #2490ef);
+	}
+
+	.jana-message-assistant .jana-message-content {
+		background: var(--subtle-fg, #2d3748);
+		color: var(--text-color, #e2e8f0);
+	}
+
+	.jana-markdown code {
+		background: rgba(255, 255, 255, 0.1);
+	}
+
+	.jana-markdown th {
+		background: var(--subtle-fg, #2d3748);
+	}
+
+	.jana-markdown th,
+	.jana-markdown td {
+		border-color: var(--border-color, #4a5568);
+	}
+
+	.jana-markdown a {
+		color: #63b3ed;
+	}
+
+	.jana-input {
+		background: var(--control-bg, #2d3748);
+		color: var(--text-color, #e2e8f0);
+		border-color: var(--border-color, #4a5568);
+	}
+
+	.jana-input:focus {
+		border-color: var(--primary, #2490ef);
+		box-shadow: 0 0 0 2px rgba(36, 144, 239, 0.25);
+	}
+
+	.jana-input-area {
+		background: var(--fg-color, #1a202c);
+		border-top-color: var(--border-color, #2d3748);
+	}
+
+	.jana-session-item {
+		background: var(--fg-color, #1a202c);
+		border-bottom-color: var(--border-color, #2d3748);
+	}
+
+	.jana-session-item:hover {
+		background: var(--subtle-fg, #2d3748);
+	}
+
+	.jana-session-item-title {
+		color: var(--text-color, #e2e8f0);
+	}
+
+	.jana-disclaimer {
+		background: #422006;
+		border-bottom-color: #854d0e;
+		color: #fbbf24;
+	}
+
+	.jana-disclaimer-icon {
+		color: #f59e0b;
+	}
+
+	.jana-panel-embedded {
+		background: var(--fg-color, #1a202c);
+	}
+
+	.jana-embedded-toolbar {
+		background: var(--fg-color, #1a202c);
+		border-bottom-color: var(--border-color, #2d3748);
+	}
+}
+
+/* html[data-theme="dark"] for Frappe Desk explicit dark mode */
+html[data-theme="dark"] .jana-panel,
+html[data-theme="dark"] .jana-panel-header,
+html[data-theme="dark"] .jana-input-area,
+html[data-theme="dark"] .jana-panel-embedded,
+html[data-theme="dark"] .jana-embedded-toolbar,
+html[data-theme="dark"] .jana-session-item {
+	background: var(--fg-color, #1a202c);
+}
+
+html[data-theme="dark"] .jana-message-assistant .jana-message-content {
+	background: var(--subtle-fg, #2d3748);
+	color: var(--text-color, #e2e8f0);
+}
+
+html[data-theme="dark"] .jana-input {
+	background: var(--control-bg, #2d3748);
+	color: var(--text-color, #e2e8f0);
 }
 
 /* Responsive */

@@ -10,7 +10,7 @@
 			v-if="!embedded && !isOpen"
 			class="jana-bubble"
 			@click="openPanel"
-			:title="__('Open Jana AI Assistant')"
+			:title="__('Open Jana AI Assistant') + ' (Ctrl+J)'"
 		>
 			<svg viewBox="0 0 52 52" width="52" height="52" class="jana-bubble-icon">
 				<rect width="52" height="52" rx="14" fill="#7c3aed" />
@@ -23,6 +23,8 @@
 					<path d="M20 12h2" />
 				</g>
 			</svg>
+			<!-- Unread indicator dot -->
+			<span v-if="hasUnread" class="jana-bubble-badge" />
 		</button>
 
 		<!-- Chat panel — in embedded mode, renders content only (DockPanelShell provides chrome) -->
@@ -425,6 +427,11 @@ const isNonEnglish = computed(() => {
 
 const showLangNotice = computed(() =>
 	isNonEnglish.value && !disclaimerDismissed.value,
+);
+
+const hasUnread = computed(() =>
+	!isOpen.value && messages.value.length > 0
+	&& messages.value[messages.value.length - 1]?.role === "assistant",
 );
 
 // --- Methods ---
@@ -840,8 +847,25 @@ function handleToggle(): void {
 	togglePanel();
 }
 
+function handleKeydown(e: KeyboardEvent): void {
+	// Ctrl+J / Cmd+J — toggle widget
+	if (e.key === "j" && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+		e.preventDefault();
+		togglePanel();
+	}
+	// Esc — close widget panel or abort stream
+	if (e.key === "Escape" && isOpen.value) {
+		if (isStreamingMsg.value) {
+			abortStream();
+		} else {
+			closePanel();
+		}
+	}
+}
+
 onMounted(() => {
 	document.addEventListener("jana:toggle", handleToggle);
+	document.addEventListener("keydown", handleKeydown);
 	try {
 		disclaimerDismissed.value = sessionStorage.getItem("jana_disclaimer_dismissed") === "1";
 	} catch {
@@ -855,5 +879,6 @@ onMounted(() => {
 
 onUnmounted(() => {
 	document.removeEventListener("jana:toggle", handleToggle);
+	document.removeEventListener("keydown", handleKeydown);
 });
 </script>
