@@ -211,9 +211,14 @@ class ToolExecutor:
 
 	def _handle_read_document(self, doctype: str, name: str, **_kw) -> dict:
 		"""Read a single document."""
+		from jana.services.permissions import can_read_doctype, has_any_permissions
+
 		dt_error = self._validate_doctype_exists(doctype)
 		if dt_error:
 			return dt_error
+
+		if has_any_permissions() and not can_read_doctype(doctype):
+			return {"error": _("Jana is not permitted to read {0}").format(doctype)}
 
 		frappe.has_permission(doctype, doc=name, throw=True)
 		doc = frappe.get_doc(doctype, name)
@@ -230,9 +235,14 @@ class ToolExecutor:
 		**_kw,
 	) -> dict:
 		"""List documents with optional filters."""
+		from jana.services.permissions import can_read_doctype, has_any_permissions
+
 		dt_error = self._validate_doctype_exists(doctype)
 		if dt_error:
 			return dt_error
+
+		if has_any_permissions() and not can_read_doctype(doctype):
+			return {"error": _("Jana is not permitted to read {0}").format(doctype)}
 
 		frappe.has_permission(doctype, throw=True)
 
@@ -255,9 +265,14 @@ class ToolExecutor:
 
 	def _handle_create_document(self, doctype: str, values: dict, **_kw) -> dict:
 		"""Create a new document, or return a preview if confirmation is required."""
+		from jana.services.permissions import can_create_doctype, has_any_permissions
+
 		dt_error = self._validate_doctype_exists(doctype)
 		if dt_error:
 			return dt_error
+
+		if has_any_permissions() and not can_create_doctype(doctype):
+			return {"error": _("Jana is not permitted to create {0}").format(doctype)}
 
 		frappe.has_permission(doctype, ptype="create", throw=True)
 
@@ -295,9 +310,14 @@ class ToolExecutor:
 
 	def _handle_update_document(self, doctype: str, name: str, values: dict, **_kw) -> dict:
 		"""Update fields on an existing document, or return a preview if confirmation is required."""
+		from jana.services.permissions import can_update_doctype, has_any_permissions
+
 		dt_error = self._validate_doctype_exists(doctype)
 		if dt_error:
 			return dt_error
+
+		if has_any_permissions() and not can_update_doctype(doctype):
+			return {"error": _("Jana is not permitted to update {0}").format(doctype)}
 
 		frappe.has_permission(doctype, doc=name, ptype="write", throw=True)
 
@@ -424,3 +444,30 @@ class ToolExecutor:
 			return {"error": _("Provide doctype, name, or url")}
 
 		return {"url": route, "action": "navigate"}
+
+	def _handle_get_briefing_data(self, date: str | None = None, **_kw) -> dict:
+		"""Collect briefing data from all installed ecosystem apps.
+
+		Discovers briefing sources via the ``jana_briefing_source`` hook,
+		validates each against ``jana_permissions``, calls the endpoint,
+		and returns a per-app result dict.  Failures in individual apps
+		do not block the overall briefing.
+		"""
+		from jana.services.permissions import can_call_endpoint
+
+		sources = frappe.get_hooks("jana_briefing_source") or []
+		results = {}
+
+		for source_path in sources:
+			app_name = source_path.split(".")[0]
+			if not can_call_endpoint(source_path):
+				results[app_name] = {"error": "Not permitted"}
+				continue
+			try:
+				fn = frappe.get_attr(source_path)
+				results[app_name] = fn(date=date)
+			except Exception:
+				frappe.log_error(title=f"Jana Briefing: {app_name} failed")
+				results[app_name] = {"error": "Data collection failed"}
+
+		return results

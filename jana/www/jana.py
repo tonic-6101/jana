@@ -9,6 +9,7 @@ def get_context(context):
 	frappe.sessions.get_csrf_token()
 	frappe.db.commit()
 	context.boot = get_boot()
+	context.favicon = "/assets/jana/images/jana-icon.svg"
 
 	# The Jana SPA is a standalone Vue app — it does not use the standard
 	# Frappe/ERPNext web bundles.  Clear the preload list so the framework

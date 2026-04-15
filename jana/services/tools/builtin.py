@@ -192,6 +192,31 @@ BUILTIN_TOOLS = [
 		"settings_toggle": "enable_report_queries",
 	},
 	{
+		"tool_name": "get_briefing_data",
+		"tool_type": "frappe_api",
+		"method": "get_briefing_data",
+		"description": (
+			"Collect today's briefing data from all installed ecosystem apps. "
+			"Returns a structured summary per app including time tracking, tasks, "
+			"appointments, pipeline status, notifications, and more. Use this "
+			"when the user asks about their day, schedule, or morning briefing."
+		),
+		"parameters_schema": json.dumps(
+			{
+				"type": "object",
+				"properties": {
+					"date": {
+						"type": "string",
+						"description": (
+							"Date in YYYY-MM-DD format. Defaults to today if omitted."
+						),
+					},
+				},
+			}
+		),
+		"settings_toggle": "enable_read_documents",
+	},
+	{
 		"tool_name": "navigate_to_page",
 		"tool_type": "frappe_api",
 		"method": "navigate_to_page",

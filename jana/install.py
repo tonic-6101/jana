@@ -922,6 +922,115 @@ def _install_data_analyst():
 		frappe.db.commit()
 
 
+DAILY_BRIEFING_PROMPT = (
+	"""You are Jana's Daily Briefing Agent — a cross-app intelligence assistant \
+that synthesises a morning overview from all installed Tonic ecosystem apps.
+
+**Your Role**
+
+When the user asks about their day, schedule, what happened, or requests a \
+morning briefing, call the get_briefing_data tool to collect current data \
+from all installed apps. Then present the results as a structured, actionable \
+morning briefing.
+
+**How to Work**
+
+1. Call get_briefing_data (optionally with a date parameter)
+2. Analyse the returned data from each app
+3. Present a structured briefing with sections per app
+4. Lead with the most actionable items: overdue tasks, expiring deadlines, \
+budget alerts, unanswered offers
+5. Skip sections for apps that have no noteworthy items
+6. Include navigation links using the navigate_to_page tool when referencing \
+specific records
+
+**Output Format**
+
+Use clear headers and bullet points:
+
+## 🔔 Alerts
+- ⚠ Budget alert: [tag] at 92% of monthly limit
+
+## 📋 Tasks (Orga)
+- 3 overdue tasks (oldest: [task name], due [date])
+- Today: 2 appointments starting at [time]
+- Milestone "[name]" due in 3 days
+
+## 💼 Sales (Micro)
+- 2 leads need follow-up (no activity in 7+ days)
+- 1 unanswered offer pending since [date]
+- This month: X won, Y lost
+
+## 🏠 Home
+- Warranty for [item] expires in 12 days
+- Maintenance: [task] due tomorrow
+
+## 🔔 Notifications (Dock)
+- 5 unread notifications
+- 2 pending calendar RSVPs
+
+**What You Cannot Do**
+
+- Create, modify, or delete any records
+- Access data the user does not have permission to view
+- Make predictions about business outcomes"""
+	+ _AGENT_SECURITY_RULES
+	+ """
+
+**How to Communicate**
+
+Be concise and action-oriented. The user wants a quick scan of their day, \
+not a lengthy report. Quantify everything: hours, counts, dates, percentages. \
+If there is nothing noteworthy across all apps, say so briefly."""
+)
+
+
+def _install_daily_briefing_agent():
+	"""Create the Daily Briefing agent and template (idempotent)."""
+	agent_name = "Daily Briefing"
+
+	if not frappe.db.exists("Jana Agent", agent_name):
+		agent = frappe.new_doc("Jana Agent")
+		agent.agent_name = agent_name
+		agent.system_prompt = DAILY_BRIEFING_PROMPT
+		agent.description = _(
+			"Morning briefing that synthesises time tracking, tasks, "
+			"appointments, sales pipeline, and notifications from all "
+			"installed apps"
+		)
+		agent.temperature = 0.3
+		agent.insert(ignore_permissions=True)
+		frappe.db.commit()
+
+	briefing_tools = ["get_briefing_data", "navigate_to_page"]
+	attach_tools_to_agent(agent_name, briefing_tools)
+
+	template_name = "Daily Briefing"
+	if not frappe.db.exists("Jana Template", template_name):
+		agent_config = {
+			"agent_name": agent_name,
+			"system_prompt": DAILY_BRIEFING_PROMPT,
+			"temperature": 0.3,
+			"is_template": 1,
+			"tools": [{"tool": t, "enabled": 1} for t in briefing_tools],
+		}
+
+		template = frappe.new_doc("Jana Template")
+		template.template_name = template_name
+		template.category = "general"
+		template.description = _(
+			"Cross-app morning briefing agent. Collects time tracking, "
+			"tasks, appointments, sales pipeline, notifications, and "
+			"household data from all installed ecosystem apps."
+		)
+		template.agent_config = json.dumps(agent_config)
+		template.author = frappe.session.user
+		template.published = 1
+		template.price = 0
+		template.insert(ignore_permissions=True)
+		frappe.db.commit()
+
+
 def after_install():
 	"""Create roles, default agents, tools, knowledge, and templates."""
 	_create_roles()
@@ -945,3 +1054,4 @@ def after_install():
 	_install_crm_assistant()
 	_install_hr_assistant()
 	_install_data_analyst()
+	_install_daily_briefing_agent()
